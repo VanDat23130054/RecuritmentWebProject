@@ -1,5 +1,5 @@
 /build/
-/.settings/
-/.classpath
-/.gitattributes
-/.project
+.settings/
+.classpath
+.gitattributes
+.project
