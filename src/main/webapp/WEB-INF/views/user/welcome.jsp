@@ -1,5 +1,5 @@
 <%@ page contentType="text/html;charset=UTF-8" %>
-<%@ page import="com.java_web.models.User" %>
+<%@ page import="com.java_web.model.User" %>
 
 <%
     User user = (User) request.getAttribute("user");
