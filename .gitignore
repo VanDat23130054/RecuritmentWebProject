@@ -1,6 +1,49 @@
+# Build outputs
+target/
 /build/
-.settings/
+
+# Maven wrapper - keep the jar
+!.mvn/wrapper/maven-wrapper.jar
+
+## Ignore build directories inside modules but keep source-built outputs when necessary
+!**/src/main/**/target/
+!**/src/test/**/target/
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+# IDEs and editors
+### IntelliJ IDEA ###
+.idea/
+.idea/modules.xml
+.idea/jarRepositories.xml
+.idea/compiler.xml
+.idea/libraries/
+*.iws
+*.iml
+*.ipr
+
+### Eclipse ###
+.apt_generated
 .classpath
-.gitattributes
+.factorypath
 .project
-.idea
+.settings
+.springBeans
+.sts4-cache
+
+### NetBeans ###
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+
+### VS Code ###
+.vscode/
+
+# Misc
+.gitattributes
+.DS_Store
+
+# Local project files
+/build/

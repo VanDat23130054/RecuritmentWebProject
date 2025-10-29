@@ -1,0 +1,128 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #fafafa;
+    margin: 40px;
+}
+
+form {
+    background: #fff;
+    padding: 20px;
+    width: 450px;
+    margin: 0 auto;
+    border-radius: 10px;
+    box-shadow: 0 0 8px rgba(0,0,0,0.1);
+}
+
+h2 {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #333;
+}
+
+label {
+    display: block;
+    margin-top: 10px;
+    font-weight: bold;
+}
+
+input, select, textarea {
+    width: 100%;
+    padding: 8px;
+    margin-top: 5px;
+    box-sizing: border-box;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.radio-group, .checkbox-group {
+    display: flex;
+    gap: 10px;
+    margin-top: 5px;
+}
+
+input[type="submit"] {
+    margin-top: 20px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 10px;
+    cursor: pointer;
+    border-radius: 5px;
+    width: 100%;
+    font-size: 16px;
+}
+
+input[type="submit"]:hover {
+    background-color: #0056b3;
+}
+
+.button-group {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+input[type="reset"] {
+    background-color: #6c757d;
+    color: white;
+    border: none;
+    padding: 10px;
+    cursor: pointer;
+    border-radius: 5px;
+    width: 100%;
+    font-size: 16px;
+}
+
+input[type="reset"]:hover {
+    background-color: #5a6268;
+}
+
+.button-group input[type="submit"],
+.button-group input[type="reset"] {
+    flex: 1;
+}
+
+.welcome-container {
+    max-width: 600px;
+    margin: 50px auto;
+    background-color: #f7f9fc;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    padding: 30px 40px;
+    font-family: 'Segoe UI', sans-serif;
+}
+
+h1 {
+    font-size: 1.6rem;
+    margin-bottom: 10px;
+}
+
+h3 {
+    color: #0a58ca;
+}
+
+.info-box {
+    background-color: #e9eef5;
+    border-left: 4px solid #0a58ca;
+    padding: 10px 20px;
+    margin-top: 10px;
+}
+
+a {
+    color: #0a58ca;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+.thank-text {
+    margin-top: 15px;
+    font-style: italic;
+    background-color: #e9eef5;
+    padding: 8px 12px;
+    display: inline-block;
+    border-radius: 5px;
+}
+
