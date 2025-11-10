@@ -8,6 +8,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>JobHunter - Tìm việc làm IT hàng đầu</title>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css"/>    
+    <!-- Updated to Font Awesome 6 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head>
 <body>
     <!-- Hero Search Section -->
@@ -41,7 +43,7 @@
                 </div>
                 
                 <button type="submit" class="btn-search">
-                    <i class="icon-search"></i> Search
+                    <i class="fa-solid fa-magnifying-glass"></i> Search
                 </button>
             </form>
             
@@ -65,7 +67,7 @@
                             <h3 class="job-title">${job.title}</h3>
                         </a>
                         <c:if test="${job.isFeatured}">
-                            <span class="badge-hot">HOT</span>
+                            <span class="badge-hot">🔥 HOT</span>
                         </c:if>
                     </div>
                     
@@ -81,11 +83,11 @@
                         
                         <div class="job-meta">
                             <span class="location">
-                                <i class="icon-location"></i> ${job.cityName}
+                                <i class="fa-solid fa-location-dot"></i> ${job.cityName}
                             </span>
                             <c:if test="${job.salaryMax != null}">
                                 <span class="salary">
-                                    <i class="icon-money"></i>
+                                    <i class="fa-solid fa-money-bill-wave"></i>
                                     <fmt:formatNumber value="${job.salaryMin}" type="number"/> - 
                                     <fmt:formatNumber value="${job.salaryMax}" type="number"/> ${job.currency}
                                 </span>
@@ -94,7 +96,7 @@
                         
                         <div class="job-skills">
                             <c:forEach items="${job.skillsList}" var="skill">
-                                <span class="skill-badge">${skill.name}</span>
+                                <span class="skill-badge"><i class="fa-solid fa-code"></i> ${skill.name}</span>
                             </c:forEach>
                         </div>
                     </div>
@@ -127,16 +129,16 @@
                         </div>
                         
                         <div class="employer-meta">
-                            <span class="location">${company.cityName}</span>
+                            <span class="location"><i class="fa-solid fa-building"></i> ${company.cityName}</span>
                             <a href="${pageContext.request.contextPath}/companies/${company.companyId}" 
                                class="job-count">
-                                <i class="icon-green"></i> ${company.activeJobCount} Jobs
+                                <i class="fa-solid fa-briefcase"></i> ${company.activeJobCount} Jobs
                             </a>
                         </div>
                         
                         <a href="${pageContext.request.contextPath}/companies/${company.companyId}" 
                            class="btn-view">
-                            View company <i class="icon-arrow"></i>
+                            View company <i class="fa-solid fa-arrow-right"></i>
                         </a>
                     </div>
                 </c:forEach>
