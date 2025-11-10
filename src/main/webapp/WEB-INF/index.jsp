@@ -12,6 +12,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head>
 <body>
+    <!-- Header -->
+    <jsp:include page="views/common/header.jsp" />
     <!-- Hero Search Section -->
     <section class="hero">
         <div class="container">
@@ -145,6 +147,9 @@
             </div>
         </div>
     </section>
+
+    <!-- Footer -->
+    <jsp:include page="views/common/footer.jsp" />
     
     <%-- <script src="${pageContext.request.contextPath}/js/main.js"></script> --%>
 </body>
