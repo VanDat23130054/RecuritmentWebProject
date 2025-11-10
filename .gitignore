@@ -1,23 +1,14 @@
-# Build outputs
 target/
-/build/
-
-# Maven wrapper - keep the jar
 !.mvn/wrapper/maven-wrapper.jar
-
-## Ignore build directories inside modules but keep source-built outputs when necessary
 !**/src/main/**/target/
 !**/src/test/**/target/
-!**/src/main/**/build/
-!**/src/test/**/build/
 
-# IDEs and editors
 ### IntelliJ IDEA ###
-.idea/
 .idea/modules.xml
 .idea/jarRepositories.xml
 .idea/compiler.xml
 .idea/libraries/
+.idea/
 *.iws
 *.iml
 *.ipr
@@ -37,13 +28,12 @@ target/
 /dist/
 /nbdist/
 /.nb-gradle/
+build/
+!**/src/main/**/build/
+!**/src/test/**/build/
 
 ### VS Code ###
 .vscode/
 
-# Misc
-.gitattributes
+### Mac OS ###
 .DS_Store
-
-# Local project files
-/build/
