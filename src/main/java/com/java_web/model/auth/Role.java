@@ -8,12 +8,14 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 public class Role implements Serializable {
+
     private static final long serialVersionUID = 1L;
 
     private String roleName;
     private String description;
 
-
-    public Role(String roleName) { this.roleName = roleName; }
+    public Role(String roleName) {
+        this.roleName = roleName;
+    }
 
 }
