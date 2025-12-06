@@ -1,14 +1,14 @@
 package com.java_web.dao;
 
-import com.java_web.config.DB;
-import com.java_web.model.auth.Role;
-
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+
+import com.java_web.config.DB;
+import com.java_web.model.auth.Role;
 
 public class RoleDao {
 
