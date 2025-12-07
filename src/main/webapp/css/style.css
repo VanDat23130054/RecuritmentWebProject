@@ -82,7 +82,7 @@ a {
   transition: var(--transition-fast);
 }
 
-a:hover:not(.btn) {
+a:hover:not(.btn):not(.btn-login):not(.btn-register):not(.btn-view):not(.btn-primary):not(.btn-secondary):not(.btn-outline-primary) {
   color: var(--primary-blue-dark);
 }
 
@@ -261,147 +261,107 @@ img {
 }
 
 /* ================================
-   BUTTONS
+   BOOTSTRAP BUTTON CUSTOMIZATIONS
    ================================ */
-.btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  padding: 0.625rem 1.25rem;
-  font-size: 0.875rem;
-  font-weight: 600;
-  border-radius: var(--radius);
-  border: 1px solid transparent;
-  cursor: pointer;
-  transition: var(--transition-fast);
-  text-decoration: none;
-  line-height: 1.5;
-}
-
-.btn-sm {
-  padding: 0.375rem 0.875rem;
-  font-size: 0.8125rem;
-}
-
-.btn-lg {
-  padding: 0.875rem 1.75rem;
-  font-size: 1rem;
-}
-
-.btn-block {
-  width: 100%;
-}
-
+/* Override Bootstrap's primary color with our custom blue */
 .btn-primary {
-  background: var(--primary-blue);
-  color: var(--white);
-  border-color: var(--primary-blue);
+  background-color: var(--primary-blue) !important;
+  border-color: var(--primary-blue) !important;
+  color: var(--white) !important;
 }
 
-.btn-primary:hover {
-  background: var(--primary-blue-dark);
-  border-color: var(--primary-blue-dark);
-  color: var(--white);
+.btn-primary:hover,
+.btn-primary:focus,
+.btn-primary:active {
+  background-color: var(--primary-blue-dark) !important;
+  border-color: var(--primary-blue-dark) !important;
+  color: var(--white) !important;
   transform: translateY(-2px);
-  box-shadow: var(--shadow-md);
+  box-shadow: var(--shadow-md) !important;
 }
 
-.btn-secondary {
-  background: var(--gray-600);
-  color: var(--white);
-  border-color: var(--gray-600);
+.btn-outline-primary {
+  color: var(--primary-blue) !important;
+  border-color: var(--primary-blue) !important;
 }
 
-.btn-secondary:hover {
-  background: var(--gray-700);
-  border-color: var(--gray-700);
-  color: var(--white);
+.btn-outline-primary:hover,
+.btn-outline-primary:focus,
+.btn-outline-primary:active {
+  background-color: var(--primary-blue) !important;
+  border-color: var(--primary-blue) !important;
+  color: var(--white) !important;
 }
 
-.btn-outline {
-  background: var(--white);
-  color: var(--primary-blue);
-  border-color: var(--primary-blue);
-}
-
-.btn-outline:hover {
-  background: var(--primary-blue);
-  color: var(--white);
-}
-
+/* Custom button classes for header */
 .btn-login {
   background: var(--white);
-  color: var(--primary-blue);
+  color: var(--primary-blue) !important;
   border: 1px solid var(--primary-blue);
   padding: 0.5rem 1.25rem;
   border-radius: var(--radius);
   font-weight: 600;
   transition: var(--transition-fast);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  text-decoration: none;
 }
 
 .btn-login:hover {
   background: var(--primary-blue);
-  color: var(--white);
+  color: var(--white) !important;
+  border-color: var(--primary-blue);
+  text-decoration: none;
 }
 
 .btn-register {
   background: var(--primary-blue);
-  color: var(--white);
+  color: var(--white) !important;
   padding: 0.5rem 1.25rem;
   border-radius: var(--radius);
   font-weight: 600;
   transition: var(--transition-fast);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  text-decoration: none;
 }
 
 .btn-register:hover {
   background: var(--primary-blue-dark);
+  color: var(--white) !important;
   transform: translateY(-2px);
   box-shadow: var(--shadow-md);
+  text-decoration: none;
 }
 
+/* Social login buttons */
 .btn-social {
   background: var(--white);
-  color: var(--gray-700);
+  color: var(--gray-700) !important;
   border: 1px solid var(--gray-300);
   width: 100%;
   justify-content: center;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 
 .btn-social:hover {
   background: var(--gray-50);
   border-color: var(--gray-400);
+  color: var(--gray-700) !important;
 }
 
 .btn-google:hover {
   border-color: #db4437;
-  color: #db4437;
-}
-
-/* Ensure button text and icons stay visible on hover and transition smoothly */
-.btn,
-.btn * {
-  /* keep children (icons/spans) inheriting the button color */
-  color: inherit;
-}
-
-/* Force white text on known blue button variants during hover to avoid blending */
-.btn-primary:hover,
-.btn-register:hover,
-.btn-outline:hover,
-.btn-login:hover,
-.btn-secondary:hover {
-  color: var(--white) !important;
-}
-
-/* Slightly refine button transitions so color changes animate smoothly */
-.btn {
-  transition: background-color 0.2s ease, color 0.2s ease, transform 0.15s ease;
+  color: #db4437 !important;
 }
 
 .btn-linkedin:hover {
   border-color: #0077b5;
-  color: #0077b5;
+  color: #0077b5 !important;
 }
 
 /* ================================
@@ -1525,7 +1485,7 @@ img {
   width: 100%;
   padding: 0.75rem 1.5rem;
   background: var(--primary-blue);
-  color: var(--white);
+  color: var(--white) !important;
   border-radius: var(--radius);
   font-weight: 600;
   text-align: center;
@@ -1534,21 +1494,14 @@ img {
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
+  text-decoration: none;
 }
 
 .employer-card .btn-view:hover {
   background: var(--primary-blue-dark);
   transform: translateX(4px);
-}
-
-/* Ensure view/company buttons keep their text/icons visible on hover */
-.employer-card .btn-view,
-.employer-card .btn-view * {
-  color: inherit;
-}
-
-.employer-card .btn-view:hover {
   color: var(--white) !important;
+  text-decoration: none;
 }
 
 .job-count-badge {

@@ -7,9 +7,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>JobHunter - Tìm việc làm IT hàng đầu</title>
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css"/>    
-    <!-- Updated to Font Awesome 6 -->
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome 6 -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- Custom CSS (loads after Bootstrap for overrides) -->
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css"/>
 </head>
 <body>
     <!-- Header -->
@@ -65,7 +68,7 @@
             <c:forEach items="${jobs}" var="job">
                 <div class="job-card ${job.isFeatured ? 'featured' : ''}">
                     <div class="job-card-header">
-                        <a href="${pageContext.request.contextPath}/jobs/${job.slug}">
+                        <a href="${pageContext.request.contextPath}/job/${job.jobId}">
                             <h3 class="job-title">${job.title}</h3>
                         </a>
                         <c:if test="${job.isFeatured}">
@@ -98,7 +101,7 @@
                         
                         <div class="job-skills">
                             <c:forEach items="${job.skillsList}" var="skill">
-                                <span class="skill-badge"><i class="fa-solid fa-code"></i> ${skill.name}</span>
+                                <span class="skill-badge"><i class="fa-solid fa-code"></i> ${skill.Name}</span>
                             </c:forEach>
                         </div>
                     </div>
@@ -125,7 +128,7 @@
                         <div class="employer-skills">
                             <c:forEach items="${company.topSkillsList}" var="skill" varStatus="status">
                                 <c:if test="${status.index < 5}">
-                                    <span class="skill-tag">${skill.name}</span>
+                                    <span class="skill-tag">${skill.Name}</span>
                                 </c:if>
                             </c:forEach>
                         </div>
