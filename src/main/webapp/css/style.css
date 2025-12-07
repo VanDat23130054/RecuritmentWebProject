@@ -82,7 +82,7 @@ a {
   transition: var(--transition-fast);
 }
 
-a:hover {
+a:hover:not(.btn) {
   color: var(--primary-blue-dark);
 }
 
@@ -376,6 +376,27 @@ img {
 .btn-google:hover {
   border-color: #db4437;
   color: #db4437;
+}
+
+/* Ensure button text and icons stay visible on hover and transition smoothly */
+.btn,
+.btn * {
+  /* keep children (icons/spans) inheriting the button color */
+  color: inherit;
+}
+
+/* Force white text on known blue button variants during hover to avoid blending */
+.btn-primary:hover,
+.btn-register:hover,
+.btn-outline:hover,
+.btn-login:hover,
+.btn-secondary:hover {
+  color: var(--white) !important;
+}
+
+/* Slightly refine button transitions so color changes animate smoothly */
+.btn {
+  transition: background-color 0.2s ease, color 0.2s ease, transform 0.15s ease;
 }
 
 .btn-linkedin:hover {
@@ -1518,6 +1539,16 @@ img {
 .employer-card .btn-view:hover {
   background: var(--primary-blue-dark);
   transform: translateX(4px);
+}
+
+/* Ensure view/company buttons keep their text/icons visible on hover */
+.employer-card .btn-view,
+.employer-card .btn-view * {
+  color: inherit;
+}
+
+.employer-card .btn-view:hover {
+  color: var(--white) !important;
 }
 
 .job-count-badge {
