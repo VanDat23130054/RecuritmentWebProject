@@ -36,4 +36,34 @@ public class CompanyDAO {
         }
         return companies;
     }
+
+    public Map<String, Object> getCompanyDetail(Integer companyId) throws SQLException {
+        String sql = "{call employer.sp_GetCompanyDetail(?)}";
+        
+        try (Connection conn = DB.getConnection();
+             CallableStatement stmt = conn.prepareCall(sql)) {
+            
+            stmt.setInt(1, companyId);
+            
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    Map<String, Object> company = new HashMap<>();
+                    company.put("companyId", rs.getInt("CompanyID"));
+                    company.put("name", rs.getString("CompanyName"));
+                    company.put("slug", rs.getString("Slug"));
+                    company.put("logoUrl", rs.getString("LogoUrl"));
+                    company.put("websiteUrl", rs.getString("WebsiteUrl"));
+                    company.put("description", rs.getString("Description"));
+                    company.put("industry", rs.getString("Industry"));
+                    company.put("companySize", rs.getString("CompanySize"));
+                    company.put("foundedYear", rs.getInt("FoundedYear"));
+                    company.put("address", rs.getString("Address"));
+                    company.put("cityName", rs.getString("CityName"));
+                    company.put("activeJobCount", rs.getInt("ActiveJobCount"));
+                    return company;
+                }
+            }
+        }
+        return null;
+    }
 }

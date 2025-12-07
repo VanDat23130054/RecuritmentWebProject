@@ -96,7 +96,7 @@ public class HomeServlet extends HttpServlet {
             request.setAttribute("topEmployers", topEmployers);
 
             // Forward to JSP
-            request.getRequestDispatcher("/WEB-INF/index.jsp").forward(request, response);
+            request.getRequestDispatcher("/WEB-INF/views/index.jsp").forward(request, response);
 
         } catch (IOException | NumberFormatException | SQLException | ServletException e) {
             throw new ServletException("Error loading homepage", e);
