@@ -458,6 +458,35 @@ img {
   box-shadow: var(--shadow-md);
 }
 
+.suggestions {
+  margin-top: 1.5rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: center;
+  justify-content: center;
+}
+
+.suggestions span {
+  color: rgba(255, 255, 255, 0.9);
+  font-weight: 500;
+}
+
+.suggestions .skill-tag {
+  background: rgba(255, 255, 255, 0.15);
+  color: var(--white);
+  padding: 0.5rem 1rem;
+  border-radius: var(--radius-lg);
+  font-size: 0.875rem;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  transition: var(--transition-fast);
+}
+
+.suggestions .skill-tag:hover {
+  background: rgba(255, 255, 255, 0.25);
+  transform: translateY(-2px);
+}
+
 /* ================================
    AUTH PAGES (LOGIN/REGISTER)
    ================================ */
@@ -793,6 +822,11 @@ img {
 }
 
 .job-listings {
+  padding: 3rem 0;
+  background: var(--gray-50);
+}
+
+.job-listings .container {
   display: flex;
   flex-direction: column;
   gap: 1.25rem;
@@ -805,6 +839,7 @@ img {
   box-shadow: var(--shadow);
   transition: var(--transition);
   border: 1px solid var(--gray-200);
+  position: relative;
 }
 
 .job-card:hover {
@@ -814,8 +849,37 @@ img {
 
 .job-card-header {
   display: flex;
-  gap: 1rem;
+  justify-content: space-between;
+  align-items: flex-start;
   margin-bottom: 1rem;
+}
+
+.job-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--gray-900);
+  margin: 0 0 0.5rem 0;
+  line-height: 1.4;
+}
+
+.job-title a {
+  color: var(--gray-900);
+  transition: var(--transition-fast);
+}
+
+.job-title a:hover {
+  color: var(--primary-blue);
+}
+
+.badge-hot {
+  background: linear-gradient(135deg, #ff6b6b 0%, #ff5252 100%);
+  color: var(--white);
+  padding: 0.375rem 0.875rem;
+  border-radius: var(--radius-lg);
+  font-size: 0.75rem;
+  font-weight: 700;
+  white-space: nowrap;
+  box-shadow: 0 2px 8px rgba(255, 107, 107, 0.3);
 }
 
 .company-logo {
@@ -875,6 +939,34 @@ img {
   margin: 1rem 0;
 }
 
+.company-info {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.company-info img {
+  width: 48px;
+  height: 48px;
+  object-fit: contain;
+  border-radius: var(--radius);
+  border: 1px solid var(--gray-200);
+  padding: 0.25rem;
+  background: var(--white);
+}
+
+.company-info a {
+  color: var(--gray-700);
+  font-weight: 500;
+  font-size: 0.9375rem;
+  transition: var(--transition-fast);
+}
+
+.company-info a:hover {
+  color: var(--primary-blue);
+}
+
 .job-meta {
   display: flex;
   flex-wrap: wrap;
@@ -907,6 +999,19 @@ img {
   gap: 0.5rem;
 }
 
+.skill-badge {
+  background: var(--info-light);
+  color: var(--primary-blue);
+  padding: 0.375rem 0.75rem;
+  border-radius: var(--radius);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  border: 1px solid rgba(59, 130, 246, 0.2);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+}
+
 .skill-tag {
   background: var(--gray-100);
   color: var(--gray-700);
@@ -915,6 +1020,13 @@ img {
   font-size: 0.8125rem;
   font-weight: 500;
   border: 1px solid var(--gray-200);
+  transition: var(--transition-fast);
+}
+
+.skill-tag:hover {
+  background: var(--primary-blue);
+  color: var(--white);
+  border-color: var(--primary-blue);
 }
 
 .job-card-footer {
@@ -1292,46 +1404,120 @@ img {
   font-size: 1.125rem;
 }
 
-.jobs-grid,
-.employers-grid {
+.top-employers {
+  padding: 4rem 0;
+  background: var(--white);
+}
+
+.top-employers h2 {
+  text-align: center;
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--gray-900);
+  margin-bottom: 2.5rem;
+}
+
+.employer-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: 1.5rem;
 }
 
 .employer-card {
   background: var(--white);
   border-radius: var(--radius-lg);
-  padding: 1.5rem;
+  padding: 2rem;
   box-shadow: var(--shadow);
   transition: var(--transition);
   text-align: center;
   border: 1px solid var(--gray-200);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .employer-card:hover {
-  box-shadow: var(--shadow-lg);
-  transform: translateY(-4px);
+  box-shadow: var(--shadow-xl);
+  transform: translateY(-8px);
+  border-color: var(--primary-blue);
 }
 
 .employer-card img {
-  width: 80px;
-  height: 80px;
+  width: 100px;
+  height: 100px;
   object-fit: contain;
-  margin: 0 auto 1rem;
-  border-radius: var(--radius);
+  margin: 0 auto 1.25rem;
+  border-radius: var(--radius-lg);
+  border: 2px solid var(--gray-100);
+  padding: 0.5rem;
+  background: var(--gray-50);
 }
 
-.employer-card h3 {
-  font-size: 1.125rem;
-  margin-bottom: 0.5rem;
+.employer-card h4 {
+  font-size: 1.25rem;
+  margin-bottom: 1rem;
   color: var(--gray-900);
+  font-weight: 600;
 }
 
 .employer-card p {
   color: var(--gray-600);
   font-size: 0.875rem;
   margin-bottom: 1rem;
+}
+
+.employer-skills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  justify-content: center;
+  margin-bottom: 1.25rem;
+  min-height: 60px;
+}
+
+.employer-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  width: 100%;
+  margin-bottom: 1.25rem;
+  padding-bottom: 1.25rem;
+  border-bottom: 1px solid var(--gray-200);
+}
+
+.employer-meta .location,
+.employer-meta .job-count {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  color: var(--gray-600);
+  font-size: 0.875rem;
+}
+
+.employer-meta .job-count {
+  color: var(--primary-blue);
+  font-weight: 600;
+}
+
+.employer-card .btn-view {
+  width: 100%;
+  padding: 0.75rem 1.5rem;
+  background: var(--primary-blue);
+  color: var(--white);
+  border-radius: var(--radius);
+  font-weight: 600;
+  text-align: center;
+  transition: var(--transition-fast);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.employer-card .btn-view:hover {
+  background: var(--primary-blue-dark);
+  transform: translateX(4px);
 }
 
 .job-count-badge {
