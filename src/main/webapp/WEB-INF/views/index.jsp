@@ -13,7 +13,7 @@
 </head>
 <body>
     <!-- Header -->
-    <jsp:include page="views/common/header.jsp" />
+    <jsp:include page="common/header.jsp" />
     <!-- Hero Search Section -->
     <section class="hero">
         <div class="container">
@@ -71,7 +71,7 @@
                         <c:if test="${job.isFeatured}">
                             <span class="badge-hot">🔥 HOT</span>
                         </c:if>
-                    </div>
+                    </div> 
                     
                     <div class="job-card-body">
                         <div class="company-info">
@@ -149,7 +149,7 @@
     </section>
 
     <!-- Footer -->
-    <jsp:include page="views/common/footer.jsp" />
+    <jsp:include page="common/footer.jsp" />
     
     <%-- <script src="${pageContext.request.contextPath}/js/main.js"></script> --%>
 </body>

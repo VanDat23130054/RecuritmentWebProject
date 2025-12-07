@@ -68,4 +68,72 @@ public class JobDAO {
         }
         return jobs;
     }
+
+    public Map<String, Object> getJobDetail(Integer jobId) throws SQLException {
+        String sql = "{call employer.sp_GetJobDetail(?)}";
+        
+        try (Connection conn = DB.getConnection();
+             CallableStatement stmt = conn.prepareCall(sql)) {
+            
+            stmt.setInt(1, jobId);
+            
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    Map<String, Object> job = new HashMap<>();
+                    job.put("jobId", rs.getInt("JobID"));
+                    job.put("title", rs.getString("Title"));
+                    job.put("slug", rs.getString("Slug"));
+                    job.put("companyId", rs.getInt("CompanyID"));
+                    job.put("companyName", rs.getString("CompanyName"));
+                    job.put("logoUrl", rs.getString("LogoUrl"));
+                    job.put("cityName", rs.getString("CityName"));
+                    job.put("salaryMin", rs.getObject("SalaryMin"));
+                    job.put("salaryMax", rs.getObject("SalaryMax"));
+                    job.put("currency", rs.getString("Currency"));
+                    job.put("description", rs.getString("Description"));
+                    job.put("requirements", rs.getString("Requirements"));
+                    job.put("benefits", rs.getString("Benefits"));
+                    job.put("employmentType", rs.getString("EmploymentType"));
+                    job.put("seniorityLevel", rs.getString("SeniorityLevel"));
+                    job.put("remoteType", rs.getString("RemoteType"));
+                    job.put("isFeatured", rs.getBoolean("IsFeatured"));
+                    job.put("expiresAt", rs.getTimestamp("ExpiresAt"));
+                    job.put("postedAt", rs.getTimestamp("PostedAt"));
+                    job.put("skills", rs.getString("Skills"));
+                    return job;
+                }
+            }
+        }
+        return null;
+    }
+
+    public List<Map<String, Object>> getRelatedJobs(Integer jobId, Integer companyId, int limit) 
+            throws SQLException {
+        List<Map<String, Object>> jobs = new ArrayList<>();
+        String sql = "{call employer.sp_GetRelatedJobs(?, ?, ?)}";
+        
+        try (Connection conn = DB.getConnection();
+             CallableStatement stmt = conn.prepareCall(sql)) {
+            
+            stmt.setInt(1, jobId);
+            stmt.setInt(2, companyId);
+            stmt.setInt(3, limit);
+            
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    Map<String, Object> job = new HashMap<>();
+                    job.put("jobId", rs.getInt("JobID"));
+                    job.put("title", rs.getString("Title"));
+                    job.put("slug", rs.getString("Slug"));
+                    job.put("companyName", rs.getString("CompanyName"));
+                    job.put("logoUrl", rs.getString("LogoUrl"));
+                    job.put("cityName", rs.getString("CityName"));
+                    job.put("salaryMin", rs.getObject("SalaryMin"));
+                    job.put("salaryMax", rs.getObject("SalaryMax"));
+                    jobs.add(job);
+                }
+            }
+        }
+        return jobs;
+    }
 }
