@@ -71,7 +71,7 @@
                         <c:if test="${job.isFeatured}">
                             <span class="badge-hot">🔥 HOT</span>
                         </c:if>
-                    </div>
+                    </div> 
                     
                     <div class="job-card-body">
                         <div class="company-info">
