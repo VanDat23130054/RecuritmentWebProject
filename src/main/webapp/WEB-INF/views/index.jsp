@@ -101,7 +101,7 @@
                         
                         <div class="job-skills">
                             <c:forEach items="${job.skillsList}" var="skill">
-                                <span class="skill-badge"><i class="fa-solid fa-code"></i> ${skill.name}</span>
+                                <span class="skill-badge"><i class="fa-solid fa-code"></i> ${skill.Name}</span>
                             </c:forEach>
                         </div>
                     </div>
