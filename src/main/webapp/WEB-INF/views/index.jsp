@@ -25,7 +25,7 @@
                 <span class="highlight">"Chất"</span> Developers
             </h1>
             
-            <form action="${pageContext.request.contextPath}/jobs/search" method="GET" class="search-form">
+            <form action="${pageContext.request.contextPath}/jobs" method="GET" class="search-form">
                 <!-- Location Dropdown -->
                 <div class="form-group">
                     <select name="cityId" id="citySelect">
@@ -56,7 +56,7 @@
             <div class="suggestions">
                 <span>Suggestions for you:</span>
                 <c:forEach items="${topSkills}" var="skill">
-                    <a href="?skill=${skill.skillId}" class="skill-tag">${skill.name}</a>
+                    <a href="${pageContext.request.contextPath}/jobs?keyword=${skill.name}" class="skill-tag">${skill.name}</a>
                 </c:forEach>
             </div>
         </div>
@@ -101,7 +101,7 @@
                         
                         <div class="job-skills">
                             <c:forEach items="${job.skillsList}" var="skill">
-                                <span class="skill-badge"><i class="fa-solid fa-code"></i> ${skill.Name}</span>
+                                <span class="skill-badge"><i class="fa-solid fa-code"></i> ${skill.name}</span>
                             </c:forEach>
                         </div>
                     </div>
@@ -128,7 +128,7 @@
                         <div class="employer-skills">
                             <c:forEach items="${company.topSkillsList}" var="skill" varStatus="status">
                                 <c:if test="${status.index < 5}">
-                                    <span class="skill-tag">${skill.Name}</span>
+                                    <span class="skill-tag">${skill.name}</span>
                                 </c:if>
                             </c:forEach>
                         </div>
