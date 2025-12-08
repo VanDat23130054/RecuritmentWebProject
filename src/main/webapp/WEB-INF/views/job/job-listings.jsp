@@ -37,7 +37,7 @@
                         <option value="">All Cities</option>
                         <c:forEach items="${cities}" var="city">
                             <option value="${city.cityId}" 
-                                    ${selectedCityId == city.cityId ? 'selected' : ''}>
+                                    <c:if test="${selectedCityId == city.cityId}">selected</c:if>>
                                 ${city.name}
                             </option>
                         </c:forEach>
@@ -51,8 +51,50 @@
                         <option value="">All Skills</option>
                         <c:forEach items="${skills}" var="skill">
                             <option value="${skill.skillId}" 
-                                    ${selectedSkillId == skill.skillId ? 'selected' : ''}>
+                                    <c:if test="${selectedSkillId == skill.skillId}">selected</c:if>>
                                 ${skill.name}
+                            </option>
+                        </c:forEach>
+                    </select>
+                </div>
+                
+                <!-- Employment Type Filter -->
+                <div class="filter-group">
+                    <label for="employmentType">Employment Type</label>
+                    <select name="employmentType" id="employmentType">
+                        <option value="">All Types</option>
+                        <c:forEach items="${employmentTypes}" var="type">
+                            <option value="${type.id}" 
+                                    <c:if test="${selectedEmploymentType == type.id}">selected</c:if>>
+                                ${type.name}
+                            </option>
+                        </c:forEach>
+                    </select>
+                </div>
+                
+                <!-- Seniority Level Filter -->
+                <div class="filter-group">
+                    <label for="seniorityLevel">Seniority Level</label>
+                    <select name="seniorityLevel" id="seniorityLevel">
+                        <option value="">All Levels</option>
+                        <c:forEach items="${seniorityLevels}" var="level">
+                            <option value="${level.id}" 
+                                    <c:if test="${selectedSeniorityLevel == level.id}">selected</c:if>>
+                                ${level.name}
+                            </option>
+                        </c:forEach>
+                    </select>
+                </div>
+                
+                <!-- Remote Type Filter -->
+                <div class="filter-group">
+                    <label for="remoteType">Work Mode</label>
+                    <select name="remoteType" id="remoteType">
+                        <option value="">All Modes</option>
+                        <c:forEach items="${remoteTypes}" var="remote">
+                            <option value="${remote.id}" 
+                                    <c:if test="${selectedRemoteType == remote.id}">selected</c:if>>
+                                ${remote.name}
                             </option>
                         </c:forEach>
                     </select>
@@ -79,14 +121,15 @@
                             All Job Listings
                         </c:otherwise>
                     </c:choose>
+                    <span class="job-count-badge">${totalJobs} jobs</span>
                 </h2>
                 
                 <div class="sort-options">
                     <label for="sortBy">Sort by:</label>
                     <select name="sortBy" id="sortBy" onchange="updateSort(this.value)">
-                        <option value="date" ${sortBy == 'date' ? 'selected' : ''}>Newest First</option>
-                        <option value="relevance" ${sortBy == 'relevance' ? 'selected' : ''}>Most Relevant</option>
-                        <option value="salary" ${sortBy == 'salary' ? 'selected' : ''}>Highest Salary</option>
+                        <option value="date" <c:if test="${sortBy == 'date'}">selected</c:if>>Newest First</option>
+                        <option value="relevance" <c:if test="${sortBy == 'relevance'}">selected</c:if>>Most Relevant</option>
+                        <option value="salary" <c:if test="${sortBy == 'salary'}">selected</c:if>>Highest Salary</option>
                     </select>
                 </div>
             </div>
@@ -125,7 +168,6 @@
                                     </span>
                                 </c:if>
                             </div>
-                            
                             <c:if test="${not empty job.skillsList}">
                                 <div class="job-skills">
                                     <c:forEach items="${job.skillsList}" var="skill" varStatus="status">
@@ -145,10 +187,20 @@
                                class="btn btn-primary">
                                 View Details
                             </a>
-                            <button class="btn btn-secondary save-job-btn" 
-                                    data-job-id="${job.jobId}">
-                                <i class="far fa-bookmark"></i> Save
-                            </button>
+                            <c:choose>
+                                <c:when test="${job.isSaved}">
+                                    <button class="btn btn-secondary save-job-btn saved" 
+                                            data-job-id="${job.jobId}">
+                                        <i class="fas fa-bookmark"></i> Saved
+                                    </button>
+                                </c:when>
+                                <c:otherwise>
+                                    <button class="btn btn-secondary save-job-btn" 
+                                            data-job-id="${job.jobId}">
+                                        <i class="far fa-bookmark"></i> Save
+                                    </button>
+                                </c:otherwise>
+                            </c:choose>
                         </div>
                     </div>
                 </c:forEach>
@@ -199,10 +251,40 @@
         document.querySelectorAll('.save-job-btn').forEach(btn => {
             btn.addEventListener('click', function() {
                 const jobId = this.dataset.jobId;
-                // TODO: Implement AJAX call to save job
-                console.log('Saving job:', jobId);
-                this.innerHTML = '<i class="fas fa-bookmark"></i> Saved';
-                this.classList.add('saved');
+                const isSaved = this.classList.contains('saved');
+                const action = isSaved ? 'unsave' : 'save';
+                const button = this;
+                
+                // Send AJAX request
+                fetch('${pageContext.request.contextPath}/api/save-job', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: `jobId=${jobId}&action=${action}`
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        if (action === 'save') {
+                            button.innerHTML = '<i class="fas fa-bookmark"></i> Saved';
+                            button.classList.add('saved');
+                        } else {
+                            button.innerHTML = '<i class="far fa-bookmark"></i> Save';
+                            button.classList.remove('saved');
+                        }
+                    } else {
+                        if (data.message && data.message.includes('login')) {
+                            window.location.href = '${pageContext.request.contextPath}/login?redirect=' + encodeURIComponent(window.location.pathname + window.location.search);
+                        } else {
+                            alert('Error: ' + data.message);
+                        }
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('An error occurred. Please try again.');
+                }); 
             });
         });
     </script>

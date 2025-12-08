@@ -128,7 +128,7 @@
                         <div class="employer-skills">
                             <c:forEach items="${company.topSkillsList}" var="skill" varStatus="status">
                                 <c:if test="${status.index < 5}">
-                                    <span class="skill-tag">${skill.name}</span>
+                                    <span class="skill-tag">${skill.Name}</span>
                                 </c:if>
                             </c:forEach>
                         </div>

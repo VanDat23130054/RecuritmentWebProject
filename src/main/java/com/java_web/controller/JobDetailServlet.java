@@ -36,6 +36,11 @@ public class JobDetailServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
+        // Prevent caching to avoid back button issues
+        response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
+        response.setHeader("Pragma", "no-cache");
+        response.setDateHeader("Expires", 0);
+
         try {
             // Get job ID from URL path
             String pathInfo = request.getPathInfo();

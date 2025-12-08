@@ -1,6 +1,8 @@
 package com.java_web.controller;
 
 import java.io.IOException;
+import java.security.NoSuchAlgorithmException;
+import java.sql.SQLException;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -26,6 +28,11 @@ public class LoginServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        // Prevent caching
+        response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
+        response.setHeader("Pragma", "no-cache");
+        response.setDateHeader("Expires", 0);
+        
         // Display login page
         request.getRequestDispatcher("/WEB-INF/views/auth/login.jsp").forward(request, response);
     }
@@ -81,7 +88,7 @@ public class LoginServlet extends HttpServlet {
             String redirectUrl = getRedirectUrl(user.getRole(), request);
             response.sendRedirect(redirectUrl);
             
-        } catch (Exception e) {
+        } catch (IOException | NoSuchAlgorithmException | SQLException | ServletException e) {
             throw new ServletException("Error during login", e);
         }
     }
