@@ -2,6 +2,7 @@ package com.java_web.controller;
 
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
+import java.sql.SQLException;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -111,7 +112,7 @@ public class RegisterServlet extends HttpServlet {
             
         } catch (NoSuchAlgorithmException e) {
             throw new ServletException("Error hashing password", e);
-        } catch (Exception e) {
+        } catch (IOException | SQLException | ServletException e) {
             throw new ServletException("Error during registration", e);
         }
     }
