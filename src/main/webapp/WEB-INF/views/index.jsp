@@ -105,6 +105,31 @@
                             </c:forEach>
                         </div>
                     </div>
+                    
+                    <div class="job-card-footer">
+                        <a href="${pageContext.request.contextPath}/job/${job.jobId}" class="btn btn-primary">View Details</a>
+                        <c:choose>
+                            <c:when test="${not empty sessionScope.user}">
+                                <c:choose>
+                                    <c:when test="${job.isSaved}">
+                                        <button class="btn btn-secondary save-job-btn saved" data-job-id="${job.jobId}">
+                                            <i class="fas fa-bookmark"></i> Saved
+                                        </button>
+                                    </c:when>
+                                    <c:otherwise>
+                                        <button class="btn btn-secondary save-job-btn" data-job-id="${job.jobId}">
+                                            <i class="far fa-bookmark"></i> Save
+                                        </button>
+                                    </c:otherwise>
+                                </c:choose>
+                            </c:when>
+                            <c:otherwise>
+                                <a href="${pageContext.request.contextPath}/login" class="btn btn-secondary">
+                                    <i class="far fa-bookmark"></i> Save
+                                </a>
+                            </c:otherwise>
+                        </c:choose>
+                    </div>
                 </div>
             </c:forEach>
         </div>
@@ -154,6 +179,47 @@
     <!-- Footer -->
     <jsp:include page="common/footer.jsp" />
     
-    <%-- <script src="${pageContext.request.contextPath}/js/main.js"></script> --%>
+    <script>
+        // Save job functionality
+        document.querySelectorAll('.save-job-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const jobId = this.dataset.jobId;
+                const isSaved = this.classList.contains('saved');
+                const action = isSaved ? 'unsave' : 'save';
+                const button = this;
+                
+                // Send AJAX request
+                fetch('${pageContext.request.contextPath}/api/save-job', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: 'jobId=' + jobId + '&action=' + action
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        if (action === 'save') {
+                            button.innerHTML = '<i class="fas fa-bookmark"></i> Saved';
+                            button.classList.add('saved');
+                        } else {
+                            button.innerHTML = '<i class="far fa-bookmark"></i> Save';
+                            button.classList.remove('saved');
+                        }
+                    } else {
+                        if (data.message && data.message.includes('login')) {
+                            window.location.href = '${pageContext.request.contextPath}/login?redirect=' + encodeURIComponent(window.location.pathname);
+                        } else {
+                            alert('Error: ' + data.message);
+                        }
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('An error occurred. Please try again.');
+                }); 
+            });
+        });
+    </script>
 </body>
 </html>
