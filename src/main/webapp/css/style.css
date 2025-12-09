@@ -482,15 +482,16 @@ img {
 }
 
 .auth-container {
-  max-width: 480px;
+  max-width: 520px;
   margin: 0 auto;
+  padding: 0 1rem;
 }
 
 .auth-box {
   background: var(--white);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-lg);
-  padding: 2.5rem;
+  padding: 2rem 2.5rem;
 }
 
 .auth-header {
@@ -520,6 +521,12 @@ img {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 1rem;
+}
+
+@media (max-width: 576px) {
+  .form-row {
+    grid-template-columns: 1fr;
+  }
 }
 
 .form-group {

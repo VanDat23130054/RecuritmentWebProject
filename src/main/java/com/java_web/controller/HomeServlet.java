@@ -18,6 +18,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.java_web.dao.CommonDAO;
 import com.java_web.dao.CompanyDAO;
 import com.java_web.dao.JobDAO;
+import com.java_web.dao.SavedJobDAO;
+import com.java_web.model.auth.User;
 import com.java_web.model.common.City;
 import com.java_web.model.common.Skill;
 
@@ -27,6 +29,7 @@ public class HomeServlet extends HttpServlet {
     private JobDAO jobDAO;
     private CompanyDAO companyDAO;
     private CommonDAO commonDAO;
+    private SavedJobDAO savedJobDAO;
     private ObjectMapper objectMapper;
 
     @Override
@@ -34,6 +37,7 @@ public class HomeServlet extends HttpServlet {
         jobDAO = new JobDAO();
         companyDAO = new CompanyDAO();
         commonDAO = new CommonDAO();
+        savedJobDAO = new SavedJobDAO();
         objectMapper = new ObjectMapper();
     }
 
@@ -77,6 +81,31 @@ public class HomeServlet extends HttpServlet {
                     }
                     );
                     job.put("skillsList", skillsList);
+                }
+            }
+            
+            // Check saved status for logged-in users
+            User user = (User) request.getSession().getAttribute("user");
+            if (user != null && user.getUserId() != null) {
+                for (Map<String, Object> job : jobs) {
+                    Object jobIdObj = job.get("jobId");  // Changed from "JobID" to "jobId"
+                    if (jobIdObj != null) {
+                        Integer jobIdInt = (Integer) jobIdObj;
+                        try {
+                            boolean isSaved = savedJobDAO.isJobSaved(user.getUserId(), jobIdInt);
+                            job.put("isSaved", isSaved);
+                        } catch (SQLException e) {
+                            // If error checking saved status, default to false
+                            job.put("isSaved", false);
+                        }
+                    } else {
+                        job.put("isSaved", false);
+                    }
+                }
+            } else {
+                // Not logged in, mark all as not saved
+                for (Map<String, Object> job : jobs) {
+                    job.put("isSaved", false);
                 }
             }
 

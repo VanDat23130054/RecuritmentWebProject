@@ -13,6 +13,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <!-- Custom CSS (loads after Bootstrap for overrides) -->
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css"/>
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/alert.css"/>
 </head>
 <body>
     <jsp:include page="../common/header.jsp" />
@@ -239,6 +240,7 @@
     
     <jsp:include page="../common/footer.jsp" />
     
+    <script src="${pageContext.request.contextPath}/js/alert.js"></script>
     <script>
         function updateSort(sortValue) {
             const urlParams = new URLSearchParams(window.location.search);
@@ -269,21 +271,26 @@
                         if (action === 'save') {
                             button.innerHTML = '<i class="fas fa-bookmark"></i> Saved';
                             button.classList.add('saved');
+                            showSuccess('Job saved successfully!', 'Saved');
                         } else {
                             button.innerHTML = '<i class="far fa-bookmark"></i> Save';
                             button.classList.remove('saved');
+                            showInfo('Job removed from saved list', 'Removed');
                         }
                     } else {
                         if (data.message && data.message.includes('login')) {
-                            window.location.href = '${pageContext.request.contextPath}/login?redirect=' + encodeURIComponent(window.location.pathname + window.location.search);
+                            showWarning('Please login to save jobs', 'Login Required');
+                            setTimeout(() => {
+                                window.location.href = '${pageContext.request.contextPath}/login?redirect=' + encodeURIComponent(window.location.pathname + window.location.search);
+                            }, 1500);
                         } else {
-                            alert('Error: ' + data.message);
+                            showError(data.message || 'Failed to save job', 'Error');
                         }
                     }
                 })
                 .catch(error => {
                     console.error('Error:', error);
-                    alert('An error occurred. Please try again.');
+                    showError('An error occurred. Please try again.', 'Network Error');
                 }); 
             });
         });

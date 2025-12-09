@@ -52,6 +52,10 @@ public class SavedJobDAO {
      * Check if a job is saved by a user
      */
     public boolean isJobSaved(Integer userId, Integer jobId) throws SQLException {
+        if (userId == null || jobId == null) {
+            return false;
+        }
+        
         String sql = "{call candidate.sp_IsJobSaved(?, ?)}";
 
         try (Connection conn = DB.getConnection(); CallableStatement stmt = conn.prepareCall(sql)) {
