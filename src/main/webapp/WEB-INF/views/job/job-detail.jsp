@@ -253,17 +253,17 @@
         document.querySelectorAll('.btn-share').forEach(btn => {
             btn.addEventListener('click', function() {
                 const jobUrl = window.location.href;
-                const jobTitle = '${job.title} at ${job.companyName}';
+                const jobTitle = '<c:out value="${job.title}" escapeXml="true"/> at <c:out value="${job.companyName}" escapeXml="true"/>';
                 
                 if (this.classList.contains('copy')) {
                     navigator.clipboard.writeText(jobUrl);
                     alert('Link copied to clipboard!');
                 } else if (this.classList.contains('facebook')) {
-                    window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(jobUrl)}`);
+                    window.open('https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(jobUrl));
                 } else if (this.classList.contains('twitter')) {
-                    window.open(`https://twitter.com/intent/tweet?url=${encodeURIComponent(jobUrl)}&text=${encodeURIComponent(jobTitle)}`);
+                    window.open('https://twitter.com/intent/tweet?url=' + encodeURIComponent(jobUrl) + '&text=' + encodeURIComponent(jobTitle));
                 } else if (this.classList.contains('linkedin')) {
-                    window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(jobUrl)}`);
+                    window.open('https://www.linkedin.com/sharing/share-offsite/?url=' + encodeURIComponent(jobUrl));
                 }
             });
         });
