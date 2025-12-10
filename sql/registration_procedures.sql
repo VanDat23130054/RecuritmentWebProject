@@ -100,7 +100,29 @@ BEGIN
 END;
 GO
 
--- 3. Get Candidate by User ID
+-- 3. Get Recruiter Profile by UserId (for Login)
+IF OBJECT_ID('employer.sp_GetRecruiterByUserId', 'P') IS NOT NULL
+    DROP PROCEDURE employer.sp_GetRecruiterByUserId;
+GO
+
+CREATE PROCEDURE employer.sp_GetRecruiterByUserId
+    @UserId INT
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    SELECT 
+        RecruiterId,
+        UserId,
+        CompanyId,
+        Title,
+        IsPrimaryContact
+    FROM employer.Recruiters
+    WHERE UserId = @UserId;
+END;
+GO
+
+-- 4. Get Candidate by User ID
 IF OBJECT_ID('candidate.sp_GetCandidateByUserId', 'P') IS NOT NULL
     DROP PROCEDURE candidate.sp_GetCandidateByUserId;
 GO

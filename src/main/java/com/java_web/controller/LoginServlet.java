@@ -11,18 +11,22 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import com.java_web.dao.RecruiterDAO;
 import com.java_web.dao.UserDAO;
 import com.java_web.model.auth.User;
+import com.java_web.model.employer.Recruiter;
 import com.java_web.utils.PasswordUtil;
 
 @WebServlet("/login")
 public class LoginServlet extends HttpServlet {
     
     private UserDAO userDAO;
+    private RecruiterDAO recruiterDAO;
     
     @Override
     public void init() throws ServletException {
         userDAO = new UserDAO();
+        recruiterDAO = new RecruiterDAO();
     }
     
     @Override
@@ -76,6 +80,16 @@ public class LoginServlet extends HttpServlet {
             session.setAttribute("userId", user.getUserId());
             session.setAttribute("userRole", user.getRole());
             session.setAttribute("userEmail", user.getEmail());
+            
+            // Load profile data based on role
+            if ("Recruiter".equals(user.getRole())) {
+                Recruiter recruiter = recruiterDAO.getRecruiterByUserId(user.getUserId());
+                if (recruiter != null) {
+                    session.setAttribute("recruiterId", recruiter.getRecruiterId());
+                    session.setAttribute("companyId", recruiter.getCompanyId());
+                    session.setAttribute("recruiterTitle", recruiter.getTitle());
+                }
+            }
             
             // Set session timeout (30 minutes default, or longer if remember me)
             if ("on".equals(remember)) {

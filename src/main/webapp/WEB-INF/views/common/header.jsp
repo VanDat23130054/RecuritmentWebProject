@@ -34,9 +34,31 @@
                                 <i class="fa-solid fa-chevron-down"></i>
                             </button>
                             <div class="user-dropdown">
-                                <a href="${pageContext.request.contextPath}/profile"><i class="fa-solid fa-user"></i> My Profile</a>
-                                <a href="${pageContext.request.contextPath}/applications"><i class="fa-solid fa-file-alt"></i> My Applications</a>
-                                <a href="${pageContext.request.contextPath}/saved-jobs"><i class="fa-solid fa-bookmark"></i> Saved Jobs</a>
+                                <c:choose>
+                                    <c:when test="${sessionScope.userRole == 'Recruiter'}">
+                                        <!-- Recruiter Menu -->
+                                        <a href="${pageContext.request.contextPath}/employer/dashboard">
+                                            <i class="fa-solid fa-chart-line"></i> Employer Portal
+                                        </a>
+                                        <a href="${pageContext.request.contextPath}/employer/jobs">
+                                            <i class="fa-solid fa-briefcase"></i> My Jobs
+                                        </a>
+                                        <a href="${pageContext.request.contextPath}/employer/applications">
+                                            <i class="fa-solid fa-file-alt"></i> Applications
+                                        </a>
+                                        <a href="${pageContext.request.contextPath}/employer/company-profile">
+                                            <i class="fa-solid fa-building"></i> Company Profile
+                                        </a>
+                                        <hr>
+                                        <a href="${pageContext.request.contextPath}/profile"><i class="fa-solid fa-user"></i> My Profile</a>
+                                    </c:when>
+                                    <c:otherwise>
+                                        <!-- Candidate Menu -->
+                                        <a href="${pageContext.request.contextPath}/profile"><i class="fa-solid fa-user"></i> My Profile</a>
+                                        <a href="${pageContext.request.contextPath}/applications"><i class="fa-solid fa-file-alt"></i> My Applications</a>
+                                        <a href="${pageContext.request.contextPath}/saved-jobs"><i class="fa-solid fa-bookmark"></i> Saved Jobs</a>
+                                    </c:otherwise>
+                                </c:choose>
                                 <hr>
                                 <a href="${pageContext.request.contextPath}/logout"><i class="fa-solid fa-sign-out-alt"></i> Logout</a>
                             </div>
