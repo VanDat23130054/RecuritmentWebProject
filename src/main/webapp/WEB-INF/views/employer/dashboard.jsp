@@ -308,8 +308,8 @@
                                                            class="btn-icon" title="View Application">
                                                             <i class="fas fa-eye"></i>
                                                         </a>
-                                                        <c:if test="${not empty app.resumeUrl}">
-                                                            <a href="${app.resumeUrl}" 
+                                                        <c:if test="${not empty app.fileUrl}">
+                                                            <a href="${app.fileUrl}" 
                                                                class="btn-icon" title="Download Resume" target="_blank">
                                                                 <i class="fas fa-download"></i>
                                                             </a>

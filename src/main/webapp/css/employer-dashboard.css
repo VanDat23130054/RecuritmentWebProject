@@ -114,13 +114,21 @@
 .stat-card {
     background: #fff;
     border-radius: 12px;
-    padding: 1.5rem;
+    padding: 1.25rem 1.5rem;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-    display: flex;
+    /* use a two-column grid so icon and content align consistently */
+    display: grid;
+    grid-template-columns: 64px 1fr;
     align-items: center;
-    gap: 1.25rem;
+    gap: 1rem;
     transition: transform 0.2s, box-shadow 0.2s;
+    min-height: 112px; /* force consistent card height */
 }
+
+/* Ensure grid items stretch so all cards have equal height */
+.stats-grid { align-items: stretch; }
+
+.stat-content { display: flex; flex-direction: column; justify-content: center; }
 
 .stat-card:hover {
     transform: translateY(-2px);
@@ -144,9 +152,19 @@
 
 .stat-content h3 {
     margin: 0 0 0.25rem 0;
-    font-size: 2rem;
+    font-size: 1.6rem;
     font-weight: 700;
     color: #1f2937;
+    line-height: 1;
+}
+
+@media (min-width: 1200px) {
+    .stat-content h3 { font-size: 1.9rem; }
+}
+
+@media (max-width: 480px) {
+    .stat-card { min-height: 96px; }
+    .stat-content h3 { font-size: 1.25rem; }
 }
 
 .stat-content p {

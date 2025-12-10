@@ -127,7 +127,7 @@ public class RecruiterDAO {
                     app.put("candidateEmail", rs.getString("CandidateEmail"));
                     app.put("appliedAt", rs.getTimestamp("AppliedAt"));
                     app.put("status", rs.getString("Status"));
-                    app.put("resumeUrl", rs.getString("ResumeUrl"));
+                    app.put("fileUrl", rs.getString("FileUrl"));
                     applications.add(app);
                 }
             }
