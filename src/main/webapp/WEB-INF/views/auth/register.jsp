@@ -71,7 +71,8 @@
                             <label>I want to register as:</label>
                             <div class="radio-group">
                                 <label class="radio-label">
-                                    <input type="radio" name="role" value="Candidate" checked>
+                                    <input type="radio" name="role" value="Candidate" ${empty role || role == 'Candidate' ? 'checked' : ''} 
+                                           onchange="toggleRecruiterFields()">
                                     <span class="radio-custom"></span>
                                     <div class="radio-content">
                                         <strong>Job Seeker</strong>
@@ -80,13 +81,30 @@
                                 </label>
                                 
                                 <label class="radio-label">
-                                    <input type="radio" name="role" value="Recruiter">
+                                    <input type="radio" name="role" value="Recruiter" ${role == 'Recruiter' ? 'checked' : ''}
+                                           onchange="toggleRecruiterFields()">
                                     <span class="radio-custom"></span>
                                     <div class="radio-content">
                                         <strong>Employer/Recruiter</strong>
                                         <small>Hiring IT talent</small>
                                     </div>
                                 </label>
+                            </div>
+                        </div>
+                        
+                        <!-- Recruiter-specific fields -->
+                        <div id="recruiterFields" style="display: none;">
+                            <div class="form-group">
+                                <label for="companyName">Company Name <span class="text-danger">*</span></label>
+                                <input type="text" id="companyName" name="companyName" 
+                                       placeholder="Enter your company name" value="${companyName}">
+                                <small class="form-hint">If your company exists, we'll link you to it</small>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="recruiterTitle">Your Title/Position</label>
+                                <input type="text" id="recruiterTitle" name="recruiterTitle" 
+                                       placeholder="e.g., HR Manager, Talent Acquisition Specialist" value="${recruiterTitle}">
                             </div>
                         </div>
                         
@@ -129,6 +147,26 @@
     <jsp:include page="../common/footer.jsp" />
     
     <script>
+        // Toggle recruiter fields
+        function toggleRecruiterFields() {
+            const recruiterRadio = document.querySelector('input[name="role"][value="Recruiter"]');
+            const recruiterFields = document.getElementById('recruiterFields');
+            const companyNameField = document.getElementById('companyName');
+            
+            if (recruiterRadio.checked) {
+                recruiterFields.style.display = 'block';
+                companyNameField.required = true;
+            } else {
+                recruiterFields.style.display = 'none';
+                companyNameField.required = false;
+            }
+        }
+        
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            toggleRecruiterFields();
+        });
+        
         // Password match validation
         const password = document.getElementById('password');
         const confirmPassword = document.getElementById('confirmPassword');

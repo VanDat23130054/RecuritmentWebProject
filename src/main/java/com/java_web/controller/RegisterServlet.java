@@ -11,6 +11,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.apache.commons.lang3.StringUtils;
+
+import com.java_web.dao.RecruiterDAO;
 import com.java_web.dao.UserDAO;
 import com.java_web.model.auth.User;
 import com.java_web.utils.PasswordUtil;
@@ -19,10 +22,12 @@ import com.java_web.utils.PasswordUtil;
 public class RegisterServlet extends HttpServlet {
     
     private UserDAO userDAO;
+    private RecruiterDAO recruiterDAO;
     
     @Override
     public void init() throws ServletException {
         userDAO = new UserDAO();
+        recruiterDAO = new RecruiterDAO();
     }
 
     @Override
@@ -47,23 +52,33 @@ public class RegisterServlet extends HttpServlet {
         String lastName = request.getParameter("lastName");
         String role = request.getParameter("role"); // Candidate or Recruiter
         
+        // Recruiter-specific fields
+        String companyName = request.getParameter("companyName");
+        String recruiterTitle = request.getParameter("recruiterTitle");
+        
         // Validation
         if (password == null || !password.equals(confirmPassword)) {
             request.setAttribute("error", "Passwords do not match");
-            request.setAttribute("email", email);
-            request.setAttribute("firstName", firstName);
-            request.setAttribute("lastName", lastName);
+            setFormAttributes(request, email, firstName, lastName, role, companyName, recruiterTitle);
             request.getRequestDispatcher("/WEB-INF/views/auth/register.jsp").forward(request, response);
             return;
         }
         
         if (password.length() < 6) {
             request.setAttribute("error", "Password must be at least 6 characters");
-            request.setAttribute("email", email);
-            request.setAttribute("firstName", firstName);
-            request.setAttribute("lastName", lastName);
+            setFormAttributes(request, email, firstName, lastName, role, companyName, recruiterTitle);
             request.getRequestDispatcher("/WEB-INF/views/auth/register.jsp").forward(request, response);
             return;
+        }
+        
+        // Validate recruiter-specific fields
+        if ("Recruiter".equals(role)) {
+            if (StringUtils.isBlank(companyName)) {
+                request.setAttribute("error", "Company name is required for recruiters");
+                setFormAttributes(request, email, firstName, lastName, role, companyName, recruiterTitle);
+                request.getRequestDispatcher("/WEB-INF/views/auth/register.jsp").forward(request, response);
+                return;
+            }
         }
         
         try {
@@ -71,9 +86,7 @@ public class RegisterServlet extends HttpServlet {
             User existingUser = userDAO.findByEmail(email);
             if (existingUser != null) {
                 request.setAttribute("error", "Email already registered");
-                request.setAttribute("email", email);
-                request.setAttribute("firstName", firstName);
-                request.setAttribute("lastName", lastName);
+                setFormAttributes(request, email, firstName, lastName, role, companyName, recruiterTitle);
                 request.getRequestDispatcher("/WEB-INF/views/auth/register.jsp").forward(request, response);
                 return;
             }
@@ -92,8 +105,42 @@ public class RegisterServlet extends HttpServlet {
             newUser.setActive(true);
             newUser.setEmailConfirmed(false);
             
-            // Save user
-            Integer userId = userDAO.createUser(newUser);
+            // Prepare full name
+            String fullName = firstName + " " + lastName;
+            
+            // Register user with profile
+            Integer userId;
+            Integer profileId;
+            Integer companyId = null;
+            
+            if ("Recruiter".equals(newUser.getRole())) {
+                // Use combined registration for recruiter
+                Object[] result = userDAO.registerUser(
+                    email, 
+                    passwordHash, 
+                    salt, 
+                    "Recruiter", 
+                    fullName, 
+                    companyName, 
+                    StringUtils.isNotBlank(recruiterTitle) ? recruiterTitle : "Recruiter"
+                );
+                userId = (Integer) result[0];
+                profileId = (Integer) result[1];
+                companyId = (Integer) result[2];
+            } else {
+                // Use combined registration for candidate
+                Object[] result = userDAO.registerUser(
+                    email, 
+                    passwordHash, 
+                    salt, 
+                    "Candidate", 
+                    fullName, 
+                    null, 
+                    null
+                );
+                userId = (Integer) result[0];
+                profileId = (Integer) result[1];
+            }
             
             // Auto login after registration
             newUser.setUserId(userId);
@@ -103,17 +150,41 @@ public class RegisterServlet extends HttpServlet {
             session.setAttribute("userRole", newUser.getRole());
             session.setAttribute("userEmail", email);
             
+            if ("Recruiter".equals(newUser.getRole())) {
+                session.setAttribute("companyId", companyId);
+                session.setAttribute("recruiterId", profileId);
+            } else {
+                session.setAttribute("candidateId", profileId);
+            }
+            
             // Redirect based on role
             if ("Recruiter".equals(newUser.getRole())) {
                 response.sendRedirect(request.getContextPath() + "/employer/dashboard");
             } else {
-                response.sendRedirect(request.getContextPath() + "/candidate/profile");
+                response.sendRedirect(request.getContextPath() + "/");
             }
             
         } catch (NoSuchAlgorithmException e) {
             throw new ServletException("Error hashing password", e);
-        } catch (IOException | SQLException | ServletException e) {
-            throw new ServletException("Error during registration", e);
+        } catch (SQLException e) {
+            // Check for duplicate email constraint
+            if (e.getMessage().contains("unique") || e.getMessage().contains("duplicate")) {
+                request.setAttribute("error", "Email already registered");
+            } else {
+                request.setAttribute("error", "Registration failed. Please try again.");
+            }
+            setFormAttributes(request, email, firstName, lastName, role, companyName, recruiterTitle);
+            request.getRequestDispatcher("/WEB-INF/views/auth/register.jsp").forward(request, response);
         }
+    }
+    
+    private void setFormAttributes(HttpServletRequest request, String email, String firstName, 
+                                   String lastName, String role, String companyName, String recruiterTitle) {
+        request.setAttribute("email", email);
+        request.setAttribute("firstName", firstName);
+        request.setAttribute("lastName", lastName);
+        request.setAttribute("role", role);
+        request.setAttribute("companyName", companyName);
+        request.setAttribute("recruiterTitle", recruiterTitle);
     }
 }
