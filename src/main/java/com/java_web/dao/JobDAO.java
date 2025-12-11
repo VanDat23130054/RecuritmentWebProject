@@ -136,4 +136,96 @@ public class JobDAO {
         }
         return jobs;
     }
+
+    /**
+     * Create a new job posting
+     */
+    public Integer createJob(Integer companyId, String title, String description,
+                            String requirements, String benefits, Integer cityId,
+                            Integer employmentType, Integer seniorityLevel, Integer remoteType,
+                            Integer salaryMin, Integer salaryMax, String currency,
+                            String expiresAt, Byte statusId) throws SQLException {
+        String sql = "{call employer.sp_CreateJob(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)}";
+        
+        try (Connection conn = DB.getConnection();
+             CallableStatement stmt = conn.prepareCall(sql)) {
+            
+            stmt.setInt(1, companyId);
+            stmt.setString(2, title);
+            stmt.setString(3, description);
+            
+            if (requirements != null) {
+                stmt.setString(4, requirements);
+            } else {
+                stmt.setNull(4, Types.NVARCHAR);
+            }
+            
+            if (benefits != null) {
+                stmt.setString(5, benefits);
+            } else {
+                stmt.setNull(5, Types.NVARCHAR);
+            }
+            
+            stmt.setInt(6, cityId);
+            stmt.setInt(7, employmentType);
+            
+            if (seniorityLevel != null) {
+                stmt.setInt(8, seniorityLevel);
+            } else {
+                stmt.setNull(8, Types.INTEGER);
+            }
+            
+            if (remoteType != null) {
+                stmt.setInt(9, remoteType);
+            } else {
+                stmt.setNull(9, Types.INTEGER);
+            }
+            
+            if (salaryMin != null) {
+                stmt.setInt(10, salaryMin);
+            } else {
+                stmt.setNull(10, Types.INTEGER);
+            }
+            
+            if (salaryMax != null) {
+                stmt.setInt(11, salaryMax);
+            } else {
+                stmt.setNull(11, Types.INTEGER);
+            }
+            
+            if (currency != null) {
+                stmt.setString(12, currency);
+            } else {
+                stmt.setString(12, "USD");
+            }
+            
+            if (expiresAt != null && !expiresAt.isEmpty()) {
+                stmt.setString(13, expiresAt);
+            } else {
+                stmt.setNull(13, Types.VARCHAR);
+            }
+            
+            stmt.setByte(14, statusId);
+            stmt.registerOutParameter(15, Types.INTEGER);
+            
+            stmt.execute();
+            return stmt.getInt(15);
+        }
+    }
+
+    /**
+     * Add a skill to a job
+     */
+    public void addJobSkill(Integer jobId, Integer skillId) throws SQLException {
+        String sql = "{call employer.sp_AddJobSkill(?, ?)}";
+        
+        try (Connection conn = DB.getConnection();
+             CallableStatement stmt = conn.prepareCall(sql)) {
+            
+            stmt.setInt(1, jobId);
+            stmt.setInt(2, skillId);
+            stmt.execute();
+        }
+    }
 }
+
