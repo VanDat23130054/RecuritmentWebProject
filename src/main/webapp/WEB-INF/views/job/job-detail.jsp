@@ -13,6 +13,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <!-- Custom CSS -->
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css"/>
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/alert.css"/>
 </head>
 <body>
     <jsp:include page="../common/header.jsp" />
@@ -53,23 +54,40 @@
                 
                 <div class="job-actions">
                     <c:choose>
-                        <c:when test="${not empty sessionScope.user}">
+                        <c:when test="${not empty sessionScope.user && sessionScope.user.role == 'Candidate'}">
                             <a href="${pageContext.request.contextPath}/apply/${job.jobId}" 
                                class="btn btn-primary btn-lg">
                                 <i class="fas fa-paper-plane"></i> Apply Now
                             </a>
                         </c:when>
-                        <c:otherwise>
+                        <c:when test="${empty sessionScope.user}">
                             <a href="${pageContext.request.contextPath}/login?returnUrl=/job/${job.jobId}" 
                                class="btn btn-primary btn-lg">
                                 <i class="fas fa-sign-in-alt"></i> Login to Apply
                             </a>
-                        </c:otherwise>
+                        </c:when>
+                        <c:when test="${sessionScope.user.role == 'Recruiter' || sessionScope.user.role == 'EmployerAdmin'}">
+                            <a href="${pageContext.request.contextPath}/employer/dashboard" 
+                               class="btn btn-primary btn-lg">
+                                <i class="fas fa-tachometer-alt"></i> Go to Dashboard
+                            </a>
+                        </c:when>
                     </c:choose>
                     
-                    <button class="btn btn-secondary btn-lg save-job-btn" data-job-id="${job.jobId}">
-                        <i class="far fa-bookmark"></i> Save Job
-                    </button>
+                    <c:if test="${empty sessionScope.user || sessionScope.user.role == 'Candidate'}">
+                        <c:choose>
+                            <c:when test="${job.isSaved}">
+                                <button class="btn btn-secondary btn-lg save-job-btn saved" data-job-id="${job.jobId}">
+                                    <i class="fas fa-bookmark"></i> Saved
+                                </button>
+                            </c:when>
+                            <c:otherwise>
+                                <button class="btn btn-secondary btn-lg save-job-btn" data-job-id="${job.jobId}">
+                                    <i class="far fa-bookmark"></i> Save Job
+                                </button>
+                            </c:otherwise>
+                        </c:choose>
+                    </c:if>
                 </div>
             </div>
             
@@ -239,15 +257,54 @@
     
     <jsp:include page="../common/footer.jsp" />
     
+    <script src="${pageContext.request.contextPath}/js/alert.js"></script>
     <script>
         // Save job functionality
-        document.querySelector('.save-job-btn').addEventListener('click', function() {
-            const jobId = this.dataset.jobId;
-            // TODO: Implement AJAX call to save job
-            console.log('Saving job:', jobId);
-            this.innerHTML = '<i class="fas fa-bookmark"></i> Saved';
-            this.classList.add('saved');
-        });
+        const saveJobBtn = document.querySelector('.save-job-btn');
+        if (saveJobBtn) {
+            saveJobBtn.addEventListener('click', function() {
+                const jobId = this.dataset.jobId;
+                const isSaved = this.classList.contains('saved');
+                const action = isSaved ? 'unsave' : 'save';
+                const button = this;
+                
+                // Send AJAX request
+                fetch('${pageContext.request.contextPath}/api/save-job', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: 'jobId=' + jobId + '&action=' + action
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        if (action === 'save') {
+                            button.innerHTML = '<i class="fas fa-bookmark"></i> Saved';
+                            button.classList.add('saved');
+                            showSuccess('Job saved successfully!', 'Saved');
+                        } else {
+                            button.innerHTML = '<i class="far fa-bookmark"></i> Save Job';
+                            button.classList.remove('saved');
+                            showInfo('Job removed from saved list', 'Removed');
+                        }
+                    } else {
+                        if (data.message && data.message.includes('login')) {
+                            showWarning('Please login to save jobs', 'Login Required');
+                            setTimeout(() => {
+                                window.location.href = '${pageContext.request.contextPath}/login?returnUrl=' + encodeURIComponent(window.location.pathname);
+                            }, 1500);
+                        } else {
+                            showError(data.message || 'Failed to save job', 'Error');
+                        }
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showError('An error occurred. Please try again.', 'Network Error');
+                });
+            });
+        }
         
         // Share functionality
         document.querySelectorAll('.btn-share').forEach(btn => {

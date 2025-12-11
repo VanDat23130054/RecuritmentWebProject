@@ -43,6 +43,14 @@ public class SaveJobServlet extends HttpServlet {
             }
 
             User user = (User) session.getAttribute("user");
+            
+            // Check if user is a candidate - only candidates can save jobs
+            if (!"Candidate".equals(user.getRole())) {
+                response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                out.print("{\"success\": false, \"message\": \"Only candidates can save jobs\"}");
+                return;
+            }
+            
             String jobIdStr = request.getParameter("jobId");
             String action = request.getParameter("action"); // "save" or "unsave"
 

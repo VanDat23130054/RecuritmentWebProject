@@ -10,6 +10,7 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -17,18 +18,22 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.java_web.dao.CompanyDAO;
 import com.java_web.dao.JobDAO;
+import com.java_web.dao.SavedJobDAO;
+import com.java_web.model.auth.User;
 
 @WebServlet("/job/*")
 public class JobDetailServlet extends HttpServlet {
 
     private JobDAO jobDAO;
     private CompanyDAO companyDAO;
+    private SavedJobDAO savedJobDAO;
     private ObjectMapper objectMapper;
 
     @Override
     public void init() throws ServletException {
         jobDAO = new JobDAO();
         companyDAO = new CompanyDAO();
+        savedJobDAO = new SavedJobDAO();
         objectMapper = new ObjectMapper();
     }
 
@@ -76,6 +81,20 @@ public class JobDetailServlet extends HttpServlet {
             
             // Get related jobs
             List<Map<String, Object>> relatedJobs = jobDAO.getRelatedJobs(jobId, companyId, 5);
+
+            // Check if job is saved for logged-in candidate
+            HttpSession session = request.getSession(false);
+            if (session != null && session.getAttribute("user") != null) {
+                User user = (User) session.getAttribute("user");
+                if ("Candidate".equals(user.getRole())) {
+                    boolean isSaved = savedJobDAO.isJobSaved(user.getUserId(), jobId);
+                    job.put("isSaved", isSaved);
+                } else {
+                    job.put("isSaved", false);
+                }
+            } else {
+                job.put("isSaved", false);
+            }
 
             request.setAttribute("job", job);
             request.setAttribute("company", company);

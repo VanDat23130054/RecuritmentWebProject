@@ -188,20 +188,22 @@
                                class="btn btn-primary">
                                 View Details
                             </a>
-                            <c:choose>
-                                <c:when test="${job.isSaved}">
-                                    <button class="btn btn-secondary save-job-btn saved" 
-                                            data-job-id="${job.jobId}">
-                                        <i class="fas fa-bookmark"></i> Saved
-                                    </button>
-                                </c:when>
-                                <c:otherwise>
-                                    <button class="btn btn-secondary save-job-btn" 
-                                            data-job-id="${job.jobId}">
-                                        <i class="far fa-bookmark"></i> Save
-                                    </button>
-                                </c:otherwise>
-                            </c:choose>
+                            <c:if test="${empty sessionScope.user || sessionScope.user.role == 'Candidate'}">
+                                <c:choose>
+                                    <c:when test="${job.isSaved}">
+                                        <button class="btn btn-secondary save-job-btn saved" 
+                                                data-job-id="${job.jobId}">
+                                            <i class="fas fa-bookmark"></i> Saved
+                                        </button>
+                                    </c:when>
+                                    <c:otherwise>
+                                        <button class="btn btn-secondary save-job-btn" 
+                                                data-job-id="${job.jobId}">
+                                            <i class="far fa-bookmark"></i> Save
+                                        </button>
+                                    </c:otherwise>
+                                </c:choose>
+                            </c:if>
                         </div>
                     </div>
                 </c:forEach>
@@ -263,7 +265,7 @@
                     headers: {
                         'Content-Type': 'application/x-www-form-urlencoded',
                     },
-                    body: `jobId=${jobId}&action=${action}`
+                    body: 'jobId=' + jobId + '&action=' + action
                 })
                 .then(response => response.json())
                 .then(data => {
