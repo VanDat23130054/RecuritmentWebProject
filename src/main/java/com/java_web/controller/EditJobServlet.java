@@ -2,6 +2,9 @@ package com.java_web.controller;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
 
@@ -16,23 +19,19 @@ import org.apache.commons.lang3.StringUtils;
 
 import com.java_web.dao.CommonDAO;
 import com.java_web.dao.JobDAO;
-import com.java_web.dao.RecruiterDAO;
 import com.java_web.model.auth.User;
 import com.java_web.model.common.City;
 import com.java_web.model.common.Skill;
-import com.java_web.model.employer.Recruiter;
 
-@WebServlet("/employer/post-job")
-public class PostJobServlet extends HttpServlet {
+@WebServlet("/employer/edit-job/*")
+public class EditJobServlet extends HttpServlet {
 
     private CommonDAO commonDAO;
-    private RecruiterDAO recruiterDAO;
     private JobDAO jobDAO;
 
     @Override
     public void init() throws ServletException {
         commonDAO = new CommonDAO();
-        recruiterDAO = new RecruiterDAO();
         jobDAO = new JobDAO();
     }
 
@@ -43,7 +42,7 @@ public class PostJobServlet extends HttpServlet {
         // Check authentication and role
         HttpSession session = request.getSession(false);
         if (session == null || session.getAttribute("user") == null) {
-            response.sendRedirect(request.getContextPath() + "/login?returnUrl=/employer/post-job");
+            response.sendRedirect(request.getContextPath() + "/login?returnUrl=" + request.getRequestURI());
             return;
         }
 
@@ -53,7 +52,31 @@ public class PostJobServlet extends HttpServlet {
             return;
         }
 
+        // Get recruiterId from session
+        Integer recruiterId = (Integer) session.getAttribute("recruiterId");
+        if (recruiterId == null) {
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Recruiter profile not found");
+            return;
+        }
+
+        // Get job ID from URL path
+        String pathInfo = request.getPathInfo();
+        if (pathInfo == null || pathInfo.length() <= 1) {
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Job ID is required");
+            return;
+        }
+
         try {
+            Integer jobId = Integer.valueOf(pathInfo.substring(1));
+            
+            // Get job details (with authorization check)
+            Map<String, Object> job = jobDAO.getJobForEdit(jobId, recruiterId);
+            
+            if (job == null) {
+                response.sendError(HttpServletResponse.SC_NOT_FOUND, "Job not found or access denied");
+                return;
+            }
+
             // Get form data
             List<City> cities = commonDAO.getAllCities();
             List<Skill> skills = commonDAO.getTopSkills(100);
@@ -61,16 +84,26 @@ public class PostJobServlet extends HttpServlet {
             List<Map<String, String>> seniorityLevels = commonDAO.getSeniorityLevels();
             List<Map<String, String>> remoteTypes = commonDAO.getRemoteTypes();
 
+            // Format expiresAt for date input
+            Timestamp expiresAt = (Timestamp) job.get("expiresAt");
+            if (expiresAt != null) {
+                LocalDate date = expiresAt.toLocalDateTime().toLocalDate();
+                job.put("expiresAtFormatted", date.format(DateTimeFormatter.ISO_LOCAL_DATE));
+            }
+
+            request.setAttribute("job", job);
             request.setAttribute("cities", cities);
             request.setAttribute("skills", skills);
             request.setAttribute("employmentTypes", employmentTypes);
             request.setAttribute("seniorityLevels", seniorityLevels);
             request.setAttribute("remoteTypes", remoteTypes);
 
-            request.getRequestDispatcher("/WEB-INF/views/employer/post-job.jsp").forward(request, response);
+            request.getRequestDispatcher("/WEB-INF/views/employer/edit-job.jsp").forward(request, response);
 
+        } catch (NumberFormatException e) {
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid job ID");
         } catch (SQLException e) {
-            throw new ServletException("Error loading post job form", e);
+            throw new ServletException("Error loading job for edit", e);
         }
     }
 
@@ -91,14 +124,22 @@ public class PostJobServlet extends HttpServlet {
             return;
         }
 
+        // Get recruiterId from session
+        Integer recruiterId = (Integer) session.getAttribute("recruiterId");
+        if (recruiterId == null) {
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Recruiter profile not found");
+            return;
+        }
+
+        // Get job ID from URL path
+        String pathInfo = request.getPathInfo();
+        if (pathInfo == null || pathInfo.length() <= 1) {
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Job ID is required");
+            return;
+        }
+
         try {
-            // Get recruiter info
-            Recruiter recruiter = recruiterDAO.getRecruiterByUserId(user.getUserId());
-            if (recruiter == null) {
-                request.setAttribute("error", "Recruiter profile not found");
-                doGet(request, response);
-                return;
-            }
+            Integer jobId = Integer.valueOf(pathInfo.substring(1));
 
             // Get form parameters
             String title = request.getParameter("title");
@@ -133,10 +174,10 @@ public class PostJobServlet extends HttpServlet {
             Integer salaryMax = StringUtils.isNotBlank(salaryMaxStr) ? Integer.valueOf(salaryMaxStr) : null;
             Byte statusId = StringUtils.isNotBlank(statusIdStr) ? Byte.valueOf(statusIdStr) : 2; // Default: Published
 
-            // Create job
-            Integer jobId = jobDAO.createJob(
-                recruiter.getCompanyId(),
-                recruiter.getRecruiterId(),
+            // Update job
+            boolean success = jobDAO.updateJob(
+                jobId,
+                recruiterId,
                 title,
                 description,
                 requirements,
@@ -152,7 +193,14 @@ public class PostJobServlet extends HttpServlet {
                 statusId
             );
 
-            // Add skills if provided
+            if (!success) {
+                request.setAttribute("error", "Failed to update job");
+                doGet(request, response);
+                return;
+            }
+
+            // Update skills: remove all and add new ones
+            jobDAO.removeAllJobSkills(jobId);
             if (skillIds != null && skillIds.length > 0) {
                 for (String skillIdStr : skillIds) {
                     if (StringUtils.isNotBlank(skillIdStr)) {
@@ -162,10 +210,8 @@ public class PostJobServlet extends HttpServlet {
             }
 
             // Redirect to job detail or dashboard
-            response.sendRedirect(request.getContextPath() + "/job/" + jobId + "?success=posted");
+            response.sendRedirect(request.getContextPath() + "/job/" + jobId + "?success=updated");
 
-        } catch (SQLException e) {
-            throw new ServletException("Error creating job", e);
         } catch (NumberFormatException e) {
             request.setAttribute("error", "Invalid form data");
             try {
@@ -173,6 +219,8 @@ public class PostJobServlet extends HttpServlet {
             } catch (Exception ex) {
                 throw new ServletException("Error reloading form", ex);
             }
+        } catch (SQLException e) {
+            throw new ServletException("Error updating job", e);
         }
     }
 }

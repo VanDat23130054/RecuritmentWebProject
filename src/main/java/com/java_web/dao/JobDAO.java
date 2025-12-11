@@ -140,76 +140,77 @@ public class JobDAO {
     /**
      * Create a new job posting
      */
-    public Integer createJob(Integer companyId, String title, String description,
+    public Integer createJob(Integer companyId, Integer recruiterId, String title, String description,
                             String requirements, String benefits, Integer cityId,
                             Integer employmentType, Integer seniorityLevel, Integer remoteType,
                             Integer salaryMin, Integer salaryMax, String currency,
                             String expiresAt, Byte statusId) throws SQLException {
-        String sql = "{call employer.sp_CreateJob(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)}";
+        String sql = "{call employer.sp_CreateJob(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)}";
         
         try (Connection conn = DB.getConnection();
              CallableStatement stmt = conn.prepareCall(sql)) {
             
             stmt.setInt(1, companyId);
-            stmt.setString(2, title);
-            stmt.setString(3, description);
+            stmt.setInt(2, recruiterId);
+            stmt.setString(3, title);
+            stmt.setString(4, description);
             
             if (requirements != null) {
-                stmt.setString(4, requirements);
-            } else {
-                stmt.setNull(4, Types.NVARCHAR);
-            }
-            
-            if (benefits != null) {
-                stmt.setString(5, benefits);
+                stmt.setString(5, requirements);
             } else {
                 stmt.setNull(5, Types.NVARCHAR);
             }
             
-            stmt.setInt(6, cityId);
-            stmt.setInt(7, employmentType);
-            
-            if (seniorityLevel != null) {
-                stmt.setInt(8, seniorityLevel);
+            if (benefits != null) {
+                stmt.setString(6, benefits);
             } else {
-                stmt.setNull(8, Types.INTEGER);
+                stmt.setNull(6, Types.NVARCHAR);
             }
             
-            if (remoteType != null) {
-                stmt.setInt(9, remoteType);
+            stmt.setInt(7, cityId);
+            stmt.setInt(8, employmentType);
+            
+            if (seniorityLevel != null) {
+                stmt.setInt(9, seniorityLevel);
             } else {
                 stmt.setNull(9, Types.INTEGER);
             }
             
-            if (salaryMin != null) {
-                stmt.setInt(10, salaryMin);
+            if (remoteType != null) {
+                stmt.setInt(10, remoteType);
             } else {
                 stmt.setNull(10, Types.INTEGER);
             }
             
-            if (salaryMax != null) {
-                stmt.setInt(11, salaryMax);
+            if (salaryMin != null) {
+                stmt.setInt(11, salaryMin);
             } else {
                 stmt.setNull(11, Types.INTEGER);
             }
             
-            if (currency != null) {
-                stmt.setString(12, currency);
+            if (salaryMax != null) {
+                stmt.setInt(12, salaryMax);
             } else {
-                stmt.setString(12, "USD");
+                stmt.setNull(12, Types.INTEGER);
+            }
+            
+            if (currency != null) {
+                stmt.setString(13, currency);
+            } else {
+                stmt.setString(13, "USD");
             }
             
             if (expiresAt != null && !expiresAt.isEmpty()) {
-                stmt.setString(13, expiresAt);
+                stmt.setString(14, expiresAt);
             } else {
-                stmt.setNull(13, Types.VARCHAR);
+                stmt.setNull(14, Types.VARCHAR);
             }
             
-            stmt.setByte(14, statusId);
-            stmt.registerOutParameter(15, Types.INTEGER);
+            stmt.setByte(15, statusId);
+            stmt.registerOutParameter(16, Types.INTEGER);
             
             stmt.execute();
-            return stmt.getInt(15);
+            return stmt.getInt(16);
         }
     }
 
@@ -226,6 +227,186 @@ public class JobDAO {
             stmt.setInt(2, skillId);
             stmt.execute();
         }
+    }
+
+    /**
+     * Get job details for editing (with authorization check)
+     */
+    public Map<String, Object> getJobForEdit(Integer jobId, Integer recruiterId) throws SQLException {
+        String sql = "{call employer.sp_GetJobForEdit(?, ?)}";
+        Map<String, Object> result = new HashMap<>();
+        
+        try (Connection conn = DB.getConnection();
+             CallableStatement stmt = conn.prepareCall(sql)) {
+            
+            stmt.setInt(1, jobId);
+            stmt.setInt(2, recruiterId);
+            
+            // First result set: job details
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    result.put("jobId", rs.getInt("JobId"));
+                    result.put("companyId", rs.getInt("CompanyId"));
+                    result.put("recruiterId", rs.getInt("RecruiterId"));
+                    result.put("title", rs.getString("Title"));
+                    result.put("slug", rs.getString("Slug"));
+                    result.put("description", rs.getString("Description"));
+                    result.put("requirements", rs.getString("Requirements"));
+                    result.put("benefits", rs.getString("Benefits"));
+                    result.put("cityId", rs.getInt("CityId"));
+                    result.put("employmentTypeId", rs.getByte("EmploymentTypeId"));
+                    
+                    Object seniorityLevel = rs.getObject("SeniorityLevelId");
+                    result.put("seniorityLevelId", seniorityLevel != null ? rs.getByte("SeniorityLevelId") : null);
+                    
+                    Object remoteType = rs.getObject("RemoteTypeId");
+                    result.put("remoteTypeId", remoteType != null ? rs.getByte("RemoteTypeId") : null);
+                    
+                    result.put("salaryMin", rs.getObject("SalaryMin"));
+                    result.put("salaryMax", rs.getObject("SalaryMax"));
+                    result.put("currency", rs.getString("Currency"));
+                    result.put("statusId", rs.getByte("StatusId"));
+                    result.put("isFeatured", rs.getBoolean("IsFeatured"));
+                    result.put("postedAt", rs.getTimestamp("PostedAt"));
+                    result.put("expiresAt", rs.getTimestamp("ExpiresAt"));
+                    result.put("viewsCount", rs.getInt("ViewsCount"));
+                    result.put("applicationsCount", rs.getInt("ApplicationsCount"));
+                }
+            }
+            
+            // Second result set: skills
+            if (stmt.getMoreResults()) {
+                List<Map<String, Object>> skills = new ArrayList<>();
+                try (ResultSet rs = stmt.getResultSet()) {
+                    while (rs.next()) {
+                        Map<String, Object> skill = new HashMap<>();
+                        skill.put("skillId", rs.getInt("SkillId"));
+                        skill.put("skillName", rs.getString("SkillName"));
+                        skills.add(skill);
+                    }
+                }
+                result.put("skills", skills);
+            }
+        }
+        
+        return result.isEmpty() ? null : result;
+    }
+
+    /**
+     * Update an existing job posting
+     */
+    public boolean updateJob(Integer jobId, Integer recruiterId, String title, String description,
+                            String requirements, String benefits, Integer cityId,
+                            Integer employmentType, Integer seniorityLevel, Integer remoteType,
+                            Integer salaryMin, Integer salaryMax, String currency,
+                            String expiresAt, Byte statusId) throws SQLException {
+        String sql = "{call employer.sp_UpdateJob(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)}";
+        
+        try (Connection conn = DB.getConnection();
+             CallableStatement stmt = conn.prepareCall(sql)) {
+            
+            stmt.setInt(1, jobId);
+            stmt.setInt(2, recruiterId);
+            stmt.setString(3, title);
+            stmt.setString(4, description);
+            
+            if (requirements != null) {
+                stmt.setString(5, requirements);
+            } else {
+                stmt.setNull(5, Types.NVARCHAR);
+            }
+            
+            if (benefits != null) {
+                stmt.setString(6, benefits);
+            } else {
+                stmt.setNull(6, Types.NVARCHAR);
+            }
+            
+            stmt.setInt(7, cityId);
+            stmt.setByte(8, employmentType.byteValue());
+            
+            if (seniorityLevel != null) {
+                stmt.setByte(9, seniorityLevel.byteValue());
+            } else {
+                stmt.setNull(9, Types.TINYINT);
+            }
+            
+            if (remoteType != null) {
+                stmt.setByte(10, remoteType.byteValue());
+            } else {
+                stmt.setNull(10, Types.TINYINT);
+            }
+            
+            if (salaryMin != null) {
+                stmt.setInt(11, salaryMin);
+            } else {
+                stmt.setNull(11, Types.INTEGER);
+            }
+            
+            if (salaryMax != null) {
+                stmt.setInt(12, salaryMax);
+            } else {
+                stmt.setNull(12, Types.INTEGER);
+            }
+            
+            if (currency != null) {
+                stmt.setString(13, currency);
+            } else {
+                stmt.setString(13, "USD");
+            }
+            
+            if (expiresAt != null && !expiresAt.isEmpty()) {
+                stmt.setString(14, expiresAt);
+            } else {
+                stmt.setNull(14, Types.VARCHAR);
+            }
+            
+            stmt.setByte(15, statusId);
+            
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt("Success") == 1;
+                }
+            }
+        }
+        
+        return false;
+    }
+
+    /**
+     * Remove all skills from a job (used before adding new ones during update)
+     */
+    public void removeAllJobSkills(Integer jobId) throws SQLException {
+        String sql = "{call employer.sp_RemoveAllJobSkills(?)}";
+        
+        try (Connection conn = DB.getConnection();
+             CallableStatement stmt = conn.prepareCall(sql)) {
+            
+            stmt.setInt(1, jobId);
+            stmt.execute();
+        }
+    }
+
+    /**
+     * Delete/deactivate a job
+     */
+    public boolean deleteJob(Integer jobId, Integer recruiterId) throws SQLException {
+        String sql = "{call employer.sp_DeleteJob(?, ?)}";
+        
+        try (Connection conn = DB.getConnection();
+             CallableStatement stmt = conn.prepareCall(sql)) {
+            
+            stmt.setInt(1, jobId);
+            stmt.setInt(2, recruiterId);
+            
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt("Success") == 1;
+                }
+            }
+        }
+        
+        return false;
     }
 }
 
