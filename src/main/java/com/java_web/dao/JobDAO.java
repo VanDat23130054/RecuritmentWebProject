@@ -138,6 +138,90 @@ public class JobDAO {
     }
 
     /**
+     * Get all jobs for a recruiter with pagination and filtering
+     */
+    public List<Map<String, Object>> getRecruiterJobs(Integer recruiterId, Integer statusId, 
+            String keyword, int pageNumber, int pageSize) throws SQLException {
+        List<Map<String, Object>> jobs = new ArrayList<>();
+        String sql = "{call employer.sp_GetRecruiterJobs(?, ?, ?, ?, ?)}";
+        
+        try (Connection conn = DB.getConnection();
+             CallableStatement stmt = conn.prepareCall(sql)) {
+            
+            stmt.setInt(1, recruiterId);
+            
+            if (statusId != null) {
+                stmt.setInt(2, statusId);
+            } else {
+                stmt.setNull(2, Types.TINYINT);
+            }
+            
+            if (keyword != null && !keyword.trim().isEmpty()) {
+                stmt.setString(3, keyword);
+            } else {
+                stmt.setNull(3, Types.VARCHAR);
+            }
+            
+            stmt.setInt(4, pageNumber);
+            stmt.setInt(5, pageSize);
+            
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    Map<String, Object> job = new HashMap<>();
+                    job.put("jobId", rs.getInt("JobID"));
+                    job.put("title", rs.getString("Title"));
+                    job.put("slug", rs.getString("Slug"));
+                    job.put("cityName", rs.getString("CityName"));
+                    job.put("statusId", rs.getByte("StatusId"));
+                    job.put("status", rs.getString("Status"));
+                    job.put("postedAt", rs.getTimestamp("PostedAt"));
+                    job.put("expiresAt", rs.getTimestamp("ExpiresAt"));
+                    job.put("viewsCount", rs.getInt("ViewsCount"));
+                    job.put("applicationsCount", rs.getInt("ApplicationsCount"));
+                    job.put("isFeatured", rs.getBoolean("IsFeatured"));
+                    job.put("employmentType", rs.getString("EmploymentType"));
+                    job.put("salaryMin", rs.getObject("SalaryMin"));
+                    job.put("salaryMax", rs.getObject("SalaryMax"));
+                    job.put("currency", rs.getString("Currency"));
+                    jobs.add(job);
+                }
+            }
+        }
+        return jobs;
+    }
+
+    /**
+     * Get total job count for a recruiter with optional filters
+     */
+    public int getRecruiterJobCount(Integer recruiterId, Integer statusId, String keyword) 
+            throws SQLException {
+        String sql = "{call employer.sp_GetRecruiterJobCount(?, ?, ?, ?)}";
+        
+        try (Connection conn = DB.getConnection();
+             CallableStatement stmt = conn.prepareCall(sql)) {
+            
+            stmt.setInt(1, recruiterId);
+            
+            if (statusId != null) {
+                stmt.setInt(2, statusId);
+            } else {
+                stmt.setNull(2, Types.TINYINT);
+            }
+            
+            if (keyword != null && !keyword.trim().isEmpty()) {
+                stmt.setString(3, keyword);
+            } else {
+                stmt.setNull(3, Types.VARCHAR);
+            }
+            
+            stmt.registerOutParameter(4, Types.INTEGER);
+            stmt.execute();
+            
+            return stmt.getInt(4);
+        }
+    }
+
+    /**
      * Create a new job posting
      */
     public Integer createJob(Integer companyId, Integer recruiterId, String title, String description,
