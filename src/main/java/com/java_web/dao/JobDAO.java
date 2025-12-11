@@ -298,7 +298,7 @@ public class JobDAO {
     public boolean updateJob(Integer jobId, Integer recruiterId, String title, String description,
                             String requirements, String benefits, Integer cityId,
                             Integer employmentType, Integer seniorityLevel, Integer remoteType,
-                            Integer salaryMin, Integer salaryMax, String currency,
+                            Double salaryMin, Double salaryMax, String currency,
                             String expiresAt, Byte statusId) throws SQLException {
         String sql = "{call employer.sp_UpdateJob(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)}";
         
@@ -338,13 +338,13 @@ public class JobDAO {
             }
             
             if (salaryMin != null) {
-                stmt.setInt(11, salaryMin);
+                stmt.setDouble(11, salaryMin);
             } else {
                 stmt.setNull(11, Types.INTEGER);
             }
             
             if (salaryMax != null) {
-                stmt.setInt(12, salaryMax);
+                stmt.setDouble(12, salaryMax);
             } else {
                 stmt.setNull(12, Types.INTEGER);
             }

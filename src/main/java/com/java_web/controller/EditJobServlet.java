@@ -35,6 +35,39 @@ public class EditJobServlet extends HttpServlet {
         jobDAO = new JobDAO();
     }
 
+    /**
+     * Helper method to reload form data for the edit job page
+     */
+    private void reloadFormData(HttpServletRequest request, Integer jobId, Integer recruiterId) 
+            throws SQLException {
+        // Reload job data
+        Map<String, Object> job = jobDAO.getJobForEdit(jobId, recruiterId);
+        if (job == null) {
+            throw new SQLException("Job not found or access denied");
+        }
+        
+        // Load all form data
+        List<City> cities = commonDAO.getAllCities();
+        List<Skill> skills = commonDAO.getTopSkills(100);
+        List<Map<String, String>> employmentTypes = commonDAO.getEmploymentTypes();
+        List<Map<String, String>> seniorityLevels = commonDAO.getSeniorityLevels();
+        List<Map<String, String>> remoteTypes = commonDAO.getRemoteTypes();
+        
+        // Format expiresAt for date input
+        if (job.get("expiresAt") != null) {
+            Timestamp expiresAt = (Timestamp) job.get("expiresAt");
+            LocalDate expiresDate = expiresAt.toLocalDateTime().toLocalDate();
+            job.put("expiresAtFormatted", expiresDate.format(DateTimeFormatter.ISO_LOCAL_DATE));
+        }
+        
+        request.setAttribute("job", job);
+        request.setAttribute("cities", cities);
+        request.setAttribute("skills", skills);
+        request.setAttribute("employmentTypes", employmentTypes);
+        request.setAttribute("seniorityLevels", seniorityLevels);
+        request.setAttribute("remoteTypes", remoteTypes);
+    }
+
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -69,34 +102,8 @@ public class EditJobServlet extends HttpServlet {
         try {
             Integer jobId = Integer.valueOf(pathInfo.substring(1));
             
-            // Get job details (with authorization check)
-            Map<String, Object> job = jobDAO.getJobForEdit(jobId, recruiterId);
-            
-            if (job == null) {
-                response.sendError(HttpServletResponse.SC_NOT_FOUND, "Job not found or access denied");
-                return;
-            }
-
-            // Get form data
-            List<City> cities = commonDAO.getAllCities();
-            List<Skill> skills = commonDAO.getTopSkills(100);
-            List<Map<String, String>> employmentTypes = commonDAO.getEmploymentTypes();
-            List<Map<String, String>> seniorityLevels = commonDAO.getSeniorityLevels();
-            List<Map<String, String>> remoteTypes = commonDAO.getRemoteTypes();
-
-            // Format expiresAt for date input
-            Timestamp expiresAt = (Timestamp) job.get("expiresAt");
-            if (expiresAt != null) {
-                LocalDate date = expiresAt.toLocalDateTime().toLocalDate();
-                job.put("expiresAtFormatted", date.format(DateTimeFormatter.ISO_LOCAL_DATE));
-            }
-
-            request.setAttribute("job", job);
-            request.setAttribute("cities", cities);
-            request.setAttribute("skills", skills);
-            request.setAttribute("employmentTypes", employmentTypes);
-            request.setAttribute("seniorityLevels", seniorityLevels);
-            request.setAttribute("remoteTypes", remoteTypes);
+            // Load job and form data using helper method
+            reloadFormData(request, jobId, recruiterId);
 
             request.getRequestDispatcher("/WEB-INF/views/employer/edit-job.jsp").forward(request, response);
 
@@ -161,7 +168,8 @@ public class EditJobServlet extends HttpServlet {
             if (StringUtils.isBlank(title) || StringUtils.isBlank(description) || 
                 StringUtils.isBlank(cityIdStr) || StringUtils.isBlank(employmentTypeStr)) {
                 request.setAttribute("error", "Please fill in all required fields");
-                doGet(request, response);
+                reloadFormData(request, jobId, recruiterId);
+                request.getRequestDispatcher("/WEB-INF/views/employer/edit-job.jsp").forward(request, response);
                 return;
             }
 
@@ -170,8 +178,8 @@ public class EditJobServlet extends HttpServlet {
             Integer employmentType = Integer.valueOf(employmentTypeStr);
             Integer seniorityLevel = StringUtils.isNotBlank(seniorityLevelStr) ? Integer.valueOf(seniorityLevelStr) : null;
             Integer remoteType = StringUtils.isNotBlank(remoteTypeStr) ? Integer.valueOf(remoteTypeStr) : null;
-            Integer salaryMin = StringUtils.isNotBlank(salaryMinStr) ? Integer.valueOf(salaryMinStr) : null;
-            Integer salaryMax = StringUtils.isNotBlank(salaryMaxStr) ? Integer.valueOf(salaryMaxStr) : null;
+            Double salaryMin = StringUtils.isNotBlank(salaryMinStr) ? Double.valueOf(salaryMinStr) : null;
+            Double salaryMax = StringUtils.isNotBlank(salaryMaxStr) ? Double.valueOf(salaryMaxStr) : null;
             Byte statusId = StringUtils.isNotBlank(statusIdStr) ? Byte.valueOf(statusIdStr) : 2; // Default: Published
 
             // Update job
@@ -195,7 +203,8 @@ public class EditJobServlet extends HttpServlet {
 
             if (!success) {
                 request.setAttribute("error", "Failed to update job");
-                doGet(request, response);
+                reloadFormData(request, jobId, recruiterId);
+                request.getRequestDispatcher("/WEB-INF/views/employer/edit-job.jsp").forward(request, response);
                 return;
             }
 
@@ -213,9 +222,13 @@ public class EditJobServlet extends HttpServlet {
             response.sendRedirect(request.getContextPath() + "/job/" + jobId + "?success=updated");
 
         } catch (NumberFormatException e) {
-            request.setAttribute("error", "Invalid form data");
+            request.setAttribute("error", "Invalid form data: " + e.getMessage());
+            // Get job ID from URL for reloading the form
+            Integer jobId = Integer.valueOf(pathInfo.substring(1));
+            
             try {
-                doGet(request, response);
+                reloadFormData(request, jobId, recruiterId);
+                request.getRequestDispatcher("/WEB-INF/views/employer/edit-job.jsp").forward(request, response);
             } catch (Exception ex) {
                 throw new ServletException("Error reloading form", ex);
             }
