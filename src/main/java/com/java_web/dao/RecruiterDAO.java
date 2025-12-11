@@ -21,8 +21,7 @@ public class RecruiterDAO {
     public Recruiter getRecruiterByUserId(Integer userId) throws SQLException {
         String sql = "{call employer.sp_GetRecruiterByUserId(?)}";
 
-        try (Connection conn = DB.getConnection(); 
-             CallableStatement stmt = conn.prepareCall(sql)) {
+        try (Connection conn = DB.getConnection(); CallableStatement stmt = conn.prepareCall(sql)) {
 
             stmt.setInt(1, userId);
 
@@ -48,8 +47,7 @@ public class RecruiterDAO {
         Map<String, Object> stats = new HashMap<>();
         String sql = "{call employer.sp_GetRecruiterDashboardStats(?)}";
 
-        try (Connection conn = DB.getConnection(); 
-             CallableStatement stmt = conn.prepareCall(sql)) {
+        try (Connection conn = DB.getConnection(); CallableStatement stmt = conn.prepareCall(sql)) {
 
             stmt.setInt(1, recruiterId);
 
@@ -72,14 +70,15 @@ public class RecruiterDAO {
      */
     public List<Map<String, Object>> getRecruiterJobs(Integer recruiterId, int pageNumber, int pageSize) throws SQLException {
         List<Map<String, Object>> jobs = new ArrayList<>();
-        String sql = "{call employer.sp_GetRecruiterJobs(?, ?, ?)}";
+        String sql = "{call employer.sp_GetRecruiterJobs(?, ?, ?, ?, ?)}";
 
-        try (Connection conn = DB.getConnection(); 
-             CallableStatement stmt = conn.prepareCall(sql)) {
+        try (Connection conn = DB.getConnection(); CallableStatement stmt = conn.prepareCall(sql)) {
 
             stmt.setInt(1, recruiterId);
-            stmt.setInt(2, pageNumber);
-            stmt.setInt(3, pageSize);
+            stmt.setNull(2, Types.TINYINT); // statusId - NULL to get all statuses
+            stmt.setNull(3, Types.NVARCHAR); // keyword - NULL for no filtering
+            stmt.setInt(4, pageNumber);
+            stmt.setInt(5, pageSize);
 
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
@@ -110,8 +109,7 @@ public class RecruiterDAO {
         List<Map<String, Object>> applications = new ArrayList<>();
         String sql = "{call employer.sp_GetRecentApplicationsByRecruiter(?, ?)}";
 
-        try (Connection conn = DB.getConnection(); 
-             CallableStatement stmt = conn.prepareCall(sql)) {
+        try (Connection conn = DB.getConnection(); CallableStatement stmt = conn.prepareCall(sql)) {
 
             stmt.setInt(1, recruiterId);
             stmt.setInt(2, limit);
@@ -142,8 +140,7 @@ public class RecruiterDAO {
         List<Map<String, Object>> stats = new ArrayList<>();
         String sql = "{call employer.sp_GetApplicationStatsByStatus(?)}";
 
-        try (Connection conn = DB.getConnection(); 
-             CallableStatement stmt = conn.prepareCall(sql)) {
+        try (Connection conn = DB.getConnection(); CallableStatement stmt = conn.prepareCall(sql)) {
 
             stmt.setInt(1, recruiterId);
 
@@ -165,8 +162,7 @@ public class RecruiterDAO {
     public Integer createRecruiter(Recruiter recruiter) throws SQLException {
         String sql = "{call employer.sp_CreateRecruiter(?, ?, ?, ?, ?)}";
 
-        try (Connection conn = DB.getConnection(); 
-             CallableStatement stmt = conn.prepareCall(sql)) {
+        try (Connection conn = DB.getConnection(); CallableStatement stmt = conn.prepareCall(sql)) {
 
             stmt.setInt(1, recruiter.getUserId());
             stmt.setInt(2, recruiter.getCompanyId());
