@@ -2,6 +2,7 @@ package com.java_web.controller;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.sql.SQLException;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -32,17 +33,10 @@ public class UpdateApplicationStatusServlet extends HttpServlet {
             return;
         }
 
-        // Check role
-        String role = (String) session.getAttribute("role");
-        if (!"Recruiter".equals(role) && !"EmployerAdmin".equals(role)) {
-            out.print("{\"success\": false, \"message\": \"Access denied\"}");
-            return;
-        }
-
-        // Get recruiter ID
+        // Get recruiter ID - this serves as role check too
         Integer recruiterId = (Integer) session.getAttribute("recruiterId");
         if (recruiterId == null) {
-            out.print("{\"success\": false, \"message\": \"Recruiter profile not found\"}");
+            out.print("{\"success\": false, \"message\": \"Access denied. Only recruiters can update application status.\"}");
             return;
         }
 
@@ -90,7 +84,7 @@ public class UpdateApplicationStatusServlet extends HttpServlet {
 
         } catch (NumberFormatException e) {
             out.print("{\"success\": false, \"message\": \"Invalid application ID\"}");
-        } catch (Exception e) {
+        } catch (SQLException e) {
             e.printStackTrace();
             out.print("{\"success\": false, \"message\": \"An error occurred while updating status\"}");
         }

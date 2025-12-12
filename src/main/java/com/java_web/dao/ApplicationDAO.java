@@ -149,7 +149,7 @@ public class ApplicationDAO {
      */
     public boolean updateApplicationStatus(Integer applicationId, Integer recruiterId,
             String newStatus) throws SQLException {
-        String sql = "{call employer.sp_UpdateApplicationStatus(?, ?, ?)}";
+        String sql = "{call employer.sp_UpdateApplicationStatus(?, ?, ?, ?)}";
 
         try (Connection conn = DB.getConnection(); CallableStatement stmt = conn.prepareCall(sql)) {
 
@@ -157,8 +157,14 @@ public class ApplicationDAO {
             stmt.setInt(2, recruiterId);
             stmt.setString(3, newStatus);
 
-            int rowsAffected = stmt.executeUpdate();
-            return rowsAffected > 0;
+            // Register OUTPUT parameter
+            stmt.registerOutParameter(4, java.sql.Types.BIT);
+
+            stmt.execute();
+
+            // Get the success flag from OUTPUT parameter
+            boolean success = stmt.getBoolean(4);
+            return success;
         }
     }
 

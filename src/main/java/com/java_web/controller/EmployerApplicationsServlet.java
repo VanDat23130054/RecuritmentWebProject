@@ -78,11 +78,11 @@ public class EmployerApplicationsServlet extends HttpServlet {
 
             // Get application counts by status for filter tabs
             Map<String, Integer> statusCounts = applicationDAO.getApplicationStatusCounts(recruiterId);
-            int allCount = statusCounts.values().stream().mapToInt(Integer::intValue).sum();
-            int appliedCount = statusCounts.getOrDefault("Applied", 0);
-            int underReviewCount = statusCounts.getOrDefault("Under Review", 0);
-            int interviewCount = statusCounts.getOrDefault("Interview Scheduled", 0);
-            int rejectedCount = statusCounts.getOrDefault("Rejected", 0);
+            int allCount = statusCounts.getOrDefault("all", 0);
+            int appliedCount = statusCounts.getOrDefault("applied", 0);
+            int underReviewCount = statusCounts.getOrDefault("underReview", 0);
+            int interviewCount = statusCounts.getOrDefault("interview", 0);
+            int rejectedCount = statusCounts.getOrDefault("rejected", 0);
 
             // Get recruiter's jobs for job filter dropdown
             List<Map<String, Object>> recruiterJobs = jobDAO.getRecruiterJobs(

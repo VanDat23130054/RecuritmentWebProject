@@ -176,12 +176,12 @@
                                                                     <i class="fas fa-edit"></i>
                                                                 </button>
                                                                 <ul class="dropdown-menu">
-                                                                    <li><a class="dropdown-item" href="#" onclick="updateStatus(${app.applicationId}, 'Applied')">Applied</a></li>
-                                                                    <li><a class="dropdown-item" href="#" onclick="updateStatus(${app.applicationId}, 'Under Review')">Under Review</a></li>
-                                                                    <li><a class="dropdown-item" href="#" onclick="updateStatus(${app.applicationId}, 'Interview Scheduled')">Interview Scheduled</a></li>
-                                                                    <li><a class="dropdown-item" href="#" onclick="updateStatus(${app.applicationId}, 'Offer Extended')">Offer Extended</a></li>
+                                                                    <li><a class="dropdown-item" href="#" onclick="return updateStatus(event, ${app.applicationId}, 'Applied')">Applied</a></li>
+                                                                    <li><a class="dropdown-item" href="#" onclick="return updateStatus(event, ${app.applicationId}, 'Under Review')">Under Review</a></li>
+                                                                    <li><a class="dropdown-item" href="#" onclick="return updateStatus(event, ${app.applicationId}, 'Interview Scheduled')">Interview Scheduled</a></li>
+                                                                    <li><a class="dropdown-item" href="#" onclick="return updateStatus(event, ${app.applicationId}, 'Offer Extended')">Offer Extended</a></li>
                                                                     <li><hr class="dropdown-divider"></li>
-                                                                    <li><a class="dropdown-item text-danger" href="#" onclick="updateStatus(${app.applicationId}, 'Rejected')">Reject</a></li>
+                                                                    <li><a class="dropdown-item text-danger" href="#" onclick="return updateStatus(event, ${app.applicationId}, 'Rejected')">Reject</a></li>
                                                                 </ul>
                                                             </div>
                                                         </div>
@@ -265,23 +265,8 @@
     <%@ include file="../common/footer.jsp" %>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="${pageContext.request.contextPath}/js/alert.js"></script>
     <script>
-        // Show alert message
-        function showAlert(message, type) {
-            const alertContainer = document.getElementById('alertContainer');
-            const alert = document.createElement('div');
-            alert.className = `alert alert-${type} alert-dismissible fade show`;
-            alert.innerHTML = `
-                ${message}
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            `;
-            alertContainer.appendChild(alert);
-            
-            setTimeout(() => {
-                alert.remove();
-            }, 5000);
-        }
-
         // View application details
         function viewApplication(applicationId) {
             const modal = new bootstrap.Modal(document.getElementById('applicationModal'));
@@ -337,40 +322,80 @@
         }
 
         // Update application status
-        function updateStatus(applicationId, newStatus) {
-            if (!confirm(`Change application status to "${newStatus}"?`)) {
-                return;
+        function updateStatus(event, applicationId, newStatus) {
+            event.preventDefault();
+            
+            console.log('updateStatus called:', applicationId, newStatus);
+            
+            if (!confirm('Change application status to "' + newStatus + '"?')) {
+                console.log('User cancelled');
+                return false;
             }
 
-            showAlert('<i class="fas fa-spinner fa-spin me-2"></i>Updating status...', 'info');
+            console.log('User confirmed, sending request...');
 
-            fetch('${pageContext.request.contextPath}/employer/applications/updateStatus', {
+            // Check if alert functions exist
+            if (typeof showInfo === 'function') {
+                showInfo('Updating application status...', 'Processing', 0);
+            } else {
+                console.warn('showInfo function not found');
+            }
+
+            const url = '${pageContext.request.contextPath}/employer/applications/updateStatus';
+            const body = 'applicationId=' + applicationId + '&status=' + encodeURIComponent(newStatus);
+            
+            console.log('Fetch URL:', url);
+            console.log('Request body:', body);
+
+            fetch(url, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
                 },
-                body: 'applicationId=' + applicationId + '&status=' + encodeURIComponent(newStatus)
+                body: body
             })
-            .then(response => response.json())
+            .then(response => {
+                console.log('Response status:', response.status);
+                return response.json();
+            })
             .then(data => {
+                console.log('Response data:', data);
                 if (data.success) {
-                    showAlert('<i class="fas fa-check-circle me-2"></i>' + data.message, 'success');
+                    if (typeof showSuccess === 'function') {
+                        showSuccess(data.message || 'Status updated successfully!', 'Updated');
+                    } else {
+                        alert(data.message || 'Status updated successfully!');
+                    }
                     setTimeout(() => {
                         location.reload();
-                    }, 1000);
+                    }, 1500);
                 } else {
-                    showAlert('<i class="fas fa-exclamation-circle me-2"></i>' + data.message, 'danger');
+                    if (typeof showError === 'function') {
+                        showError(data.message || 'Failed to update status', 'Error');
+                    } else {
+                        alert('Error: ' + (data.message || 'Failed to update status'));
+                    }
                 }
             })
             .catch(error => {
-                showAlert('<i class="fas fa-exclamation-circle me-2"></i>Failed to update status', 'danger');
+                console.error('Fetch error:', error);
+                if (typeof showError === 'function') {
+                    showError('An error occurred. Please try again.', 'Network Error');
+                } else {
+                    alert('An error occurred. Please try again.');
+                }
             });
+            
+            return false;
         }
 
         // Check for success message in URL
         const urlParams = new URLSearchParams(window.location.search);
         if (urlParams.get('success') === 'statusUpdated') {
-            showAlert('<i class="fas fa-check-circle me-2"></i>Application status updated successfully!', 'success');
+            showSuccess('Application status updated successfully!', 'Success');
+            // Clean up URL
+            window.history.replaceState({}, document.title, window.location.pathname + '?' + 
+                new URLSearchParams([...urlParams].filter(([key]) => key !== 'success')).toString());
         }
     </script>
 
