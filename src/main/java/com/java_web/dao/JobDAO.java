@@ -136,4 +136,37 @@ public class JobDAO {
         }
         return jobs;
     }
+
+    // New: get all jobs posted by a recruiter (by userId)
+    public List<Map<String, Object>> getJobsByRecruiter(Integer userId) throws SQLException {
+        List<Map<String, Object>> jobs = new ArrayList<>();
+        String sql = "{call employer.sp_GetJobsByRecruiter(?)}";
+
+        try (Connection conn = DB.getConnection(); CallableStatement stmt = conn.prepareCall(sql)) {
+
+            stmt.setInt(1, userId);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    Map<String, Object> job = new HashMap<>();
+                    job.put("jobId", rs.getInt("JobID"));
+                    job.put("title", rs.getString("Title"));
+                    job.put("slug", rs.getString("Slug"));
+                    job.put("companyId", rs.getInt("CompanyID"));
+                    job.put("companyName", rs.getString("CompanyName"));
+                    job.put("logoUrl", rs.getString("LogoUrl"));
+                    job.put("cityName", rs.getString("CityName"));
+                    job.put("salaryMin", rs.getObject("SalaryMin"));
+                    job.put("salaryMax", rs.getObject("SalaryMax"));
+                    job.put("currency", rs.getString("Currency"));
+                    job.put("isFeatured", rs.getBoolean("IsFeatured"));
+                    job.put("Skills", rs.getString("Skills"));
+                    job.put("postedAt", rs.getTimestamp("PostedAt"));
+                    jobs.add(job);
+                }
+            }
+        }
+        return jobs;
+    }
+
 }
