@@ -33,17 +33,10 @@ public class ApplicationDetailServlet extends HttpServlet {
             return;
         }
 
-        // Check role
-        String role = (String) session.getAttribute("role");
-        if (!"Recruiter".equals(role) && !"EmployerAdmin".equals(role)) {
-            out.print("{\"success\": false, \"message\": \"Access denied\"}");
-            return;
-        }
-
-        // Get recruiter ID
+        // Get recruiter ID - this serves as role check too
         Integer recruiterId = (Integer) session.getAttribute("recruiterId");
         if (recruiterId == null) {
-            out.print("{\"success\": false, \"message\": \"Recruiter profile not found\"}");
+            out.print("{\"success\": false, \"message\": \"Access denied. Only recruiters can view application details.\"}");
             return;
         }
 

@@ -122,8 +122,8 @@ BEGIN
         c.Name AS companyName,
         cand.FullName AS candidateName,
         u.Email AS candidateEmail,
-        cand.Summary AS candidatePhone,
-        cand.CityId AS candidateLocation,
+        cand.Summary AS candidateSummary,
+        cities.Name AS candidateCity,
         res.FileName AS resumeFileName,
         res.FileUrl AS resumeFileUrl
     FROM candidate.Applications a
@@ -132,6 +132,7 @@ BEGIN
     INNER JOIN employer.Companies c ON j.CompanyId = c.CompanyId
     INNER JOIN candidate.Candidates cand ON a.CandidateId = cand.CandidateId
     INNER JOIN auth.Users u ON cand.UserId = u.UserId
+    LEFT JOIN common.Cities cities ON cand.CityId = cities.CityId
     LEFT JOIN candidate.Resumes res ON a.ResumeId = res.ResumeId
     WHERE a.ApplicationId = @applicationId
         AND r.RecruiterId = @recruiterId;

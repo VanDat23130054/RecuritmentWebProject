@@ -123,20 +123,21 @@ public class ApplicationDAO {
                     Map<String, Object> app = new HashMap<>();
                     app.put("applicationId", rs.getInt("ApplicationId"));
                     app.put("jobId", rs.getInt("JobId"));
-                    app.put("jobTitle", rs.getString("JobTitle"));
                     app.put("candidateId", rs.getInt("CandidateId"));
-                    app.put("candidateName", rs.getString("CandidateName"));
-                    app.put("candidateEmail", rs.getString("CandidateEmail"));
-                    app.put("candidatePhone", rs.getString("CandidatePhone"));
+                    app.put("candidateEmail", rs.getString("candidateEmail"));
+                    app.put("candidateName", rs.getString("candidateName"));
+                    app.put("candidateSummary", rs.getString("candidateSummary"));
+                    app.put("candidateCity", rs.getString("candidateCity"));
                     app.put("coverLetter", rs.getString("CoverLetter"));
                     app.put("source", rs.getString("Source"));
                     app.put("appliedAt", rs.getTimestamp("AppliedAt"));
                     app.put("status", rs.getString("Status"));
-                    app.put("statusUpdatedAt", rs.getTimestamp("StatusUpdatedAt"));
                     app.put("resumeId", rs.getObject("ResumeId"));
-                    app.put("fileUrl", rs.getString("FileUrl"));
-                    app.put("fileName", rs.getString("FileName"));
-                    app.put("resumeData", rs.getString("ResumeData"));
+                    app.put("jobTitle", rs.getString("jobTitle"));
+                    app.put("jobDescription", rs.getString("jobDescription"));
+                    app.put("companyName", rs.getString("companyName"));
+                    app.put("resumeFileName", rs.getString("resumeFileName"));
+                    app.put("resumeFileUrl", rs.getString("resumeFileUrl"));
                     return app;
                 }
             }
