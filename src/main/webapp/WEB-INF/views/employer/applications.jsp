@@ -342,12 +342,12 @@
                         }
                         
                         const summaryHtml = app.candidateSummary
-                            ? `<p class="mb-0">${app.candidateSummary}</p>`
+                            ? `<p class="mb-0">${'$'}{app.candidateSummary}</p>`
                             : '<p class="text-muted mb-0">No candidate summary provided.</p>';
                         
                         const resumeHtml = app.resumeFileUrl
-                            ? `<a href="${app.resumeFileUrl}" target="_blank" class="btn btn-outline-primary btn-sm">
-                                    <i class="fas fa-file-download me-1"></i>${app.resumeFileName || 'Download Resume'}
+                            ? `<a href="${pageContext.request.contextPath}${'$'}{app.resumeFileUrl}" target="_blank" class="btn btn-outline-primary btn-sm">
+                                    <i class="fas fa-file-download me-1"></i>${'$'}{app.resumeFileName || 'Download Resume'}
                                </a>`
                             : '<span class="text-muted">No resume uploaded</span>';
                         
@@ -355,36 +355,36 @@
                             <div class="row">
                                 <div class="col-md-6 mb-3">
                                     <h6 class="text-muted">Candidate Information</h6>
-                                    <p class="mb-1"><strong>Name:</strong> \${app.candidateName || 'N/A'}</p>
-                                    <p class="mb-1"><strong>Email:</strong> \${app.candidateEmail || 'N/A'}</p>
-                                    <p class="mb-1"><strong>Location:</strong> \${app.candidateCity || 'N/A'}</p>
+                                    <p class="mb-1"><strong>Name:</strong> ${'$'}{app.candidateName || 'N/A'}</p>
+                                    <p class="mb-1"><strong>Email:</strong> ${'$'}{app.candidateEmail || 'N/A'}</p>
+                                    <p class="mb-1"><strong>Location:</strong> ${'$'}{app.candidateCity || 'N/A'}</p>
                                 </div>
                                 <div class="col-md-6 mb-3">
                                     <h6 class="text-muted">Job Information</h6>
-                                    <p class="mb-1"><strong>Position:</strong> \${app.jobTitle || 'N/A'}</p>
-                                    <p class="mb-1"><strong>Company:</strong> \${app.companyName || 'N/A'}</p>
-                                    <p class="mb-1"><strong>Applied:</strong> \${appliedDate}</p>
-                                    <p class="mb-1"><strong>Source:</strong> \${app.source || 'N/A'}</p>
+                                    <p class="mb-1"><strong>Position:</strong> ${'$'}{app.jobTitle || 'N/A'}</p>
+                                    <p class="mb-1"><strong>Company:</strong> ${'$'}{app.companyName || 'N/A'}</p>
+                                    <p class="mb-1"><strong>Applied:</strong> ${'$'}{appliedDate}</p>
+                                    <p class="mb-1"><strong>Source:</strong> ${'$'}{app.source || 'N/A'}</p>
                                 </div>
                                 <div class="col-12 mb-3">
                                     <h6 class="text-muted">Candidate Summary</h6>
                                     <div class="border rounded p-3 bg-light">
-                                        \${summaryHtml}
+                                        ${'$'}{summaryHtml}
                                     </div>
                                 </div>
                                 <div class="col-12 mb-3">
                                     <h6 class="text-muted">Cover Letter</h6>
                                     <div class="border rounded p-3 bg-light">
-                                        \${app.coverLetter || '<em class="text-muted">No cover letter provided</em>'}
+                                        ${'$'}{app.coverLetter || '<em class="text-muted">No cover letter provided</em>'}
                                     </div>
                                 </div>
                                 <div class="col-12 mb-3">
                                     <h6 class="text-muted">Resume</h6>
-                                    \${resumeHtml}
+                                    ${'$'}{resumeHtml}
                                 </div>
                                 <div class="col-12">
                                     <h6 class="text-muted">Application Status</h6>
-                                    <p><span class="badge bg-primary">\${app.status || 'Unknown'}</span></p>
+                                    <p><span class="badge bg-primary">${'$'}{app.status || 'Unknown'}</span></p>
                                 </div>
                             </div>
                         `;

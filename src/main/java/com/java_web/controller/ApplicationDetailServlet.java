@@ -65,11 +65,18 @@ public class ApplicationDetailServlet extends HttpServlet {
             json.append("\"candidateName\": \"").append(escapeJson(application.get("candidateName"))).append("\",");
             json.append("\"candidateEmail\": \"").append(escapeJson(application.get("candidateEmail"))).append("\",");
 
-            Object phone = application.get("candidatePhone");
-            if (phone != null) {
-                json.append("\"candidatePhone\": \"").append(escapeJson(phone)).append("\",");
+            Object candidateSummary = application.get("candidateSummary");
+            if (candidateSummary != null) {
+                json.append("\"candidateSummary\": \"").append(escapeJson(candidateSummary)).append("\",");
             } else {
-                json.append("\"candidatePhone\": null,");
+                json.append("\"candidateSummary\": null,");
+            }
+
+            Object candidateCity = application.get("candidateCity");
+            if (candidateCity != null) {
+                json.append("\"candidateCity\": \"").append(escapeJson(candidateCity)).append("\",");
+            } else {
+                json.append("\"candidateCity\": null,");
             }
 
             json.append("\"jobTitle\": \"").append(escapeJson(application.get("jobTitle"))).append("\",");
@@ -82,8 +89,37 @@ public class ApplicationDetailServlet extends HttpServlet {
                 json.append("\"coverLetter\": null,");
             }
 
+            Object source = application.get("source");
+            if (source != null) {
+                json.append("\"source\": \"").append(escapeJson(source)).append("\",");
+            } else {
+                json.append("\"source\": null,");
+            }
+
             json.append("\"appliedAt\": \"").append(application.get("appliedAt")).append("\",");
-            json.append("\"status\": \"").append(escapeJson(application.get("status"))).append("\"");
+            json.append("\"status\": \"").append(escapeJson(application.get("status"))).append("\",");
+
+            Object resumeId = application.get("resumeId");
+            if (resumeId != null) {
+                json.append("\"resumeId\": ").append(resumeId).append(",");
+            } else {
+                json.append("\"resumeId\": null,");
+            }
+
+            Object resumeFileName = application.get("resumeFileName");
+            if (resumeFileName != null) {
+                json.append("\"resumeFileName\": \"").append(escapeJson(resumeFileName)).append("\",");
+            } else {
+                json.append("\"resumeFileName\": null,");
+            }
+
+            Object resumeFileUrl = application.get("resumeFileUrl");
+            if (resumeFileUrl != null) {
+                json.append("\"resumeFileUrl\": \"").append(escapeJson(resumeFileUrl)).append("\"");
+            } else {
+                json.append("\"resumeFileUrl\": null");
+            }
+
             json.append("}}");
 
             out.print(json.toString());
