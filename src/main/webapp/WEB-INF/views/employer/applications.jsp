@@ -403,9 +403,29 @@
                 });
         }
 
-        // Download resume
+        // Download resume using hidden iframe to avoid navigation issues
         function downloadResume(resumeId) {
-            window.location.href = '${pageContext.request.contextPath}/employer/applications/resume?id=' + resumeId;
+            if (!resumeId) {
+                if (typeof showError === 'function') {
+                    showError('Resume ID not found', 'Error');
+                } else {
+                    alert('Resume ID not found');
+                }
+                return;
+            }
+            console.log('Downloading resume ID:', resumeId);
+            
+            // Create or get hidden iframe
+            let iframe = document.getElementById('downloadFrame');
+            if (!iframe) {
+                iframe = document.createElement('iframe');
+                iframe.id = 'downloadFrame';
+                iframe.style.display = 'none';
+                document.body.appendChild(iframe);
+            }
+            
+            // Use iframe to download, preserving session
+            iframe.src = '${pageContext.request.contextPath}/employer/applications/resume?id=' + resumeId;
         }
 
         // Update application status
