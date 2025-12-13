@@ -10,19 +10,59 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/employer-dashboard.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/alert.css">
 </head>
 <body>
-    <%@ include file="../common/header.jsp" %>
+    <jsp:include page="../common/header.jsp" />
 
-    <div class="container-fluid py-4">
-        <div class="row mb-4">
-            <div class="col-12">
-                <h2 class="mb-3">
-                    <i class="fas fa-file-alt me-2"></i>Job Applications
-                </h2>
-                
-                <!-- Alert Container -->
-                <div id="alertContainer"></div>
+    <div class="dashboard-container">
+        <!-- Sidebar Navigation -->
+        <aside class="dashboard-sidebar">
+            <div class="sidebar-header">
+                <h3><i class="fas fa-building"></i> Employer Portal</h3>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <a href="${pageContext.request.contextPath}/employer/dashboard" class="nav-item">
+                    <i class="fas fa-chart-line"></i> Dashboard
+                </a>
+                <a href="${pageContext.request.contextPath}/employer/jobs" class="nav-item">
+                    <i class="fas fa-briefcase"></i> My Jobs
+                </a>
+                <a href="${pageContext.request.contextPath}/employer/post-job" class="nav-item">
+                    <i class="fas fa-plus-circle"></i> Post New Job
+                </a>
+                <a href="${pageContext.request.contextPath}/employer/applications" class="nav-item active">
+                    <i class="fas fa-file-alt"></i> Applications
+                </a>
+                <a href="${pageContext.request.contextPath}/employer/company-profile" class="nav-item">
+                    <i class="fas fa-building"></i> Company Profile
+                </a>
+                <a href="${pageContext.request.contextPath}/employer/settings" class="nav-item">
+                    <i class="fas fa-cog"></i> Settings
+                </a>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="dashboard-main">
+            <div id="alertContainer"></div>
+
+            <div class="container-fluid py-4">
+                <div class="row mb-4">
+                    <div class="col-12">
+                <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
+                    <div>
+                        <h2 class="mb-1">
+                            <i class="fas fa-file-alt me-2"></i>Job Applications
+                        </h2>
+                        <p class="text-muted mb-0">Review and manage every candidate in one place</p>
+                    </div>
+                    <a href="${pageContext.request.contextPath}/employer/post-job" class="btn btn-primary">
+                        <i class="fas fa-plus me-1"></i>Post New Job
+                    </a>
+                </div>
 
                 <!-- Filter Card -->
                 <div class="card shadow-sm mb-4">
@@ -239,6 +279,8 @@
             </div>
         </div>
     </div>
+        </main>
+    </div>
 
     <!-- Application Detail Modal -->
     <div class="modal fade" id="applicationModal" tabindex="-1" aria-labelledby="applicationModalLabel" aria-hidden="true">
@@ -262,7 +304,7 @@
         </div>
     </div>
 
-    <%@ include file="../common/footer.jsp" %>
+    <jsp:include page="../common/footer.jsp" />
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="${pageContext.request.contextPath}/js/alert.js"></script>
