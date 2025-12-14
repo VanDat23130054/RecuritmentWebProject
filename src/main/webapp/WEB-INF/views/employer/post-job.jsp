@@ -38,8 +38,8 @@
                 <a href="${pageContext.request.contextPath}/employer/company-profile" class="nav-item">
                     <i class="fas fa-building"></i> Company Profile
                 </a>
-                 <a href="${pageContext.request.contextPath}/employer/graph" class="nav-item">
-                    <i class="fa-solid fa-chart-line"></i> Graph
+                <a href="${pageContext.request.contextPath}/employer/graph" class="nav-item">
+                    <i class="fa-solid fa-chart-line"></i> Analytics
                 </a>
             </nav>
         </aside>

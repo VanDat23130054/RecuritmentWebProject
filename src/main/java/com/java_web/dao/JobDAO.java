@@ -71,12 +71,11 @@ public class JobDAO {
 
     public Map<String, Object> getJobDetail(Integer jobId) throws SQLException {
         String sql = "{call employer.sp_GetJobDetail(?)}";
-        
-        try (Connection conn = DB.getConnection();
-             CallableStatement stmt = conn.prepareCall(sql)) {
-            
+
+        try (Connection conn = DB.getConnection(); CallableStatement stmt = conn.prepareCall(sql)) {
+
             stmt.setInt(1, jobId);
-            
+
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
                     Map<String, Object> job = new HashMap<>();
@@ -107,18 +106,17 @@ public class JobDAO {
         return null;
     }
 
-    public List<Map<String, Object>> getRelatedJobs(Integer jobId, Integer companyId, int limit) 
+    public List<Map<String, Object>> getRelatedJobs(Integer jobId, Integer companyId, int limit)
             throws SQLException {
         List<Map<String, Object>> jobs = new ArrayList<>();
         String sql = "{call employer.sp_GetRelatedJobs(?, ?, ?)}";
-        
-        try (Connection conn = DB.getConnection();
-             CallableStatement stmt = conn.prepareCall(sql)) {
-            
+
+        try (Connection conn = DB.getConnection(); CallableStatement stmt = conn.prepareCall(sql)) {
+
             stmt.setInt(1, jobId);
             stmt.setInt(2, companyId);
             stmt.setInt(3, limit);
-            
+
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
                     Map<String, Object> job = new HashMap<>();
@@ -140,31 +138,30 @@ public class JobDAO {
     /**
      * Get all jobs for a recruiter with pagination and filtering
      */
-    public List<Map<String, Object>> getRecruiterJobs(Integer recruiterId, Integer statusId, 
+    public List<Map<String, Object>> getRecruiterJobs(Integer recruiterId, Integer statusId,
             String keyword, int pageNumber, int pageSize) throws SQLException {
         List<Map<String, Object>> jobs = new ArrayList<>();
         String sql = "{call employer.sp_GetRecruiterJobs(?, ?, ?, ?, ?)}";
-        
-        try (Connection conn = DB.getConnection();
-             CallableStatement stmt = conn.prepareCall(sql)) {
-            
+
+        try (Connection conn = DB.getConnection(); CallableStatement stmt = conn.prepareCall(sql)) {
+
             stmt.setInt(1, recruiterId);
-            
+
             if (statusId != null) {
                 stmt.setInt(2, statusId);
             } else {
                 stmt.setNull(2, Types.TINYINT);
             }
-            
+
             if (keyword != null && !keyword.trim().isEmpty()) {
                 stmt.setString(3, keyword);
             } else {
                 stmt.setNull(3, Types.VARCHAR);
             }
-            
+
             stmt.setInt(4, pageNumber);
             stmt.setInt(5, pageSize);
-            
+
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
                     Map<String, Object> job = new HashMap<>();
@@ -193,30 +190,29 @@ public class JobDAO {
     /**
      * Get total job count for a recruiter with optional filters
      */
-    public int getRecruiterJobCount(Integer recruiterId, Integer statusId, String keyword) 
+    public int getRecruiterJobCount(Integer recruiterId, Integer statusId, String keyword)
             throws SQLException {
         String sql = "{call employer.sp_GetRecruiterJobCount(?, ?, ?, ?)}";
-        
-        try (Connection conn = DB.getConnection();
-             CallableStatement stmt = conn.prepareCall(sql)) {
-            
+
+        try (Connection conn = DB.getConnection(); CallableStatement stmt = conn.prepareCall(sql)) {
+
             stmt.setInt(1, recruiterId);
-            
+
             if (statusId != null) {
                 stmt.setInt(2, statusId);
             } else {
                 stmt.setNull(2, Types.TINYINT);
             }
-            
+
             if (keyword != null && !keyword.trim().isEmpty()) {
                 stmt.setString(3, keyword);
             } else {
                 stmt.setNull(3, Types.VARCHAR);
             }
-            
+
             stmt.registerOutParameter(4, Types.INTEGER);
             stmt.execute();
-            
+
             return stmt.getInt(4);
         }
     }
@@ -225,74 +221,73 @@ public class JobDAO {
      * Create a new job posting
      */
     public Integer createJob(Integer companyId, Integer recruiterId, String title, String description,
-                            String requirements, String benefits, Integer cityId,
-                            Integer employmentType, Integer seniorityLevel, Integer remoteType,
-                            Integer salaryMin, Integer salaryMax, String currency,
-                            String expiresAt, Byte statusId) throws SQLException {
+            String requirements, String benefits, Integer cityId,
+            Integer employmentType, Integer seniorityLevel, Integer remoteType,
+            Integer salaryMin, Integer salaryMax, String currency,
+            String expiresAt, Byte statusId) throws SQLException {
         String sql = "{call employer.sp_CreateJob(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)}";
-        
-        try (Connection conn = DB.getConnection();
-             CallableStatement stmt = conn.prepareCall(sql)) {
-            
+
+        try (Connection conn = DB.getConnection(); CallableStatement stmt = conn.prepareCall(sql)) {
+
             stmt.setInt(1, companyId);
             stmt.setInt(2, recruiterId);
             stmt.setString(3, title);
             stmt.setString(4, description);
-            
+
             if (requirements != null) {
                 stmt.setString(5, requirements);
             } else {
                 stmt.setNull(5, Types.NVARCHAR);
             }
-            
+
             if (benefits != null) {
                 stmt.setString(6, benefits);
             } else {
                 stmt.setNull(6, Types.NVARCHAR);
             }
-            
+
             stmt.setInt(7, cityId);
             stmt.setInt(8, employmentType);
-            
+
             if (seniorityLevel != null) {
                 stmt.setInt(9, seniorityLevel);
             } else {
                 stmt.setNull(9, Types.INTEGER);
             }
-            
+
             if (remoteType != null) {
                 stmt.setInt(10, remoteType);
             } else {
                 stmt.setNull(10, Types.INTEGER);
             }
-            
+
             if (salaryMin != null) {
                 stmt.setInt(11, salaryMin);
             } else {
                 stmt.setNull(11, Types.INTEGER);
             }
-            
+
             if (salaryMax != null) {
                 stmt.setInt(12, salaryMax);
             } else {
                 stmt.setNull(12, Types.INTEGER);
             }
-            
+
             if (currency != null) {
                 stmt.setString(13, currency);
             } else {
                 stmt.setString(13, "USD");
             }
-            
+
             if (expiresAt != null && !expiresAt.isEmpty()) {
                 stmt.setString(14, expiresAt);
             } else {
                 stmt.setNull(14, Types.VARCHAR);
             }
-            
+
             stmt.setByte(15, statusId);
             stmt.registerOutParameter(16, Types.INTEGER);
-            
+
             stmt.execute();
             return stmt.getInt(16);
         }
@@ -303,10 +298,9 @@ public class JobDAO {
      */
     public void addJobSkill(Integer jobId, Integer skillId) throws SQLException {
         String sql = "{call employer.sp_AddJobSkill(?, ?)}";
-        
-        try (Connection conn = DB.getConnection();
-             CallableStatement stmt = conn.prepareCall(sql)) {
-            
+
+        try (Connection conn = DB.getConnection(); CallableStatement stmt = conn.prepareCall(sql)) {
+
             stmt.setInt(1, jobId);
             stmt.setInt(2, skillId);
             stmt.execute();
@@ -319,13 +313,12 @@ public class JobDAO {
     public Map<String, Object> getJobForEdit(Integer jobId, Integer recruiterId) throws SQLException {
         String sql = "{call employer.sp_GetJobForEdit(?, ?)}";
         Map<String, Object> result = new HashMap<>();
-        
-        try (Connection conn = DB.getConnection();
-             CallableStatement stmt = conn.prepareCall(sql)) {
-            
+
+        try (Connection conn = DB.getConnection(); CallableStatement stmt = conn.prepareCall(sql)) {
+
             stmt.setInt(1, jobId);
             stmt.setInt(2, recruiterId);
-            
+
             // First result set: job details
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
@@ -339,13 +332,13 @@ public class JobDAO {
                     result.put("benefits", rs.getString("Benefits"));
                     result.put("cityId", rs.getInt("CityId"));
                     result.put("employmentTypeId", rs.getByte("EmploymentTypeId"));
-                    
+
                     Object seniorityLevel = rs.getObject("SeniorityLevelId");
                     result.put("seniorityLevelId", seniorityLevel != null ? rs.getByte("SeniorityLevelId") : null);
-                    
+
                     Object remoteType = rs.getObject("RemoteTypeId");
                     result.put("remoteTypeId", remoteType != null ? rs.getByte("RemoteTypeId") : null);
-                    
+
                     result.put("salaryMin", rs.getObject("SalaryMin"));
                     result.put("salaryMax", rs.getObject("SalaryMax"));
                     result.put("currency", rs.getString("Currency"));
@@ -357,7 +350,7 @@ public class JobDAO {
                     result.put("applicationsCount", rs.getInt("ApplicationsCount"));
                 }
             }
-            
+
             // Second result set: skills
             if (stmt.getMoreResults()) {
                 List<Map<String, Object>> skills = new ArrayList<>();
@@ -372,7 +365,7 @@ public class JobDAO {
                 result.put("skills", skills);
             }
         }
-        
+
         return result.isEmpty() ? null : result;
     }
 
@@ -380,80 +373,79 @@ public class JobDAO {
      * Update an existing job posting
      */
     public boolean updateJob(Integer jobId, Integer recruiterId, String title, String description,
-                            String requirements, String benefits, Integer cityId,
-                            Integer employmentType, Integer seniorityLevel, Integer remoteType,
-                            Double salaryMin, Double salaryMax, String currency,
-                            String expiresAt, Byte statusId) throws SQLException {
+            String requirements, String benefits, Integer cityId,
+            Integer employmentType, Integer seniorityLevel, Integer remoteType,
+            Double salaryMin, Double salaryMax, String currency,
+            String expiresAt, Byte statusId) throws SQLException {
         String sql = "{call employer.sp_UpdateJob(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)}";
-        
-        try (Connection conn = DB.getConnection();
-             CallableStatement stmt = conn.prepareCall(sql)) {
-            
+
+        try (Connection conn = DB.getConnection(); CallableStatement stmt = conn.prepareCall(sql)) {
+
             stmt.setInt(1, jobId);
             stmt.setInt(2, recruiterId);
             stmt.setString(3, title);
             stmt.setString(4, description);
-            
+
             if (requirements != null) {
                 stmt.setString(5, requirements);
             } else {
                 stmt.setNull(5, Types.NVARCHAR);
             }
-            
+
             if (benefits != null) {
                 stmt.setString(6, benefits);
             } else {
                 stmt.setNull(6, Types.NVARCHAR);
             }
-            
+
             stmt.setInt(7, cityId);
             stmt.setByte(8, employmentType.byteValue());
-            
+
             if (seniorityLevel != null) {
                 stmt.setByte(9, seniorityLevel.byteValue());
             } else {
                 stmt.setNull(9, Types.TINYINT);
             }
-            
+
             if (remoteType != null) {
                 stmt.setByte(10, remoteType.byteValue());
             } else {
                 stmt.setNull(10, Types.TINYINT);
             }
-            
+
             if (salaryMin != null) {
                 stmt.setDouble(11, salaryMin);
             } else {
                 stmt.setNull(11, Types.INTEGER);
             }
-            
+
             if (salaryMax != null) {
                 stmt.setDouble(12, salaryMax);
             } else {
                 stmt.setNull(12, Types.INTEGER);
             }
-            
+
             if (currency != null) {
                 stmt.setString(13, currency);
             } else {
                 stmt.setString(13, "USD");
             }
-            
+
             if (expiresAt != null && !expiresAt.isEmpty()) {
                 stmt.setString(14, expiresAt);
             } else {
                 stmt.setNull(14, Types.VARCHAR);
             }
-            
+
             stmt.setByte(15, statusId);
-            
+
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
                     return rs.getInt("Success") == 1;
                 }
             }
         }
-        
+
         return false;
     }
 
@@ -462,10 +454,9 @@ public class JobDAO {
      */
     public void removeAllJobSkills(Integer jobId) throws SQLException {
         String sql = "{call employer.sp_RemoveAllJobSkills(?)}";
-        
-        try (Connection conn = DB.getConnection();
-             CallableStatement stmt = conn.prepareCall(sql)) {
-            
+
+        try (Connection conn = DB.getConnection(); CallableStatement stmt = conn.prepareCall(sql)) {
+
             stmt.setInt(1, jobId);
             stmt.execute();
         }
@@ -476,21 +467,45 @@ public class JobDAO {
      */
     public boolean deleteJob(Integer jobId, Integer recruiterId) throws SQLException {
         String sql = "{call employer.sp_DeleteJob(?, ?)}";
-        
-        try (Connection conn = DB.getConnection();
-             CallableStatement stmt = conn.prepareCall(sql)) {
-            
+
+        try (Connection conn = DB.getConnection(); CallableStatement stmt = conn.prepareCall(sql)) {
+
             stmt.setInt(1, jobId);
             stmt.setInt(2, recruiterId);
-            
+
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
                     return rs.getInt("Success") == 1;
                 }
             }
         }
-        
+
         return false;
     }
-}
 
+    /**
+     * Get job performance metrics for graphs
+     */
+    public List<Map<String, Object>> getJobPerformanceMetrics(Integer recruiterId) throws SQLException {
+        List<Map<String, Object>> metrics = new ArrayList<>();
+        String sql = "{call employer.sp_GetJobPerformanceMetrics(?)}";
+
+        try (Connection conn = DB.getConnection(); CallableStatement stmt = conn.prepareCall(sql)) {
+            stmt.setInt(1, recruiterId);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    Map<String, Object> job = new HashMap<>();
+                    job.put("jobId", rs.getInt("JobID"));
+                    job.put("title", rs.getString("Title"));
+                    job.put("viewsCount", rs.getInt("ViewsCount"));
+                    job.put("applicationsCount", rs.getInt("ApplicationsCount"));
+                    job.put("conversionRate", rs.getDouble("ConversionRate"));
+                    job.put("daysSincePosted", rs.getInt("DaysSincePosted"));
+                    metrics.add(job);
+                }
+            }
+        }
+        return metrics;
+    }
+}

@@ -192,4 +192,54 @@ public class ApplicationDAO {
         }
         return counts;
     }
+
+    /**
+     * Get applications timeline for the last N days
+     */
+    public List<Map<String, Object>> getApplicationsTimeline(Integer recruiterId, int days) throws SQLException {
+        List<Map<String, Object>> timeline = new ArrayList<>();
+        String sql = "{call employer.sp_GetApplicationsTimeline(?, ?)}";
+
+        try (Connection conn = DB.getConnection(); CallableStatement stmt = conn.prepareCall(sql)) {
+            stmt.setInt(1, recruiterId);
+            stmt.setInt(2, days);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    Map<String, Object> data = new HashMap<>();
+                    data.put("date", rs.getDate("Date"));
+                    data.put("count", rs.getInt("ApplicationCount"));
+                    timeline.add(data);
+                }
+            }
+        }
+        return timeline;
+    }
+
+    /**
+     * Get application funnel conversion data
+     */
+    public Map<String, Object> getApplicationFunnel(Integer recruiterId) throws SQLException {
+        Map<String, Object> funnel = new HashMap<>();
+        String sql = "{call employer.sp_GetApplicationFunnel(?)}";
+
+        try (Connection conn = DB.getConnection(); CallableStatement stmt = conn.prepareCall(sql)) {
+            stmt.setInt(1, recruiterId);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    funnel.put("totalViews", rs.getInt("TotalViews"));
+                    funnel.put("totalApplications", rs.getInt("TotalApplications"));
+                    funnel.put("underReview", rs.getInt("UnderReview"));
+                    funnel.put("interviewed", rs.getInt("Interviewed"));
+                    funnel.put("offered", rs.getInt("Offered"));
+                    funnel.put("viewToAppRate", rs.getDouble("ViewToAppRate"));
+                    funnel.put("appToReviewRate", rs.getDouble("AppToReviewRate"));
+                    funnel.put("reviewToInterviewRate", rs.getDouble("ReviewToInterviewRate"));
+                    funnel.put("interviewToOfferRate", rs.getDouble("InterviewToOfferRate"));
+                }
+            }
+        }
+        return funnel;
+    }
 }
