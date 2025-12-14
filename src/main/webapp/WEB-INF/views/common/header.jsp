@@ -35,7 +35,7 @@
                             </button>
                             <div class="user-dropdown">
                                 <c:choose>
-                                    <c:when test="${sessionScope.userRole == 'Recruiter'}">
+                                    <c:when test="${sessionScope.userRole == 'Recruiter' || sessionScope.userRole == 'EmployerAdmin'}">
                                         <!-- Recruiter Menu -->
                                         <a href="${pageContext.request.contextPath}/employer/dashboard">
                                             <i class="fa-solid fa-chart-line"></i> Employer Portal

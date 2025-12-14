@@ -151,30 +151,60 @@
                             <c:when test="${not empty company}">
                                 <div class="company-info">
                                     <c:if test="${not empty company.logoUrl}">
-                                        <img src="${company.logoUrl}" alt="${company.name}" class="company-logo">
+                                        <img src="${company.logoUrl}" alt="${company.name}" class="company-logo" style="max-width: 150px; max-height: 150px; object-fit: contain; margin-bottom: 15px;">
                                     </c:if>
                                     <h4>${company.name}</h4>
-                                    <p class="company-location">
-                                        <i class="fas fa-map-marker-alt"></i> ${company.cityName}, ${company.countryName}
-                                    </p>
-                                    <c:if test="${not empty company.website}">
-                                        <p class="company-website">
-                                            <i class="fas fa-globe"></i> 
-                                            <a href="${company.website}" target="_blank">${company.website}</a>
+                                    <c:if test="${not empty company.cityName}">
+                                        <p class="company-location">
+                                            <i class="fas fa-map-marker-alt"></i> ${company.cityName}
                                         </p>
                                     </c:if>
-                                    <a href="${pageContext.request.contextPath}/employer/company-profile" class="btn btn-sm btn-outline">
-                                        Edit Company Profile
-                                    </a>
+                                    <c:if test="${not empty company.industry}">
+                                        <p class="company-industry">
+                                            <i class="fas fa-industry"></i> ${company.industry}
+                                        </p>
+                                    </c:if>
+                                    <c:if test="${not empty company.companySize}">
+                                        <p class="company-size">
+                                            <i class="fas fa-users"></i> ${company.companySize}
+                                        </p>
+                                    </c:if>
+                                    <c:if test="${not empty company.websiteUrl}">
+                                        <p class="company-website">
+                                            <i class="fas fa-globe"></i> 
+                                            <a href="${company.websiteUrl}" target="_blank">${company.websiteUrl}</a>
+                                        </p>
+                                    </c:if>
+                                    <c:if test="${not empty company.description}">
+                                        <p class="company-description mt-3" style="font-size: 0.9rem; color: #666;">
+                                            ${company.description.length() > 200 ? company.description.substring(0, 200).concat('...') : company.description}
+                                        </p>
+                                    </c:if>
+                                    <div class="mt-3">
+                                        <c:choose>
+                                            <c:when test="${user.role == 'EmployerAdmin'}">
+                                                <a href="${pageContext.request.contextPath}/employer/company-profile" class="btn btn-sm btn-outline-primary">
+                                                    <i class="fas fa-edit"></i> Edit Company Profile
+                                                </a>
+                                            </c:when>
+                                            <c:otherwise>
+                                                <a href="${pageContext.request.contextPath}/employer/company-profile" class="btn btn-sm btn-outline-secondary">
+                                                    <i class="fas fa-eye"></i> View Company Profile
+                                                </a>
+                                            </c:otherwise>
+                                        </c:choose>
+                                    </div>
                                 </div>
                             </c:when>
                             <c:otherwise>
                                 <div class="empty-state">
                                     <i class="fas fa-building"></i>
                                     <p>Company profile not set up</p>
-                                    <a href="${pageContext.request.contextPath}/employer/company-profile" class="btn btn-sm btn-primary">
-                                        Set Up Company
-                                    </a>
+                                    <c:if test="${user.role == 'EmployerAdmin'}">
+                                        <a href="${pageContext.request.contextPath}/employer/company-profile" class="btn btn-sm btn-primary">
+                                            <i class="fas fa-plus"></i> Set Up Company
+                                        </a>
+                                    </c:if>
                                 </div>
                             </c:otherwise>
                         </c:choose>

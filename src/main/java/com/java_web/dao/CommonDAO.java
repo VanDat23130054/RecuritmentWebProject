@@ -2,6 +2,7 @@ package com.java_web.dao;
 
 import java.sql.CallableStatement;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -26,6 +27,22 @@ public class CommonDAO {
                 city.setCityId(rs.getInt("CityID"));
                 city.setName(rs.getString("CityName"));
                 city.setProvinceId(rs.getInt("ProvinceID"));
+                cities.add(city);
+            }
+        }
+        return cities;
+    }
+
+    public List<Map<String, Object>> getAllCitiesWithList() throws SQLException {
+        List<Map<String, Object>> cities = new ArrayList<>();
+        String sql = "{call common.sp_GetAllCities}";
+
+        try (Connection conn = DB.getConnection(); PreparedStatement stmt = conn.prepareCall(sql); ResultSet rs = stmt.executeQuery()) {
+
+            while (rs.next()) {
+                Map<String, Object> city = new HashMap<>();
+                city.put("cityId", rs.getInt("CityID"));
+                city.put("name", rs.getString("CityName"));
                 cities.add(city);
             }
         }
@@ -57,9 +74,7 @@ public class CommonDAO {
         List<Map<String, String>> types = new ArrayList<>();
         String sql = "{call common.sp_GetEmploymentTypes}";
 
-        try (Connection conn = DB.getConnection(); 
-             CallableStatement stmt = conn.prepareCall(sql); 
-             ResultSet rs = stmt.executeQuery()) {
+        try (Connection conn = DB.getConnection(); CallableStatement stmt = conn.prepareCall(sql); ResultSet rs = stmt.executeQuery()) {
 
             while (rs.next()) {
                 Map<String, String> type = new HashMap<>();
@@ -75,9 +90,7 @@ public class CommonDAO {
         List<Map<String, String>> levels = new ArrayList<>();
         String sql = "{call common.sp_GetSeniorityLevels}";
 
-        try (Connection conn = DB.getConnection(); 
-             CallableStatement stmt = conn.prepareCall(sql); 
-             ResultSet rs = stmt.executeQuery()) {
+        try (Connection conn = DB.getConnection(); CallableStatement stmt = conn.prepareCall(sql); ResultSet rs = stmt.executeQuery()) {
 
             while (rs.next()) {
                 Map<String, String> level = new HashMap<>();
@@ -93,9 +106,7 @@ public class CommonDAO {
         List<Map<String, String>> types = new ArrayList<>();
         String sql = "{call common.sp_GetRemoteTypes}";
 
-        try (Connection conn = DB.getConnection(); 
-             CallableStatement stmt = conn.prepareCall(sql); 
-             ResultSet rs = stmt.executeQuery()) {
+        try (Connection conn = DB.getConnection(); CallableStatement stmt = conn.prepareCall(sql); ResultSet rs = stmt.executeQuery()) {
 
             while (rs.next()) {
                 Map<String, String> type = new HashMap<>();
