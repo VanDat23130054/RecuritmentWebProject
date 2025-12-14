@@ -39,8 +39,8 @@
                 <a href="${pageContext.request.contextPath}/employer/company-profile" class="nav-item">
                     <i class="fas fa-building"></i> Company Profile
                 </a>
-                <a href="${pageContext.request.contextPath}/employer/settings" class="nav-item">
-                    <i class="fas fa-cog"></i> Settings
+                 <a href="${pageContext.request.contextPath}/employer/graph" class="nav-item">
+                    <i class="fa-solid fa-chart-line"></i> Graph
                 </a>
             </nav>
         </aside>

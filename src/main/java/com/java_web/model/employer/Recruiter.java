@@ -1,13 +1,14 @@
 package com.java_web.model.employer;
 
+import java.io.Serializable;
+
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.io.Serializable;
 
 @Data
 @NoArgsConstructor
 public class Recruiter implements Serializable {
+
     private static final long serialVersionUID = 1L;
     private Integer recruiterId;
     private Integer userId;   // FK -> auth.Users.userId
