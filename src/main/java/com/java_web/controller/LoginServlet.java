@@ -19,16 +19,16 @@ import com.java_web.utils.PasswordUtil;
 
 @WebServlet("/login")
 public class LoginServlet extends HttpServlet {
-    
+
     private UserDAO userDAO;
     private RecruiterDAO recruiterDAO;
-    
+
     @Override
     public void init() throws ServletException {
         userDAO = new UserDAO();
         recruiterDAO = new RecruiterDAO();
     }
-    
+
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -36,53 +36,53 @@ public class LoginServlet extends HttpServlet {
         response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
         response.setHeader("Pragma", "no-cache");
         response.setDateHeader("Expires", 0);
-        
+
         // Display login page
         request.getRequestDispatcher("/WEB-INF/views/auth/login.jsp").forward(request, response);
     }
-    
+
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        
+
         String email = request.getParameter("email");
         String password = request.getParameter("password");
         String remember = request.getParameter("remember");
-        
+
         try {
             User user = userDAO.findByEmail(email);
-            
+
             if (user == null) {
                 request.setAttribute("error", "Invalid email or password");
                 request.getRequestDispatcher("/WEB-INF/views/auth/login.jsp").forward(request, response);
                 return;
             }
-            
+
             if (!user.isActive()) {
                 request.setAttribute("error", "Your account has been deactivated");
                 request.getRequestDispatcher("/WEB-INF/views/auth/login.jsp").forward(request, response);
                 return;
             }
-            
+
             // Verify password
             if (!PasswordUtil.verifyPassword(password, user.getPasswordHash(), user.getSalt())) {
                 request.setAttribute("error", "Invalid email or password");
                 request.getRequestDispatcher("/WEB-INF/views/auth/login.jsp").forward(request, response);
                 return;
             }
-            
+
             // Update last login
             userDAO.updateLastLogin(user.getUserId());
-            
+
             // Create session
             HttpSession session = request.getSession();
             session.setAttribute("user", user);
             session.setAttribute("userId", user.getUserId());
             session.setAttribute("userRole", user.getRole());
             session.setAttribute("userEmail", user.getEmail());
-            
+
             // Load profile data based on role
-            if ("Recruiter".equals(user.getRole())) {
+            if ("Recruiter".equals(user.getRole()) || "EmployerAdmin".equals(user.getRole())) {
                 Recruiter recruiter = recruiterDAO.getRecruiterByUserId(user.getUserId());
                 if (recruiter != null) {
                     session.setAttribute("recruiterId", recruiter.getRecruiterId());
@@ -90,29 +90,29 @@ public class LoginServlet extends HttpServlet {
                     session.setAttribute("recruiterTitle", recruiter.getTitle());
                 }
             }
-            
+
             // Set session timeout (30 minutes default, or longer if remember me)
             if ("on".equals(remember)) {
                 session.setMaxInactiveInterval(7 * 24 * 60 * 60); // 7 days
             } else {
                 session.setMaxInactiveInterval(30 * 60); // 30 minutes
             }
-            
+
             // Redirect based on role
             String redirectUrl = getRedirectUrl(user.getRole(), request);
             response.sendRedirect(redirectUrl);
-            
+
         } catch (IOException | NoSuchAlgorithmException | SQLException | ServletException e) {
             throw new ServletException("Error during login", e);
         }
     }
-    
+
     private String getRedirectUrl(String role, HttpServletRequest request) {
         String returnUrl = request.getParameter("returnUrl");
         if (returnUrl != null && !returnUrl.isEmpty()) {
             return returnUrl;
         }
-        
+
         switch (role) {
             case "Admin":
                 return request.getContextPath() + "/admin/dashboard";

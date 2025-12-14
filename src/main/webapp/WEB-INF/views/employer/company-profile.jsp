@@ -166,16 +166,17 @@
                             </div>
                         </div>
                     </div>
-
-                    <div class="form-actions">
-                        <a href="${pageContext.request.contextPath}/employer/dashboard" 
-                           class="btn btn-secondary">
-                            <i class="fas fa-times"></i> Cancel
-                        </a>
-                        <button type="submit" class="btn btn-primary">
-                            <i class="fas fa-save"></i> Save Changes
-                        </button>
-                    </div>
+                    <c:if test="${user.role == 'EmployerAdmin'}">
+                        <div class="form-actions">
+                            <a href="${pageContext.request.contextPath}/employer/dashboard" 
+                            class="btn btn-secondary">
+                                <i class="fas fa-times"></i> Cancel
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save"></i> Save Changes
+                            </button>
+                        </div>
+                    </c:if>
                 </form>
             </div>
         </main>
