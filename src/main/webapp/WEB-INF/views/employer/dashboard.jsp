@@ -119,14 +119,32 @@
                     <div class="card-body">
                         <c:choose>
                             <c:when test="${not empty applicationStats}">
-                                <div class="status-chart">
+                                <div class="status-chart" style="display: flex; flex-direction: column; gap: 12px;">
                                     <c:forEach items="${applicationStats}" var="stat">
-                                        <div class="status-item">
+                                        <div class="status-item" style="display: flex; justify-content: space-between; align-items: center; padding: 10px; background: #f8f9fa; border-radius: 6px;">
                                             <div class="status-label">
-                                                <span class="status-dot status-${stat.status}"></span>
-                                                ${stat.status}
+                                                <c:choose>
+                                                    <c:when test="${stat.status == 'Applied'}">
+                                                        <span class="badge bg-primary">${stat.status}</span>
+                                                    </c:when>
+                                                    <c:when test="${stat.status == 'Under Review'}">
+                                                        <span class="badge bg-info">${stat.status}</span>
+                                                    </c:when>
+                                                    <c:when test="${stat.status == 'Interview Scheduled'}">
+                                                        <span class="badge bg-warning">${stat.status}</span>
+                                                    </c:when>
+                                                    <c:when test="${stat.status == 'Offer Extended'}">
+                                                        <span class="badge bg-success">${stat.status}</span>
+                                                    </c:when>
+                                                    <c:when test="${stat.status == 'Rejected'}">
+                                                        <span class="badge bg-danger">${stat.status}</span>
+                                                    </c:when>
+                                                    <c:otherwise>
+                                                        <span class="badge bg-secondary">${stat.status}</span>
+                                                    </c:otherwise>
+                                                </c:choose>
                                             </div>
-                                            <div class="status-count">${stat.count}</div>
+                                            <div class="status-count" style="font-size: 1.5rem; font-weight: 600; color: #1f2937;">${stat.count}</div>
                                         </div>
                                     </c:forEach>
                                 </div>
@@ -149,46 +167,58 @@
                     <div class="card-body">
                         <c:choose>
                             <c:when test="${not empty company}">
-                                <div class="company-info">
+                                <div class="company-info" style="display: flex; flex-direction: column; gap: 15px;">
                                     <c:if test="${not empty company.logoUrl}">
-                                        <img src="${company.logoUrl}" alt="${company.name}" class="company-logo" style="max-width: 150px; max-height: 150px; object-fit: contain; margin-bottom: 15px;">
+                                        <div style="text-align: center; padding: 15px; background: #f8f9fa; border-radius: 8px;">
+                                            <img src="${company.logoUrl}" alt="${company.name}" class="company-logo" 
+                                                 style="max-width: 120px; max-height: 120px; object-fit: contain;">
+                                        </div>
                                     </c:if>
-                                    <h4>${company.name}</h4>
-                                    <c:if test="${not empty company.cityName}">
-                                        <p class="company-location">
-                                            <i class="fas fa-map-marker-alt"></i> ${company.cityName}
-                                        </p>
-                                    </c:if>
-                                    <c:if test="${not empty company.industry}">
-                                        <p class="company-industry">
-                                            <i class="fas fa-industry"></i> ${company.industry}
-                                        </p>
-                                    </c:if>
-                                    <c:if test="${not empty company.companySize}">
-                                        <p class="company-size">
-                                            <i class="fas fa-users"></i> ${company.companySize}
-                                        </p>
-                                    </c:if>
-                                    <c:if test="${not empty company.websiteUrl}">
-                                        <p class="company-website">
-                                            <i class="fas fa-globe"></i> 
-                                            <a href="${company.websiteUrl}" target="_blank">${company.websiteUrl}</a>
-                                        </p>
-                                    </c:if>
+                                    <div style="text-align: center;">
+                                        <h4 style="margin: 0; color: #1f2937; font-size: 1.25rem;">${company.name}</h4>
+                                    </div>
+                                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 10px 0; border-top: 1px solid #e5e7eb; border-bottom: 1px solid #e5e7eb;">
+                                        <c:if test="${not empty company.cityName}">
+                                            <div style="display: flex; align-items: center; gap: 8px; font-size: 0.875rem;">
+                                                <i class="fas fa-map-marker-alt" style="color: #6366f1; width: 16px;"></i>
+                                                <span style="color: #4b5563;">${company.cityName}</span>
+                                            </div>
+                                        </c:if>
+                                        <c:if test="${not empty company.industry}">
+                                            <div style="display: flex; align-items: center; gap: 8px; font-size: 0.875rem;">
+                                                <i class="fas fa-industry" style="color: #6366f1; width: 16px;"></i>
+                                                <span style="color: #4b5563;">${company.industry}</span>
+                                            </div>
+                                        </c:if>
+                                        <c:if test="${not empty company.companySize}">
+                                            <div style="display: flex; align-items: center; gap: 8px; font-size: 0.875rem;">
+                                                <i class="fas fa-users" style="color: #6366f1; width: 16px;"></i>
+                                                <span style="color: #4b5563;">${company.companySize}</span>
+                                            </div>
+                                        </c:if>
+                                        <c:if test="${not empty company.websiteUrl}">
+                                            <div style="display: flex; align-items: center; gap: 8px; font-size: 0.875rem;">
+                                                <i class="fas fa-globe" style="color: #6366f1; width: 16px;"></i>
+                                                <a href="${company.websiteUrl}" target="_blank" style="color: #3b82f6; text-decoration: none; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                                                    Website
+                                                </a>
+                                            </div>
+                                        </c:if>
+                                    </div>
                                     <c:if test="${not empty company.description}">
-                                        <p class="company-description mt-3" style="font-size: 0.9rem; color: #666;">
-                                            ${company.description.length() > 200 ? company.description.substring(0, 200).concat('...') : company.description}
-                                        </p>
+                                        <div style="font-size: 0.875rem; color: #6b7280; line-height: 1.5;">
+                                            ${company.description.length() > 150 ? company.description.substring(0, 150).concat('...') : company.description}
+                                        </div>
                                     </c:if>
-                                    <div class="mt-3">
+                                    <div style="text-align: center; margin-top: 5px;">
                                         <c:choose>
                                             <c:when test="${user.role == 'EmployerAdmin'}">
-                                                <a href="${pageContext.request.contextPath}/employer/company-profile" class="btn btn-sm btn-outline-primary">
+                                                <a href="${pageContext.request.contextPath}/employer/company-profile" class="btn btn-sm btn-outline-primary" style="width: 100%;">
                                                     <i class="fas fa-edit"></i> Edit Company Profile
                                                 </a>
                                             </c:when>
                                             <c:otherwise>
-                                                <a href="${pageContext.request.contextPath}/employer/company-profile" class="btn btn-sm btn-outline-secondary">
+                                                <a href="${pageContext.request.contextPath}/employer/company-profile" class="btn btn-primary" style="width: 100%;">
                                                     <i class="fas fa-eye"></i> View Company Profile
                                                 </a>
                                             </c:otherwise>
