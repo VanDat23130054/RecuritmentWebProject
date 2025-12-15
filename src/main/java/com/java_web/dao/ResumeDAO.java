@@ -8,11 +8,10 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Types;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import com.java_web.config.DB;
+import com.java_web.model.dto.ResumeDTO;
 
 /**
  * Data Access Object for Resume operations Handles database operations for
@@ -87,9 +86,9 @@ public class ResumeDAO {
      * Get resume by resumeId
      *
      * @param resumeId ID of the resume
-     * @return Map containing resume details
+     * @return ResumeDTO containing resume details
      */
-    public Map<String, Object> getResume(int resumeId) throws SQLException {
+    public ResumeDTO getResume(int resumeId) throws SQLException {
         String sql = "SELECT ResumeId, CandidateId, DriveFileId, FileName, FileUrl, ParsedJson, "
                 + "IsPrimary, IsPublic, UploadedAt FROM candidate.Resumes WHERE ResumeId = ?";
 
@@ -99,16 +98,16 @@ public class ResumeDAO {
 
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
-                    Map<String, Object> resume = new HashMap<>();
-                    resume.put("resumeId", rs.getInt("ResumeId"));
-                    resume.put("candidateId", rs.getInt("CandidateId"));
-                    resume.put("driveFileId", rs.getString("DriveFileId"));
-                    resume.put("fileName", rs.getString("FileName"));
-                    resume.put("fileUrl", rs.getString("FileUrl"));
-                    resume.put("parsedJson", rs.getString("ParsedJson"));
-                    resume.put("isPrimary", rs.getBoolean("IsPrimary"));
-                    resume.put("isPublic", rs.getBoolean("IsPublic"));
-                    resume.put("uploadedAt", rs.getTimestamp("UploadedAt"));
+                    ResumeDTO resume = new ResumeDTO();
+                    resume.setResumeId(rs.getInt("ResumeId"));
+                    resume.setCandidateId(rs.getInt("CandidateId"));
+                    resume.setDriveFileId(rs.getString("DriveFileId"));
+                    resume.setFileName(rs.getString("FileName"));
+                    resume.setFileUrl(rs.getString("FileUrl"));
+                    resume.setParsedJson(rs.getString("ParsedJson"));
+                    resume.setIsPrimary(rs.getBoolean("IsPrimary"));
+                    resume.setIsPublic(rs.getBoolean("IsPublic"));
+                    resume.setUploadedAt(rs.getTimestamp("UploadedAt"));
                     return resume;
                 }
             }
@@ -120,14 +119,14 @@ public class ResumeDAO {
      * Get all resumes for a candidate
      *
      * @param candidateId ID of the candidate
-     * @return List of resume maps
+     * @return List of ResumeDTO objects
      */
-    public List<Map<String, Object>> getResumesByCandidateId(int candidateId) throws SQLException {
+    public List<ResumeDTO> getResumesByCandidateId(int candidateId) throws SQLException {
         String sql = "SELECT ResumeId, CandidateId, DriveFileId, FileName, FileUrl, ParsedJson, "
                 + "IsPrimary, IsPublic, UploadedAt FROM candidate.Resumes WHERE CandidateId = ? "
                 + "ORDER BY IsPrimary DESC, UploadedAt DESC";
 
-        List<Map<String, Object>> resumes = new ArrayList<>();
+        List<ResumeDTO> resumes = new ArrayList<>();
 
         try (Connection conn = DB.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
 
@@ -135,16 +134,19 @@ public class ResumeDAO {
 
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
-                    Map<String, Object> resume = new HashMap<>();
-                    resume.put("resumeId", rs.getInt("ResumeId"));
-                    resume.put("candidateId", rs.getInt("CandidateId"));
-                    resume.put("driveFileId", rs.getString("DriveFileId"));
-                    resume.put("fileName", rs.getString("FileName"));
-                    resume.put("fileUrl", rs.getString("FileUrl"));
-                    resume.put("parsedJson", rs.getString("ParsedJson"));
-                    resume.put("isPrimary", rs.getBoolean("IsPrimary"));
-                    resume.put("isPublic", rs.getBoolean("IsPublic"));
-                    resume.put("uploadedAt", rs.getTimestamp("UploadedAt"));
+                    ResumeDTO resume = new ResumeDTO();
+                    resume.setResumeId(rs.getInt("ResumeId"));
+                    resume.setCandidateId(rs.getInt("CandidateId"));
+                    resume.setDriveFileId(rs.getString("DriveFileId"));
+                    resume.setFileName(rs.getString("FileName"));
+                    resume.setFileUrl(rs.getString("FileUrl"));
+                    resume.setParsedJson(rs.getString("ParsedJson"));
+                    resume.setIsPrimary(rs.getBoolean("IsPrimary"));
+                    resume.setIsPublic(rs.getBoolean("IsPublic"));
+
+                    java.sql.Timestamp uploadedAt = rs.getTimestamp("UploadedAt");
+                    resume.setUploadedAt(uploadedAt != null ? uploadedAt : null);
+
                     resumes.add(resume);
                 }
             }
@@ -193,25 +195,25 @@ public class ResumeDAO {
      *
      * @return List of all resumes
      */
-    public List<Map<String, Object>> getAllResumes() throws SQLException {
+    public List<ResumeDTO> getAllResumes() throws SQLException {
         String sql = "SELECT ResumeId, CandidateId, DriveFileId, FileName, FileUrl, ParsedJson, "
                 + "IsPrimary, IsPublic, UploadedAt FROM candidate.Resumes";
 
-        List<Map<String, Object>> resumes = new ArrayList<>();
+        List<ResumeDTO> resumes = new ArrayList<>();
 
         try (Connection conn = DB.getConnection(); Statement stmt = conn.createStatement(); ResultSet rs = stmt.executeQuery(sql)) {
 
             while (rs.next()) {
-                Map<String, Object> resume = new HashMap<>();
-                resume.put("resumeId", rs.getInt("ResumeId"));
-                resume.put("candidateId", rs.getInt("CandidateId"));
-                resume.put("driveFileId", rs.getString("DriveFileId"));
-                resume.put("fileName", rs.getString("FileName"));
-                resume.put("fileUrl", rs.getString("FileUrl"));
-                resume.put("parsedJson", rs.getString("ParsedJson"));
-                resume.put("isPrimary", rs.getBoolean("IsPrimary"));
-                resume.put("isPublic", rs.getBoolean("IsPublic"));
-                resume.put("uploadedAt", rs.getTimestamp("UploadedAt"));
+                ResumeDTO resume = new ResumeDTO();
+                resume.setResumeId(rs.getInt("ResumeId"));
+                resume.setCandidateId(rs.getInt("CandidateId"));
+                resume.setDriveFileId(rs.getString("DriveFileId"));
+                resume.setFileName(rs.getString("FileName"));
+                resume.setFileUrl(rs.getString("FileUrl"));
+                resume.setParsedJson(rs.getString("ParsedJson"));
+                resume.setIsPrimary(rs.getBoolean("IsPrimary"));
+                resume.setIsPublic(rs.getBoolean("IsPublic"));
+                resume.setUploadedAt(rs.getTimestamp("UploadedAt"));
                 resumes.add(resume);
             }
         }

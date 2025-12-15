@@ -6,20 +6,23 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import com.java_web.config.DB;
+import com.java_web.model.dto.ApplicationDetailDTO;
+import com.java_web.model.dto.ApplicationFunnelDTO;
+import com.java_web.model.dto.ApplicationListDTO;
+import com.java_web.model.dto.ApplicationStatusCountsDTO;
+import com.java_web.model.dto.TimelineDataDTO;
 
 public class ApplicationDAO {
 
     /**
      * Get all applications for a recruiter's jobs with filters and pagination
      */
-    public List<Map<String, Object>> getApplicationsByRecruiter(Integer recruiterId, Integer jobId,
+    public List<ApplicationListDTO> getApplicationsByRecruiter(Integer recruiterId, Integer jobId,
             String status, String keyword, int pageNumber, int pageSize) throws SQLException {
-        List<Map<String, Object>> applications = new ArrayList<>();
+        List<ApplicationListDTO> applications = new ArrayList<>();
         String sql = "{call employer.sp_GetApplicationsByRecruiter(?, ?, ?, ?, ?, ?)}";
 
         try (Connection conn = DB.getConnection(); CallableStatement stmt = conn.prepareCall(sql)) {
@@ -49,20 +52,21 @@ public class ApplicationDAO {
 
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
-                    Map<String, Object> app = new HashMap<>();
-                    app.put("applicationId", rs.getInt("ApplicationId"));
-                    app.put("jobId", rs.getInt("JobId"));
-                    app.put("jobTitle", rs.getString("JobTitle"));
-                    app.put("candidateId", rs.getInt("CandidateId"));
-                    app.put("candidateName", rs.getString("CandidateName"));
-                    app.put("candidateEmail", rs.getString("CandidateEmail"));
-                    app.put("coverLetter", rs.getString("CoverLetter"));
-                    app.put("source", rs.getString("Source"));
-                    app.put("appliedAt", rs.getTimestamp("AppliedAt"));
-                    app.put("status", rs.getString("Status"));
-                    app.put("resumeId", rs.getObject("ResumeId"));
-                    app.put("fileUrl", rs.getString("FileUrl"));
-                    app.put("fileName", rs.getString("FileName"));
+                    ApplicationListDTO app = new ApplicationListDTO();
+                    app.setApplicationId(rs.getInt("ApplicationId"));
+                    app.setJobId(rs.getInt("JobId"));
+                    app.setJobTitle(rs.getString("JobTitle"));
+                    app.setCandidateId(rs.getInt("CandidateId"));
+                    app.setCandidateName(rs.getString("CandidateName"));
+                    app.setCandidateEmail(rs.getString("CandidateEmail"));
+                    app.setCoverLetter(rs.getString("CoverLetter"));
+                    app.setSource(rs.getString("Source"));
+                    app.setAppliedAt(rs.getTimestamp("AppliedAt"));
+                    app.setStatus(rs.getString("Status"));
+                    app.setResumeId((Integer) rs.getObject("ResumeId"));
+                    app.setFileUrl(rs.getString("FileUrl"));
+                    app.setFileName(rs.getString("FileName"));
+                    app.setCompanyName(rs.getString("companyName"));
                     applications.add(app);
                 }
             }
@@ -109,7 +113,7 @@ public class ApplicationDAO {
     /**
      * Get detailed application information
      */
-    public Map<String, Object> getApplicationDetail(Integer applicationId, Integer recruiterId)
+    public ApplicationDetailDTO getApplicationDetail(Integer applicationId, Integer recruiterId)
             throws SQLException {
         String sql = "{call employer.sp_GetApplicationDetail(?, ?)}";
 
@@ -120,24 +124,24 @@ public class ApplicationDAO {
 
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
-                    Map<String, Object> app = new HashMap<>();
-                    app.put("applicationId", rs.getInt("ApplicationId"));
-                    app.put("jobId", rs.getInt("JobId"));
-                    app.put("candidateId", rs.getInt("CandidateId"));
-                    app.put("candidateEmail", rs.getString("candidateEmail"));
-                    app.put("candidateName", rs.getString("candidateName"));
-                    app.put("candidateSummary", rs.getString("candidateSummary"));
-                    app.put("candidateCity", rs.getString("candidateCity"));
-                    app.put("coverLetter", rs.getString("CoverLetter"));
-                    app.put("source", rs.getString("Source"));
-                    app.put("appliedAt", rs.getTimestamp("AppliedAt"));
-                    app.put("status", rs.getString("Status"));
-                    app.put("resumeId", rs.getObject("ResumeId"));
-                    app.put("jobTitle", rs.getString("jobTitle"));
-                    app.put("jobDescription", rs.getString("jobDescription"));
-                    app.put("companyName", rs.getString("companyName"));
-                    app.put("resumeFileName", rs.getString("resumeFileName"));
-                    app.put("resumeFileUrl", rs.getString("resumeFileUrl"));
+                    ApplicationDetailDTO app = new ApplicationDetailDTO();
+                    app.setApplicationId(rs.getInt("ApplicationId"));
+                    app.setJobId(rs.getInt("JobId"));
+                    app.setCandidateId(rs.getInt("CandidateId"));
+                    app.setCandidateEmail(rs.getString("candidateEmail"));
+                    app.setCandidateName(rs.getString("candidateName"));
+                    app.setCandidateSummary(rs.getString("candidateSummary"));
+                    app.setCandidateCity(rs.getString("candidateCity"));
+                    app.setCoverLetter(rs.getString("CoverLetter"));
+                    app.setSource(rs.getString("Source"));
+                    app.setAppliedAt(rs.getTimestamp("AppliedAt"));
+                    app.setStatus(rs.getString("Status"));
+                    app.setResumeId((Integer) rs.getObject("ResumeId"));
+                    app.setJobTitle(rs.getString("jobTitle"));
+                    app.setJobDescription(rs.getString("jobDescription"));
+                    app.setCompanyName(rs.getString("companyName"));
+                    app.setResumeFileName(rs.getString("resumeFileName"));
+                    app.setResumeFileUrl(rs.getString("resumeFileUrl"));
                     return app;
                 }
             }
@@ -172,8 +176,7 @@ public class ApplicationDAO {
     /**
      * Get application status counts for a recruiter
      */
-    public Map<String, Integer> getApplicationStatusCounts(Integer recruiterId) throws SQLException {
-        Map<String, Integer> counts = new HashMap<>();
+    public ApplicationStatusCountsDTO getApplicationStatusCounts(Integer recruiterId) throws SQLException {
         String sql = "{call employer.sp_GetApplicationStatusCounts(?)}";
 
         try (Connection conn = DB.getConnection(); CallableStatement stmt = conn.prepareCall(sql)) {
@@ -182,22 +185,24 @@ public class ApplicationDAO {
 
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
-                    counts.put("all", rs.getInt("allCount"));
-                    counts.put("applied", rs.getInt("appliedCount"));
-                    counts.put("underReview", rs.getInt("underReviewCount"));
-                    counts.put("interview", rs.getInt("interviewCount"));
-                    counts.put("rejected", rs.getInt("rejectedCount"));
+                    ApplicationStatusCountsDTO counts = new ApplicationStatusCountsDTO();
+                    counts.setAll(rs.getInt("allCount"));
+                    counts.setApplied(rs.getInt("appliedCount"));
+                    counts.setUnderReview(rs.getInt("underReviewCount"));
+                    counts.setInterview(rs.getInt("interviewCount"));
+                    counts.setRejected(rs.getInt("rejectedCount"));
+                    return counts;
                 }
             }
         }
-        return counts;
+        return null;
     }
 
     /**
      * Get applications timeline for the last N days
      */
-    public List<Map<String, Object>> getApplicationsTimeline(Integer recruiterId, int days) throws SQLException {
-        List<Map<String, Object>> timeline = new ArrayList<>();
+    public List<TimelineDataDTO> getApplicationsTimeline(Integer recruiterId, int days) throws SQLException {
+        List<TimelineDataDTO> timeline = new ArrayList<>();
         String sql = "{call employer.sp_GetApplicationsTimeline(?, ?)}";
 
         try (Connection conn = DB.getConnection(); CallableStatement stmt = conn.prepareCall(sql)) {
@@ -206,9 +211,9 @@ public class ApplicationDAO {
 
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
-                    Map<String, Object> data = new HashMap<>();
-                    data.put("date", rs.getDate("Date"));
-                    data.put("count", rs.getInt("ApplicationCount"));
+                    TimelineDataDTO data = new TimelineDataDTO();
+                    data.setDate(rs.getDate("Date"));
+                    data.setCount(rs.getInt("ApplicationCount"));
                     timeline.add(data);
                 }
             }
@@ -219,8 +224,7 @@ public class ApplicationDAO {
     /**
      * Get application funnel conversion data
      */
-    public Map<String, Object> getApplicationFunnel(Integer recruiterId) throws SQLException {
-        Map<String, Object> funnel = new HashMap<>();
+    public ApplicationFunnelDTO getApplicationFunnel(Integer recruiterId) throws SQLException {
         String sql = "{call employer.sp_GetApplicationFunnel(?)}";
 
         try (Connection conn = DB.getConnection(); CallableStatement stmt = conn.prepareCall(sql)) {
@@ -228,18 +232,20 @@ public class ApplicationDAO {
 
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
-                    funnel.put("totalViews", rs.getInt("TotalViews"));
-                    funnel.put("totalApplications", rs.getInt("TotalApplications"));
-                    funnel.put("underReview", rs.getInt("UnderReview"));
-                    funnel.put("interviewed", rs.getInt("Interviewed"));
-                    funnel.put("offered", rs.getInt("Offered"));
-                    funnel.put("viewToAppRate", rs.getDouble("ViewToAppRate"));
-                    funnel.put("appToReviewRate", rs.getDouble("AppToReviewRate"));
-                    funnel.put("reviewToInterviewRate", rs.getDouble("ReviewToInterviewRate"));
-                    funnel.put("interviewToOfferRate", rs.getDouble("InterviewToOfferRate"));
+                    ApplicationFunnelDTO funnel = new ApplicationFunnelDTO();
+                    funnel.setTotalViews(rs.getInt("TotalViews"));
+                    funnel.setTotalApplications(rs.getInt("TotalApplications"));
+                    funnel.setUnderReview(rs.getInt("UnderReview"));
+                    funnel.setInterviewed(rs.getInt("Interviewed"));
+                    funnel.setOffered(rs.getInt("Offered"));
+                    funnel.setViewToAppRate(rs.getDouble("ViewToAppRate"));
+                    funnel.setAppToReviewRate(rs.getDouble("AppToReviewRate"));
+                    funnel.setReviewToInterviewRate(rs.getDouble("ReviewToInterviewRate"));
+                    funnel.setInterviewToOfferRate(rs.getDouble("InterviewToOfferRate"));
+                    return funnel;
                 }
             }
         }
-        return funnel;
+        return null;
     }
 }

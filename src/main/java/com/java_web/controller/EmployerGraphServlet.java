@@ -3,7 +3,6 @@ package com.java_web.controller;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
-import java.util.Map;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -15,6 +14,10 @@ import javax.servlet.http.HttpSession;
 import com.java_web.dao.ApplicationDAO;
 import com.java_web.dao.JobDAO;
 import com.java_web.model.auth.User;
+import com.java_web.model.dto.ApplicationFunnelDTO;
+import com.java_web.model.dto.ApplicationStatusCountsDTO;
+import com.java_web.model.dto.JobPerformanceDTO;
+import com.java_web.model.dto.TimelineDataDTO;
 
 @WebServlet("/employer/graph")
 public class EmployerGraphServlet extends HttpServlet {
@@ -52,19 +55,19 @@ public class EmployerGraphServlet extends HttpServlet {
 
         try {
             // Get application status distribution
-            Map<String, Integer> statusCounts = applicationDAO.getApplicationStatusCounts(recruiterId);
+            ApplicationStatusCountsDTO statusCounts = applicationDAO.getApplicationStatusCounts(recruiterId);
             request.setAttribute("statusCounts", statusCounts);
 
             // Get applications over time (last 30 days)
-            List<Map<String, Object>> applicationsTimeline = applicationDAO.getApplicationsTimeline(recruiterId, 30);
+            List<TimelineDataDTO> applicationsTimeline = applicationDAO.getApplicationsTimeline(recruiterId, 30);
             request.setAttribute("applicationsTimeline", applicationsTimeline);
 
             // Get job performance metrics
-            List<Map<String, Object>> jobPerformance = jobDAO.getJobPerformanceMetrics(recruiterId);
+            List<JobPerformanceDTO> jobPerformance = jobDAO.getJobPerformanceMetrics(recruiterId);
             request.setAttribute("jobPerformance", jobPerformance);
 
             // Get application funnel data
-            Map<String, Object> funnelData = applicationDAO.getApplicationFunnel(recruiterId);
+            ApplicationFunnelDTO funnelData = applicationDAO.getApplicationFunnel(recruiterId);
             request.setAttribute("funnelData", funnelData);
 
             request.getRequestDispatcher("/WEB-INF/views/employer/graph.jsp")

@@ -3,7 +3,6 @@ package com.java_web.controller;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
-import java.util.Map;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -16,6 +15,8 @@ import com.java_web.dao.CommonDAO;
 import com.java_web.dao.CompanyDAO;
 import com.java_web.dao.RecruiterDAO;
 import com.java_web.model.auth.User;
+import com.java_web.model.common.City;
+import com.java_web.model.dto.CompanyDetailDTO;
 import com.java_web.model.employer.Recruiter;
 
 @WebServlet("/employer/company-profile")
@@ -60,10 +61,10 @@ public class EmployerCompanyProfileServlet extends HttpServlet {
             }
 
             // Get company details
-            Map<String, Object> company = companyDAO.getCompanyDetail(recruiter.getCompanyId());
+            CompanyDetailDTO company = companyDAO.getCompanyDetail(recruiter.getCompanyId());
 
             // Get cities for dropdown
-            List<Map<String, Object>> cities = commonDAO.getAllCitiesWithList();
+            List<City> cities = commonDAO.getAllCities();
 
             request.setAttribute("company", company);
             request.setAttribute("cities", cities);

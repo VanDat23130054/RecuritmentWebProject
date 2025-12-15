@@ -22,6 +22,8 @@ import com.java_web.dao.SavedJobDAO;
 import com.java_web.model.auth.User;
 import com.java_web.model.common.City;
 import com.java_web.model.common.Skill;
+import com.java_web.model.dto.CompanyListDTO;
+import com.java_web.model.dto.JobSearchDTO;
 
 @WebServlet({"/", "/home", "/index"})
 public class HomeServlet extends HttpServlet {
@@ -69,61 +71,60 @@ public class HomeServlet extends HttpServlet {
             Integer cityId = (StringUtils.isNotBlank(cityIdStr))
                     ? Integer.valueOf(cityIdStr) : null;
 
-            List<Map<String, Object>> jobs = jobDAO.searchJobs(keyword, cityId, null, 1, 20);
+            List<JobSearchDTO> jobs = jobDAO.searchJobs(keyword, cityId, null, 1, 20);
 
             // Parse skills JSON for each job
-            for (Map<String, Object> job : jobs) {
-                String skillsJson = (String) job.get("Skills");
+            for (JobSearchDTO job : jobs) {
+                String skillsJson = job.getSkills();
                 if (StringUtils.isNotBlank(skillsJson)) {
                     List<Map<String, Object>> skillsList = objectMapper.readValue(
                             skillsJson,
                             new TypeReference<List<Map<String, Object>>>() {
                     }
                     );
-                    job.put("skillsList", skillsList);
+                    job.setSkillsList(skillsList);
                 }
             }
-            
+
             // Check saved status for logged-in users
             User user = (User) request.getSession().getAttribute("user");
             if (user != null && user.getUserId() != null) {
-                for (Map<String, Object> job : jobs) {
-                    Object jobIdObj = job.get("jobId");  // Changed from "JobID" to "jobId"
-                    if (jobIdObj != null) {
-                        Integer jobIdInt = (Integer) jobIdObj;
+                for (JobSearchDTO job : jobs) {
+                    Integer jobIdInt = job.getJobId();
+                    if (jobIdInt != null) {
                         try {
                             boolean isSaved = savedJobDAO.isJobSaved(user.getUserId(), jobIdInt);
-                            job.put("isSaved", isSaved);
+                            job.setIsSaved(isSaved);
                         } catch (SQLException e) {
                             // If error checking saved status, default to false
-                            job.put("isSaved", false);
+                            job.setIsSaved(false);
                         }
                     } else {
-                        job.put("isSaved", false);
+                        job.setIsSaved(false);
                     }
                 }
             } else {
                 // Not logged in, mark all as not saved
-                for (Map<String, Object> job : jobs) {
-                    job.put("isSaved", false);
+                for (JobSearchDTO job : jobs) {
+                    job.setIsSaved(false);
                 }
             }
 
             request.setAttribute("jobs", jobs);
 
             // Get top employers
-            List<Map<String, Object>> topEmployers = companyDAO.getTopEmployers(6);
+            List<CompanyListDTO> topEmployers = companyDAO.getTopEmployers(6);
 
             // Parse top skills JSON for each company
-            for (Map<String, Object> company : topEmployers) {
-                String skillsJson = (String) company.get("TopSkills");
+            for (CompanyListDTO company : topEmployers) {
+                String skillsJson = company.getTopSkills();
                 if (StringUtils.isNotBlank(skillsJson)) {
                     List<Map<String, Object>> skillsList = objectMapper.readValue(
                             skillsJson,
                             new TypeReference<List<Map<String, Object>>>() {
                     }
                     );
-                    company.put("topSkillsList", skillsList);
+                    company.setTopSkillsList(skillsList);
                 }
             }
 

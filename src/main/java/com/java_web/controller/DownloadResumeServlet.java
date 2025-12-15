@@ -4,7 +4,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.Map;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -14,6 +13,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import com.java_web.dao.ResumeDAO;
+import com.java_web.model.dto.ResumeDTO;
 import com.java_web.service.GoogleDriveService;
 
 /**
@@ -107,19 +107,19 @@ public class DownloadResumeServlet extends HttpServlet {
             int resumeId = Integer.parseInt(resumeIdParam);
 
             // Get resume info from database
-            Map<String, Object> resume = resumeDAO.getResume(resumeId);
+            ResumeDTO resume = resumeDAO.getResume(resumeId);
 
             if (resume == null) {
                 response.sendError(HttpServletResponse.SC_NOT_FOUND, "Resume not found");
                 return;
             }
 
-            String driveFileId = (String) resume.get("driveFileId");
-            String fileName = (String) resume.get("fileName");
+            String driveFileId = resume.getDriveFileId();
+            String fileName = resume.getFileName();
 
             if (driveFileId == null || driveFileId.trim().isEmpty()) {
                 // Fallback for old resumes stored locally
-                String fileUrl = (String) resume.get("fileUrl");
+                String fileUrl = resume.getFileUrl();
                 if (fileUrl != null && fileUrl.startsWith("/uploads/")) {
                     // Redirect to local file
                     response.sendRedirect(request.getContextPath() + fileUrl);
@@ -145,7 +145,7 @@ public class DownloadResumeServlet extends HttpServlet {
                 System.err.println("Failed to download from Drive: " + e.getMessage());
 
                 // Try fallback to local file if Drive file not found
-                String fileUrl = (String) resume.get("fileUrl");
+                String fileUrl = resume.getFileUrl();
                 if (fileUrl != null && fileUrl.startsWith("/uploads/")) {
                     response.sendRedirect(request.getContextPath() + fileUrl);
                     return;

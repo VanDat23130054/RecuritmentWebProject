@@ -3,7 +3,6 @@ package com.java_web.controller;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
-import java.util.Map;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -17,6 +16,9 @@ import org.apache.commons.lang3.StringUtils;
 import com.java_web.dao.ApplicationDAO;
 import com.java_web.dao.JobDAO;
 import com.java_web.model.auth.User;
+import com.java_web.model.dto.ApplicationListDTO;
+import com.java_web.model.dto.ApplicationStatusCountsDTO;
+import com.java_web.model.dto.RecruiterJobDTO;
 
 @WebServlet("/employer/applications")
 public class EmployerApplicationsServlet extends HttpServlet {
@@ -66,7 +68,7 @@ public class EmployerApplicationsServlet extends HttpServlet {
             int pageSize = 20;
 
             // Get applications with filters
-            List<Map<String, Object>> applications = applicationDAO.getApplicationsByRecruiter(
+            List<ApplicationListDTO> applications = applicationDAO.getApplicationsByRecruiter(
                     recruiterId, jobId, status, keyword, currentPage, pageSize
             );
 
@@ -77,15 +79,15 @@ public class EmployerApplicationsServlet extends HttpServlet {
             int totalPages = (int) Math.ceil((double) totalApplications / pageSize);
 
             // Get application counts by status for filter tabs
-            Map<String, Integer> statusCounts = applicationDAO.getApplicationStatusCounts(recruiterId);
-            int allCount = statusCounts.getOrDefault("all", 0);
-            int appliedCount = statusCounts.getOrDefault("applied", 0);
-            int underReviewCount = statusCounts.getOrDefault("underReview", 0);
-            int interviewCount = statusCounts.getOrDefault("interview", 0);
-            int rejectedCount = statusCounts.getOrDefault("rejected", 0);
+            ApplicationStatusCountsDTO statusCounts = applicationDAO.getApplicationStatusCounts(recruiterId);
+            int allCount = statusCounts != null ? statusCounts.getAll() : 0;
+            int appliedCount = statusCounts != null ? statusCounts.getApplied() : 0;
+            int underReviewCount = statusCounts != null ? statusCounts.getUnderReview() : 0;
+            int interviewCount = statusCounts != null ? statusCounts.getInterview() : 0;
+            int rejectedCount = statusCounts != null ? statusCounts.getRejected() : 0;
 
             // Get recruiter's jobs for job filter dropdown
-            List<Map<String, Object>> recruiterJobs = jobDAO.getRecruiterJobs(
+            List<RecruiterJobDTO> recruiterJobs = jobDAO.getRecruiterJobs(
                     recruiterId, null, null, 1, 100
             );
 

@@ -2,7 +2,6 @@ package com.java_web.controller;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.Map;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -12,6 +11,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import com.java_web.dao.ApplicationDAO;
+import com.java_web.model.dto.ApplicationDetailDTO;
 
 @WebServlet("/employer/applications/detail")
 public class ApplicationDetailServlet extends HttpServlet {
@@ -51,7 +51,7 @@ public class ApplicationDetailServlet extends HttpServlet {
             int applicationId = Integer.parseInt(idParam);
 
             // Get application details
-            Map<String, Object> application = applicationDAO.getApplicationDetail(applicationId, recruiterId);
+            ApplicationDetailDTO application = applicationDAO.getApplicationDetail(applicationId, recruiterId);
 
             if (application == null) {
                 out.print("{\"success\": false, \"message\": \"Application not found\"}");
@@ -61,59 +61,59 @@ public class ApplicationDetailServlet extends HttpServlet {
             // Build JSON response
             StringBuilder json = new StringBuilder();
             json.append("{\"success\": true, \"application\": {");
-            json.append("\"applicationId\": ").append(application.get("applicationId")).append(",");
-            json.append("\"candidateName\": \"").append(escapeJson(application.get("candidateName"))).append("\",");
-            json.append("\"candidateEmail\": \"").append(escapeJson(application.get("candidateEmail"))).append("\",");
+            json.append("\"applicationId\": ").append(application.getApplicationId()).append(",");
+            json.append("\"candidateName\": \"").append(escapeJson(application.getCandidateName())).append("\",");
+            json.append("\"candidateEmail\": \"").append(escapeJson(application.getCandidateEmail())).append("\",");
 
-            Object candidateSummary = application.get("candidateSummary");
+            String candidateSummary = application.getCandidateSummary();
             if (candidateSummary != null) {
                 json.append("\"candidateSummary\": \"").append(escapeJson(candidateSummary)).append("\",");
             } else {
                 json.append("\"candidateSummary\": null,");
             }
 
-            Object candidateCity = application.get("candidateCity");
+            String candidateCity = application.getCandidateCity();
             if (candidateCity != null) {
                 json.append("\"candidateCity\": \"").append(escapeJson(candidateCity)).append("\",");
             } else {
                 json.append("\"candidateCity\": null,");
             }
 
-            json.append("\"jobTitle\": \"").append(escapeJson(application.get("jobTitle"))).append("\",");
-            json.append("\"companyName\": \"").append(escapeJson(application.get("companyName"))).append("\",");
+            json.append("\"jobTitle\": \"").append(escapeJson(application.getJobTitle())).append("\",");
+            json.append("\"companyName\": \"").append(escapeJson(application.getCompanyName())).append("\",");
 
-            Object coverLetter = application.get("coverLetter");
+            String coverLetter = application.getCoverLetter();
             if (coverLetter != null) {
                 json.append("\"coverLetter\": \"").append(escapeJson(coverLetter)).append("\",");
             } else {
                 json.append("\"coverLetter\": null,");
             }
 
-            Object source = application.get("source");
+            String source = application.getSource();
             if (source != null) {
                 json.append("\"source\": \"").append(escapeJson(source)).append("\",");
             } else {
                 json.append("\"source\": null,");
             }
 
-            json.append("\"appliedAt\": \"").append(application.get("appliedAt")).append("\",");
-            json.append("\"status\": \"").append(escapeJson(application.get("status"))).append("\",");
+            json.append("\"appliedAt\": \"").append(application.getAppliedAt()).append("\",");
+            json.append("\"status\": \"").append(escapeJson(application.getStatus())).append("\",");
 
-            Object resumeId = application.get("resumeId");
+            Integer resumeId = application.getResumeId();
             if (resumeId != null) {
                 json.append("\"resumeId\": ").append(resumeId).append(",");
             } else {
                 json.append("\"resumeId\": null,");
             }
 
-            Object resumeFileName = application.get("resumeFileName");
+            String resumeFileName = application.getResumeFileName();
             if (resumeFileName != null) {
                 json.append("\"resumeFileName\": \"").append(escapeJson(resumeFileName)).append("\",");
             } else {
                 json.append("\"resumeFileName\": null,");
             }
 
-            Object resumeFileUrl = application.get("resumeFileUrl");
+            String resumeFileUrl = application.getResumeFileUrl();
             if (resumeFileUrl != null) {
                 json.append("\"resumeFileUrl\": \"").append(escapeJson(resumeFileUrl)).append("\"");
             } else {

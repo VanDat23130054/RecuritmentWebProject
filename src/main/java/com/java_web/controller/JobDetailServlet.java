@@ -20,6 +20,9 @@ import com.java_web.dao.CompanyDAO;
 import com.java_web.dao.JobDAO;
 import com.java_web.dao.SavedJobDAO;
 import com.java_web.model.auth.User;
+import com.java_web.model.dto.CompanyDetailDTO;
+import com.java_web.model.dto.JobDetailDTO;
+import com.java_web.model.dto.RelatedJobDTO;
 
 @WebServlet("/job/*")
 public class JobDetailServlet extends HttpServlet {
@@ -58,29 +61,30 @@ public class JobDetailServlet extends HttpServlet {
             Integer jobId = Integer.valueOf(jobIdStr);
 
             // Get job details
-            Map<String, Object> job = jobDAO.getJobDetail(jobId);
-            
+            JobDetailDTO job = jobDAO.getJobDetail(jobId);
+
             if (job == null) {
                 response.sendError(HttpServletResponse.SC_NOT_FOUND, "Job not found");
                 return;
             }
 
             // Parse skills JSON
-            String skillsJson = (String) job.get("skills");
+            String skillsJson = job.getSkills();
             if (StringUtils.isNotBlank(skillsJson)) {
                 List<Map<String, Object>> skillsList = objectMapper.readValue(
                         skillsJson,
-                        new TypeReference<List<Map<String, Object>>>() {}
+                        new TypeReference<List<Map<String, Object>>>() {
+                }
                 );
-                job.put("skillsList", skillsList);
+                job.setSkillsList(skillsList);
             }
 
             // Get company info
-            Integer companyId = (Integer) job.get("companyId");
-            Map<String, Object> company = companyDAO.getCompanyDetail(companyId);
-            
+            Integer companyId = job.getCompanyId();
+            CompanyDetailDTO company = companyDAO.getCompanyDetail(companyId);
+
             // Get related jobs
-            List<Map<String, Object>> relatedJobs = jobDAO.getRelatedJobs(jobId, companyId, 5);
+            List<RelatedJobDTO> relatedJobs = jobDAO.getRelatedJobs(jobId, companyId, 5);
 
             // Check if job is saved for logged-in candidate
             HttpSession session = request.getSession(false);
@@ -88,12 +92,12 @@ public class JobDetailServlet extends HttpServlet {
                 User user = (User) session.getAttribute("user");
                 if ("Candidate".equals(user.getRole())) {
                     boolean isSaved = savedJobDAO.isJobSaved(user.getUserId(), jobId);
-                    job.put("isSaved", isSaved);
+                    job.setIsSaved(isSaved);
                 } else {
-                    job.put("isSaved", false);
+                    job.setIsSaved(false);
                 }
             } else {
-                job.put("isSaved", false);
+                job.setIsSaved(false);
             }
 
             request.setAttribute("job", job);

@@ -3,7 +3,6 @@ package com.java_web.controller;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
-import java.util.Map;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -14,20 +13,28 @@ import javax.servlet.http.HttpSession;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.java_web.dao.CompanyDAO;
+import com.java_web.dao.JobDAO;
 import com.java_web.dao.RecruiterDAO;
 import com.java_web.model.auth.User;
+import com.java_web.model.dto.ApplicationStatusStatDTO;
+import com.java_web.model.dto.CompanyDetailDTO;
+import com.java_web.model.dto.RecentApplicationDTO;
+import com.java_web.model.dto.RecruiterDashboardStatsDTO;
+import com.java_web.model.dto.RecruiterJobDTO;
 import com.java_web.model.employer.Recruiter;
 
 @WebServlet("/employer/dashboard")
 public class EmployerDashboardServlet extends HttpServlet {
 
     private RecruiterDAO recruiterDAO;
+    private JobDAO jobDAO;
     private CompanyDAO companyDAO;
     private ObjectMapper objectMapper;
 
     @Override
     public void init() throws ServletException {
         recruiterDAO = new RecruiterDAO();
+        jobDAO = new JobDAO();
         companyDAO = new CompanyDAO();
         objectMapper = new ObjectMapper();
     }
@@ -43,24 +50,24 @@ public class EmployerDashboardServlet extends HttpServlet {
 
         HttpSession session = request.getSession(false);
         if (session == null || session.getAttribute("user") == null) {
-            response.sendRedirect(request.getContextPath() + "/login?returnUrl=" + 
-                                request.getRequestURI());
+            response.sendRedirect(request.getContextPath() + "/login?returnUrl="
+                    + request.getRequestURI());
             return;
         }
 
         User user = (User) session.getAttribute("user");
-        
+
         // Check if user is a recruiter
         if (!"Recruiter".equals(user.getRole()) && !"EmployerAdmin".equals(user.getRole())) {
-            response.sendError(HttpServletResponse.SC_FORBIDDEN, 
-                             "Access denied. This page is only for recruiters.");
+            response.sendError(HttpServletResponse.SC_FORBIDDEN,
+                    "Access denied. This page is only for recruiters.");
             return;
         }
 
         try {
             // Get recruiter profile
             Recruiter recruiter = recruiterDAO.getRecruiterByUserId(user.getUserId());
-            
+
             if (recruiter == null) {
                 // Redirect to complete profile if recruiter profile doesn't exist
                 response.sendRedirect(request.getContextPath() + "/employer/setup-profile");
@@ -68,24 +75,28 @@ public class EmployerDashboardServlet extends HttpServlet {
             }
 
             // Get dashboard statistics
-            Map<String, Object> stats = recruiterDAO.getDashboardStats(recruiter.getRecruiterId());
-
-            // Get recruiter's jobs (first page, 10 items)
-            List<Map<String, Object>> recentJobs = recruiterDAO.getRecruiterJobs(
-                recruiter.getRecruiterId(), 1, 10);
+            RecruiterDashboardStatsDTO stats = recruiterDAO.getDashboardStats(recruiter.getRecruiterId());
+            System.out.println(stats);
+            // Get recruiter's jobs (first 10 for dashboard)
+            List<RecruiterJobDTO> recentJobs = jobDAO.getRecruiterJobs(
+                    recruiter.getRecruiterId(), null, null, 1, 10);
+            System.out.println(recentJobs);
 
             // Get recent applications (last 10)
-            List<Map<String, Object>> recentApplications = recruiterDAO.getRecentApplications(
-                recruiter.getRecruiterId(), 10);
+            List<RecentApplicationDTO> recentApplications = recruiterDAO.getRecentApplications(
+                    recruiter.getRecruiterId(), 10);
+            System.out.println(recentApplications);
 
             // Get application statistics by status
-            List<Map<String, Object>> applicationStats = recruiterDAO.getApplicationStatsByStatus(
-                recruiter.getRecruiterId());
+            List<ApplicationStatusStatDTO> applicationStats = recruiterDAO.getApplicationStatsByStatus(
+                    recruiter.getRecruiterId());
+            System.out.println(applicationStats);
 
             // Get company information
-            Map<String, Object> company = null;
+            CompanyDetailDTO company = null;
             if (recruiter.getCompanyId() != null) {
                 company = companyDAO.getCompanyDetail(recruiter.getCompanyId());
+                System.out.println(company);
             }
 
             // Set attributes for JSP
@@ -99,7 +110,7 @@ public class EmployerDashboardServlet extends HttpServlet {
 
             // Forward to dashboard view
             request.getRequestDispatcher("/WEB-INF/views/employer/dashboard.jsp")
-                   .forward(request, response);
+                    .forward(request, response);
 
         } catch (SQLException e) {
             throw new ServletException("Error loading employer dashboard", e);

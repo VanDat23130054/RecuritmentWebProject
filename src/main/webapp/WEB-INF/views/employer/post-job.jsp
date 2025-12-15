@@ -109,7 +109,7 @@
                                 <select id="employmentType" name="employmentType" required>
                                     <option value="">Select Type</option>
                                     <c:forEach items="${employmentTypes}" var="type">
-                                        <option value="${type.id}">${type.name}</option>
+                                        <option value="${type.employmentTypeId}">${type.name}</option>
                                     </c:forEach>
                                 </select>
                             </div>
@@ -121,7 +121,7 @@
                                 <select id="seniorityLevel" name="seniorityLevel">
                                     <option value="">Select Level</option>
                                     <c:forEach items="${seniorityLevels}" var="level">
-                                        <option value="${level.id}">${level.name}</option>
+                                        <option value="${level.seniorityLevelId}">${level.name}</option>
                                     </c:forEach>
                                 </select>
                             </div>
@@ -131,7 +131,7 @@
                                 <select id="remoteType" name="remoteType">
                                     <option value="">Select Mode</option>
                                     <c:forEach items="${remoteTypes}" var="remote">
-                                        <option value="${remote.id}">${remote.name}</option>
+                                        <option value="${remote.remoteTypeId}">${remote.name}</option>
                                     </c:forEach>
                                 </select>
                             </div>

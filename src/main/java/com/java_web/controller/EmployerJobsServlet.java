@@ -3,7 +3,6 @@ package com.java_web.controller;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
-import java.util.Map;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -16,6 +15,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import com.java_web.dao.JobDAO;
 import com.java_web.model.auth.User;
+import com.java_web.model.dto.RecruiterJobDTO;
 
 @WebServlet("/employer/jobs")
 public class EmployerJobsServlet extends HttpServlet {
@@ -30,7 +30,7 @@ public class EmployerJobsServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        
+
         // Check authentication and role
         HttpSession session = request.getSession(false);
         if (session == null || session.getAttribute("user") == null) {
@@ -56,14 +56,14 @@ public class EmployerJobsServlet extends HttpServlet {
             String statusIdStr = request.getParameter("status");
             String keyword = request.getParameter("keyword");
             String pageStr = request.getParameter("page");
-            
+
             Integer statusId = StringUtils.isNotBlank(statusIdStr) ? Integer.valueOf(statusIdStr) : null;
             int currentPage = StringUtils.isNotBlank(pageStr) ? Integer.parseInt(pageStr) : 1;
             int pageSize = 15;
 
             // Get jobs with filters
-            List<Map<String, Object>> jobs = jobDAO.getRecruiterJobs(
-                recruiterId, statusId, keyword, currentPage, pageSize
+            List<RecruiterJobDTO> jobs = jobDAO.getRecruiterJobs(
+                    recruiterId, statusId, keyword, currentPage, pageSize
             );
 
             // Get total count for pagination

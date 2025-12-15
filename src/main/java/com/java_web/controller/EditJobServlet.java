@@ -3,10 +3,7 @@ package com.java_web.controller;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.sql.Timestamp;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.Map;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -21,7 +18,11 @@ import com.java_web.dao.CommonDAO;
 import com.java_web.dao.JobDAO;
 import com.java_web.model.auth.User;
 import com.java_web.model.common.City;
+import com.java_web.model.common.EmploymentType;
+import com.java_web.model.common.RemoteType;
+import com.java_web.model.common.SeniorityLevel;
 import com.java_web.model.common.Skill;
+import com.java_web.model.dto.JobForEditDTO;
 
 @WebServlet("/employer/edit-job/*")
 public class EditJobServlet extends HttpServlet {
@@ -38,28 +39,27 @@ public class EditJobServlet extends HttpServlet {
     /**
      * Helper method to reload form data for the edit job page
      */
-    private void reloadFormData(HttpServletRequest request, Integer jobId, Integer recruiterId) 
+    private void reloadFormData(HttpServletRequest request, Integer jobId, Integer recruiterId)
             throws SQLException {
         // Reload job data
-        Map<String, Object> job = jobDAO.getJobForEdit(jobId, recruiterId);
+        JobForEditDTO job = jobDAO.getJobForEdit(jobId, recruiterId);
         if (job == null) {
             throw new SQLException("Job not found or access denied");
         }
-        
+
         // Load all form data
         List<City> cities = commonDAO.getAllCities();
         List<Skill> skills = commonDAO.getTopSkills(100);
-        List<Map<String, String>> employmentTypes = commonDAO.getEmploymentTypes();
-        List<Map<String, String>> seniorityLevels = commonDAO.getSeniorityLevels();
-        List<Map<String, String>> remoteTypes = commonDAO.getRemoteTypes();
-        
+        List<EmploymentType> employmentTypes = commonDAO.getEmploymentTypes();
+        List<SeniorityLevel> seniorityLevels = commonDAO.getSeniorityLevels();
+        List<RemoteType> remoteTypes = commonDAO.getRemoteTypes();
+
         // Format expiresAt for date input
-        if (job.get("expiresAt") != null) {
-            Timestamp expiresAt = (Timestamp) job.get("expiresAt");
-            LocalDate expiresDate = expiresAt.toLocalDateTime().toLocalDate();
-            job.put("expiresAtFormatted", expiresDate.format(DateTimeFormatter.ISO_LOCAL_DATE));
+        if (job.getExpiresAt() != null) {
+            Timestamp expiresAt = job.getExpiresAt();
+            request.setAttribute("expiresAtFormatted", expiresAt);
         }
-        
+
         request.setAttribute("job", job);
         request.setAttribute("cities", cities);
         request.setAttribute("skills", skills);
@@ -71,7 +71,7 @@ public class EditJobServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        
+
         // Check authentication and role
         HttpSession session = request.getSession(false);
         if (session == null || session.getAttribute("user") == null) {
@@ -101,7 +101,7 @@ public class EditJobServlet extends HttpServlet {
 
         try {
             Integer jobId = Integer.valueOf(pathInfo.substring(1));
-            
+
             // Load job and form data using helper method
             reloadFormData(request, jobId, recruiterId);
 
@@ -117,7 +117,7 @@ public class EditJobServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        
+
         // Check authentication and role
         HttpSession session = request.getSession(false);
         if (session == null || session.getAttribute("user") == null) {
@@ -165,8 +165,8 @@ public class EditJobServlet extends HttpServlet {
             String statusIdStr = request.getParameter("statusId");
 
             // Validate required fields
-            if (StringUtils.isBlank(title) || StringUtils.isBlank(description) || 
-                StringUtils.isBlank(cityIdStr) || StringUtils.isBlank(employmentTypeStr)) {
+            if (StringUtils.isBlank(title) || StringUtils.isBlank(description)
+                    || StringUtils.isBlank(cityIdStr) || StringUtils.isBlank(employmentTypeStr)) {
                 request.setAttribute("error", "Please fill in all required fields");
                 reloadFormData(request, jobId, recruiterId);
                 request.getRequestDispatcher("/WEB-INF/views/employer/edit-job.jsp").forward(request, response);
@@ -184,21 +184,21 @@ public class EditJobServlet extends HttpServlet {
 
             // Update job
             boolean success = jobDAO.updateJob(
-                jobId,
-                recruiterId,
-                title,
-                description,
-                requirements,
-                benefits,
-                cityId,
-                employmentType,
-                seniorityLevel,
-                remoteType,
-                salaryMin,
-                salaryMax,
-                currency,
-                expiresAtStr,
-                statusId
+                    jobId,
+                    recruiterId,
+                    title,
+                    description,
+                    requirements,
+                    benefits,
+                    cityId,
+                    employmentType,
+                    seniorityLevel,
+                    remoteType,
+                    salaryMin,
+                    salaryMax,
+                    currency,
+                    expiresAtStr,
+                    statusId
             );
 
             if (!success) {
@@ -225,7 +225,7 @@ public class EditJobServlet extends HttpServlet {
             request.setAttribute("error", "Invalid form data: " + e.getMessage());
             // Get job ID from URL for reloading the form
             Integer jobId = Integer.valueOf(pathInfo.substring(1));
-            
+
             try {
                 reloadFormData(request, jobId, recruiterId);
                 request.getRequestDispatcher("/WEB-INF/views/employer/edit-job.jsp").forward(request, response);

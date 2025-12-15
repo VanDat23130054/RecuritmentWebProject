@@ -65,8 +65,8 @@
                     <select name="employmentType" id="employmentType">
                         <option value="">All Types</option>
                         <c:forEach items="${employmentTypes}" var="type">
-                            <option value="${type.id}" 
-                                    <c:if test="${selectedEmploymentType == type.id}">selected</c:if>>
+                            <option value="${type.employmentTypeId}" 
+                                    <c:if test="${selectedEmploymentType == type.employmentTypeId}">selected</c:if>>
                                 ${type.name}
                             </option>
                         </c:forEach>
@@ -79,8 +79,8 @@
                     <select name="seniorityLevel" id="seniorityLevel">
                         <option value="">All Levels</option>
                         <c:forEach items="${seniorityLevels}" var="level">
-                            <option value="${level.id}" 
-                                    <c:if test="${selectedSeniorityLevel == level.id}">selected</c:if>>
+                            <option value="${level.seniorityLevelId}" 
+                                    <c:if test="${selectedSeniorityLevel == level.seniorityLevelId}">selected</c:if>>
                                 ${level.name}
                             </option>
                         </c:forEach>
@@ -93,8 +93,8 @@
                     <select name="remoteType" id="remoteType">
                         <option value="">All Modes</option>
                         <c:forEach items="${remoteTypes}" var="remote">
-                            <option value="${remote.id}" 
-                                    <c:if test="${selectedRemoteType == remote.id}">selected</c:if>>
+                            <option value="${remote.remoteTypeId}" 
+                                    <c:if test="${selectedRemoteType == remote.remoteTypeId}">selected</c:if>>
                                 ${remote.name}
                             </option>
                         </c:forEach>

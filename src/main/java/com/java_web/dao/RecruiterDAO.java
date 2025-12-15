@@ -6,11 +6,13 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import com.java_web.config.DB;
+import com.java_web.model.dto.ApplicationStatusStatDTO;
+import com.java_web.model.dto.RecentApplicationDTO;
+import com.java_web.model.dto.RecruiterDashboardStatsDTO;
+import com.java_web.model.dto.RecruiterJobDTO;
 import com.java_web.model.employer.Recruiter;
 
 public class RecruiterDAO {
@@ -43,8 +45,7 @@ public class RecruiterDAO {
     /**
      * Get dashboard statistics for recruiter
      */
-    public Map<String, Object> getDashboardStats(Integer recruiterId) throws SQLException {
-        Map<String, Object> stats = new HashMap<>();
+    public RecruiterDashboardStatsDTO getDashboardStats(Integer recruiterId) throws SQLException {
         String sql = "{call employer.sp_GetRecruiterDashboardStats(?)}";
 
         try (Connection conn = DB.getConnection(); CallableStatement stmt = conn.prepareCall(sql)) {
@@ -53,23 +54,58 @@ public class RecruiterDAO {
 
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
-                    stats.put("totalJobs", rs.getInt("TotalJobs"));
-                    stats.put("activeJobs", rs.getInt("ActiveJobs"));
-                    stats.put("totalApplications", rs.getInt("TotalApplications"));
-                    stats.put("newApplications", rs.getInt("NewApplications"));
-                    stats.put("interviewsScheduled", rs.getInt("InterviewsScheduled"));
-                    stats.put("totalViews", rs.getInt("TotalViews"));
+                    RecruiterDashboardStatsDTO stats = new RecruiterDashboardStatsDTO();
+                    stats.setTotalJobs(rs.getInt("TotalJobs"));
+                    stats.setActiveJobs(rs.getInt("ActiveJobs"));
+                    stats.setTotalApplications(rs.getInt("TotalApplications"));
+                    stats.setNewApplications(rs.getInt("NewApplications"));
+                    stats.setInterviewsScheduled(rs.getInt("InterviewsScheduled"));
+                    stats.setTotalViews(rs.getInt("TotalViews"));
+                    return stats;
                 }
             }
         }
-        return stats;
+        return null;
+    }
+
+    /**
+     * Get recent applications for recruiter's jobs
+     */
+    public List<RecentApplicationDTO> getRecentApplications(Integer recruiterId, int limit) throws SQLException {
+        List<RecentApplicationDTO> applications = new ArrayList<>();
+        String sql = "{call employer.sp_GetRecentApplicationsByRecruiter(?, ?)}";
+
+        try (Connection conn = DB.getConnection(); CallableStatement stmt = conn.prepareCall(sql)) {
+
+            stmt.setInt(1, recruiterId);
+            stmt.setInt(2, limit);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    RecentApplicationDTO app = new RecentApplicationDTO();
+                    app.setApplicationId(rs.getInt("ApplicationId"));
+                    app.setJobId(rs.getInt("JobId"));
+                    app.setJobTitle(rs.getString("JobTitle"));
+                    app.setCandidateId(rs.getInt("CandidateId"));
+                    app.setCandidateName(rs.getString("CandidateName"));
+                    app.setCandidateEmail(rs.getString("CandidateEmail"));
+
+                    app.setAppliedAt(rs.getTimestamp("AppliedAt"));
+
+                    app.setStatus(rs.getString("Status"));
+                    app.setFileUrl(rs.getString("FileUrl"));
+                    applications.add(app);
+                }
+            }
+        }
+        return applications;
     }
 
     /**
      * Get jobs posted by recruiter
      */
-    public List<Map<String, Object>> getRecruiterJobs(Integer recruiterId, int pageNumber, int pageSize) throws SQLException {
-        List<Map<String, Object>> jobs = new ArrayList<>();
+    public List<RecruiterJobDTO> getRecruiterJobs(Integer recruiterId, int pageNumber, int pageSize) throws SQLException {
+        List<RecruiterJobDTO> jobs = new ArrayList<>();
         String sql = "{call employer.sp_GetRecruiterJobs(?, ?, ?, ?, ?)}";
 
         try (Connection conn = DB.getConnection(); CallableStatement stmt = conn.prepareCall(sql)) {
@@ -82,19 +118,19 @@ public class RecruiterDAO {
 
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
-                    Map<String, Object> job = new HashMap<>();
-                    job.put("jobId", rs.getInt("JobId"));
-                    job.put("title", rs.getString("Title"));
-                    job.put("slug", rs.getString("Slug"));
-                    job.put("status", rs.getString("Status"));
-                    job.put("statusId", rs.getByte("StatusId"));
-                    job.put("postedAt", rs.getTimestamp("PostedAt"));
-                    job.put("expiresAt", rs.getTimestamp("ExpiresAt"));
-                    job.put("viewsCount", rs.getInt("ViewsCount"));
-                    job.put("applicationsCount", rs.getInt("ApplicationsCount"));
-                    job.put("isFeatured", rs.getBoolean("IsFeatured"));
-                    job.put("cityName", rs.getString("CityName"));
-                    job.put("employmentType", rs.getString("EmploymentType"));
+                    RecruiterJobDTO job = new RecruiterJobDTO();
+                    job.setJobId(rs.getInt("JobId"));
+                    job.setTitle(rs.getString("Title"));
+                    job.setSlug(rs.getString("Slug"));
+                    job.setStatus(rs.getString("Status"));
+                    job.setStatusId(rs.getByte("StatusId"));
+                    job.setPostedAt(rs.getTimestamp("PostedAt"));
+                    job.setExpiresAt(rs.getTimestamp("ExpiresAt"));
+                    job.setViewsCount(rs.getInt("ViewsCount"));
+                    job.setApplicationsCount(rs.getInt("ApplicationsCount"));
+                    job.setIsFeatured(rs.getBoolean("IsFeatured"));
+                    job.setCityName(rs.getString("CityName"));
+                    job.setEmploymentType(rs.getString("EmploymentType"));
                     jobs.add(job);
                 }
             }
@@ -103,41 +139,10 @@ public class RecruiterDAO {
     }
 
     /**
-     * Get recent applications for recruiter's jobs
-     */
-    public List<Map<String, Object>> getRecentApplications(Integer recruiterId, int limit) throws SQLException {
-        List<Map<String, Object>> applications = new ArrayList<>();
-        String sql = "{call employer.sp_GetRecentApplicationsByRecruiter(?, ?)}";
-
-        try (Connection conn = DB.getConnection(); CallableStatement stmt = conn.prepareCall(sql)) {
-
-            stmt.setInt(1, recruiterId);
-            stmt.setInt(2, limit);
-
-            try (ResultSet rs = stmt.executeQuery()) {
-                while (rs.next()) {
-                    Map<String, Object> app = new HashMap<>();
-                    app.put("applicationId", rs.getInt("ApplicationId"));
-                    app.put("jobId", rs.getInt("JobId"));
-                    app.put("jobTitle", rs.getString("JobTitle"));
-                    app.put("candidateId", rs.getInt("CandidateId"));
-                    app.put("candidateName", rs.getString("CandidateName"));
-                    app.put("candidateEmail", rs.getString("CandidateEmail"));
-                    app.put("appliedAt", rs.getTimestamp("AppliedAt"));
-                    app.put("status", rs.getString("Status"));
-                    app.put("fileUrl", rs.getString("FileUrl"));
-                    applications.add(app);
-                }
-            }
-        }
-        return applications;
-    }
-
-    /**
      * Get application statistics by status
      */
-    public List<Map<String, Object>> getApplicationStatsByStatus(Integer recruiterId) throws SQLException {
-        List<Map<String, Object>> stats = new ArrayList<>();
+    public List<ApplicationStatusStatDTO> getApplicationStatsByStatus(Integer recruiterId) throws SQLException {
+        List<ApplicationStatusStatDTO> stats = new ArrayList<>();
         String sql = "{call employer.sp_GetApplicationStatsByStatus(?)}";
 
         try (Connection conn = DB.getConnection(); CallableStatement stmt = conn.prepareCall(sql)) {
@@ -146,9 +151,9 @@ public class RecruiterDAO {
 
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
-                    Map<String, Object> stat = new HashMap<>();
-                    stat.put("status", rs.getString("Status"));
-                    stat.put("count", rs.getInt("Count"));
+                    ApplicationStatusStatDTO stat = new ApplicationStatusStatDTO();
+                    stat.setStatus(rs.getString("Status"));
+                    stat.setCount(rs.getInt("Count"));
                     stats.add(stat);
                 }
             }

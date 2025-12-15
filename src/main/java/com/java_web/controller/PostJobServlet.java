@@ -3,7 +3,6 @@ package com.java_web.controller;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
-import java.util.Map;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -19,6 +18,9 @@ import com.java_web.dao.JobDAO;
 import com.java_web.dao.RecruiterDAO;
 import com.java_web.model.auth.User;
 import com.java_web.model.common.City;
+import com.java_web.model.common.EmploymentType;
+import com.java_web.model.common.RemoteType;
+import com.java_web.model.common.SeniorityLevel;
 import com.java_web.model.common.Skill;
 import com.java_web.model.employer.Recruiter;
 
@@ -39,7 +41,7 @@ public class PostJobServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        
+
         // Check authentication and role
         HttpSession session = request.getSession(false);
         if (session == null || session.getAttribute("user") == null) {
@@ -57,9 +59,9 @@ public class PostJobServlet extends HttpServlet {
             // Get form data
             List<City> cities = commonDAO.getAllCities();
             List<Skill> skills = commonDAO.getTopSkills(100);
-            List<Map<String, String>> employmentTypes = commonDAO.getEmploymentTypes();
-            List<Map<String, String>> seniorityLevels = commonDAO.getSeniorityLevels();
-            List<Map<String, String>> remoteTypes = commonDAO.getRemoteTypes();
+            List<EmploymentType> employmentTypes = commonDAO.getEmploymentTypes();
+            List<SeniorityLevel> seniorityLevels = commonDAO.getSeniorityLevels();
+            List<RemoteType> remoteTypes = commonDAO.getRemoteTypes();
 
             request.setAttribute("cities", cities);
             request.setAttribute("skills", skills);
@@ -77,7 +79,7 @@ public class PostJobServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        
+
         // Check authentication and role
         HttpSession session = request.getSession(false);
         if (session == null || session.getAttribute("user") == null) {
@@ -117,8 +119,8 @@ public class PostJobServlet extends HttpServlet {
             String statusIdStr = request.getParameter("statusId");
 
             // Validate required fields
-            if (StringUtils.isBlank(title) || StringUtils.isBlank(description) || 
-                StringUtils.isBlank(cityIdStr) || StringUtils.isBlank(employmentTypeStr)) {
+            if (StringUtils.isBlank(title) || StringUtils.isBlank(description)
+                    || StringUtils.isBlank(cityIdStr) || StringUtils.isBlank(employmentTypeStr)) {
                 request.setAttribute("error", "Please fill in all required fields");
                 doGet(request, response);
                 return;
@@ -135,21 +137,21 @@ public class PostJobServlet extends HttpServlet {
 
             // Create job
             Integer jobId = jobDAO.createJob(
-                recruiter.getCompanyId(),
-                recruiter.getRecruiterId(),
-                title,
-                description,
-                requirements,
-                benefits,
-                cityId,
-                employmentType,
-                seniorityLevel,
-                remoteType,
-                salaryMin,
-                salaryMax,
-                currency,
-                expiresAtStr,
-                statusId
+                    recruiter.getCompanyId(),
+                    recruiter.getRecruiterId(),
+                    title,
+                    description,
+                    requirements,
+                    benefits,
+                    cityId,
+                    employmentType,
+                    seniorityLevel,
+                    remoteType,
+                    salaryMin,
+                    salaryMax,
+                    currency,
+                    expiresAtStr,
+                    statusId
             );
 
             // Add skills if provided

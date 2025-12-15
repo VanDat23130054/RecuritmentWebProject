@@ -21,7 +21,11 @@ import com.java_web.dao.JobDAO;
 import com.java_web.dao.SavedJobDAO;
 import com.java_web.model.auth.User;
 import com.java_web.model.common.City;
+import com.java_web.model.common.EmploymentType;
+import com.java_web.model.common.RemoteType;
+import com.java_web.model.common.SeniorityLevel;
 import com.java_web.model.common.Skill;
+import com.java_web.model.dto.JobSearchDTO;
 
 @WebServlet("/jobs")
 public class JobListingsServlet extends HttpServlet {
@@ -58,7 +62,7 @@ public class JobListingsServlet extends HttpServlet {
             String remoteTypeStr = request.getParameter("remoteType");
             String pageStr = request.getParameter("page");
             String sortBy = request.getParameter("sortBy"); // date, relevance, salary
-            
+
             Integer cityId = StringUtils.isNotBlank(cityIdStr) ? Integer.valueOf(cityIdStr) : null;
             Integer skillId = StringUtils.isNotBlank(skillIdStr) ? Integer.valueOf(skillIdStr) : null;
             Integer employmentType = StringUtils.isNotBlank(employmentTypeStr) ? Integer.valueOf(employmentTypeStr) : null;
@@ -70,37 +74,37 @@ public class JobListingsServlet extends HttpServlet {
             // Get filter data for dropdowns
             List<City> cities = commonDAO.getAllCities();
             List<Skill> skills = commonDAO.getTopSkills(50);
-            List<Map<String, String>> employmentTypes = commonDAO.getEmploymentTypes();
-            List<Map<String, String>> seniorityLevels = commonDAO.getSeniorityLevels();
-            List<Map<String, String>> remoteTypes = commonDAO.getRemoteTypes();
-            
-            // Search jobs
-            List<Map<String, Object>> jobs = jobDAO.searchJobs(keyword, cityId, skillId, currentPage, pageSize);
+            List<EmploymentType> employmentTypes = commonDAO.getEmploymentTypes();
+            List<SeniorityLevel> seniorityLevels = commonDAO.getSeniorityLevels();
+            List<RemoteType> remoteTypes = commonDAO.getRemoteTypes();
 
+            // Search jobs
+            List<JobSearchDTO> jobs = jobDAO.searchJobs(keyword, cityId, skillId, currentPage, pageSize);
             // Check if user is logged in to show saved status
             User currentUser = (User) request.getSession().getAttribute("user");
             List<Integer> savedJobIds = new ArrayList<>();
             if (currentUser != null) {
                 savedJobIds = savedJobDAO.getSavedJobsByUser(currentUser.getUserId())
-                    .stream()
-                    .map(sj -> sj.getJobId())
-                    .collect(java.util.stream.Collectors.toList());
+                        .stream()
+                        .map(sj -> sj.getJobId())
+                        .collect(java.util.stream.Collectors.toList());
             }
 
             // Parse skills JSON for each job and add saved status
-            for (Map<String, Object> job : jobs) {
-                String skillsJson = (String) job.get("Skills");
+            for (JobSearchDTO job : jobs) {
+                String skillsJson = job.getSkills();
                 if (StringUtils.isNotBlank(skillsJson)) {
                     List<Map<String, Object>> skillsList = objectMapper.readValue(
                             skillsJson,
-                            new TypeReference<List<Map<String, Object>>>() {}
+                            new TypeReference<List<Map<String, Object>>>() {
+                    }
                     );
-                    job.put("skillsList", skillsList);
+                    job.setSkillsList(skillsList);
                 }
-                
+
                 // Add saved status
-                Integer jobId = (Integer) job.get("jobId");
-                job.put("isSaved", savedJobIds.contains(jobId));
+                Integer jobId = job.getJobId();
+                job.setIsSaved(savedJobIds.contains(jobId));
             }
 
             // Get total count for better pagination
