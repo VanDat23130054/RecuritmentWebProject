@@ -1,5 +1,6 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -208,7 +209,7 @@
                             <div class="form-group">
                                 <label for="expiresAt">Expiration Date</label>
                                 <input type="date" id="expiresAt" name="expiresAt" 
-                                       value="${job.expiresAt}">
+                                       value="<fmt:formatDate value='${job.expiresAt}' pattern='yyyy-MM-dd' />">
                             </div>
 
                             <div class="form-group">

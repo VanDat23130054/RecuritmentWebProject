@@ -16,7 +16,10 @@ import org.apache.commons.lang3.StringUtils;
 import com.java_web.dao.JobDAO;
 import com.java_web.model.auth.User;
 
+import lombok.extern.slf4j.Slf4j;
+
 @WebServlet("/employer/delete-job")
+@Slf4j
 public class DeleteJobServlet extends HttpServlet {
 
     private JobDAO jobDAO;
@@ -67,8 +70,12 @@ public class DeleteJobServlet extends HttpServlet {
         try {
             Integer jobId = Integer.valueOf(jobIdStr);
 
+            log.info("Attempting to delete job {} for recruiter {}", jobId, recruiterId);
+
             // Delete the job (with authorization check in stored procedure)
             boolean success = jobDAO.deleteJob(jobId, recruiterId);
+
+            log.info("Delete job {} result: {}", jobId, success);
 
             if (success) {
                 out.print("{\"success\":true,\"message\":\"Job deleted successfully\"}");
@@ -77,8 +84,10 @@ public class DeleteJobServlet extends HttpServlet {
             }
 
         } catch (NumberFormatException e) {
+            log.error("Invalid job ID: {}", jobIdStr, e);
             out.print("{\"success\":false,\"message\":\"Invalid job ID\"}");
         } catch (SQLException e) {
+            log.error("SQL error deleting job {}", jobIdStr, e);
             String errorMsg = e.getMessage().replace("\"", "'");
             out.print("{\"success\":false,\"message\":\"Database error: " + errorMsg + "\"}");
             e.printStackTrace();

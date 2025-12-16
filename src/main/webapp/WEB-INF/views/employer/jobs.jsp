@@ -226,8 +226,8 @@
                                                     </a>
                                                     <button class="btn-icon delete" 
                                                             onclick="deleteJob(${job.jobId}, '${job.title}')"
-                                                            title="Delete Job">
-                                                        <i class="fas fa-trash"></i>
+                                                            title="Change to Draft">
+                                                     <i class="fa-brands fa-firstdraft"></i>
                                                     </button>
                                                 </div>
                                             </td>
@@ -328,7 +328,7 @@
         });
         
         function deleteJob(jobId, jobTitle) {
-            if (confirm('Are you sure you want to delete "' + jobTitle + '"?\n\nThis action cannot be undone.')) {
+            if (confirm('Are you sure you want to change status to draft with job: "' + jobTitle '")) {
                 // Show loading alert
                 showAlert('Deleting job...', 'info');
                 
