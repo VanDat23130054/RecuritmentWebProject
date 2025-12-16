@@ -154,10 +154,10 @@
                                     <span>${company.industry}</span>
                                 </div>
                             </c:if>
-                            <c:if test="${not empty company.companySize}">
+                            <c:if test="${not empty company.sizeRange}">
                                 <div class="stat-item">
                                     <i class="fas fa-users"></i>
-                                    <span>${company.companySize} employees</span>
+                                    <span>${company.sizeRange} employees</span>
                                 </div>
                             </c:if>
                             <c:if test="${not empty company.foundedYear}">

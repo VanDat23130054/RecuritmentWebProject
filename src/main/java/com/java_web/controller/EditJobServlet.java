@@ -24,7 +24,10 @@ import com.java_web.model.common.SeniorityLevel;
 import com.java_web.model.common.Skill;
 import com.java_web.model.dto.JobForEditDTO;
 
+import lombok.extern.slf4j.Slf4j;
+
 @WebServlet("/employer/edit-job/*")
+@Slf4j
 public class EditJobServlet extends HttpServlet {
 
     private CommonDAO commonDAO;
@@ -41,11 +44,18 @@ public class EditJobServlet extends HttpServlet {
      */
     private void reloadFormData(HttpServletRequest request, Integer jobId, Integer recruiterId)
             throws SQLException {
+        log.info("reloadFormData called for jobId={}, recruiterId={}", jobId, recruiterId);
+
         // Reload job data
         JobForEditDTO job = jobDAO.getJobForEdit(jobId, recruiterId);
+        log.info("Job loaded from DAO: {}", job != null ? "found" : "NULL");
+
         if (job == null) {
+            log.error("Job {} not found for recruiter {}", jobId, recruiterId);
             throw new SQLException("Job not found or access denied");
         }
+
+        log.info("Job details: title={}, recruiterId={}", job.getTitle(), job.getRecruiterId());
 
         // Load all form data
         List<City> cities = commonDAO.getAllCities();
@@ -53,6 +63,9 @@ public class EditJobServlet extends HttpServlet {
         List<EmploymentType> employmentTypes = commonDAO.getEmploymentTypes();
         List<SeniorityLevel> seniorityLevels = commonDAO.getSeniorityLevels();
         List<RemoteType> remoteTypes = commonDAO.getRemoteTypes();
+
+        log.info("Loaded form data - cities: {}, skills: {}, employmentTypes: {}",
+                cities.size(), skills.size(), employmentTypes.size());
 
         // Format expiresAt for date input
         if (job.getExpiresAt() != null) {
@@ -66,6 +79,8 @@ public class EditJobServlet extends HttpServlet {
         request.setAttribute("employmentTypes", employmentTypes);
         request.setAttribute("seniorityLevels", seniorityLevels);
         request.setAttribute("remoteTypes", remoteTypes);
+
+        log.info("All attributes set successfully");
     }
 
     @Override
@@ -102,14 +117,35 @@ public class EditJobServlet extends HttpServlet {
         try {
             Integer jobId = Integer.valueOf(pathInfo.substring(1));
 
+            log.info("Loading job {} for recruiter {}", jobId, recruiterId);
+
             // Load job and form data using helper method
             reloadFormData(request, jobId, recruiterId);
+
+            // Check if job was loaded successfully
+            JobForEditDTO job = (JobForEditDTO) request.getAttribute("job");
+            if (job == null) {
+                log.warn("Job {} not found or access denied for recruiter {}", jobId, recruiterId);
+                response.sendError(HttpServletResponse.SC_NOT_FOUND, "Job not found or you don't have permission to edit this job");
+                return;
+            }
+
+            log.info("Job {} loaded successfully: {}", jobId, job.getTitle());
 
             request.getRequestDispatcher("/WEB-INF/views/employer/edit-job.jsp").forward(request, response);
 
         } catch (NumberFormatException e) {
+            log.error("Invalid job ID in path: {}", pathInfo, e);
             response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid job ID");
         } catch (SQLException e) {
+            log.error("SQL error loading job for edit", e);
+            if (e.getMessage() != null && e.getMessage().contains("Job not found")) {
+                response.sendError(HttpServletResponse.SC_NOT_FOUND, "Job not found or you don't have permission to edit this job");
+            } else {
+                throw new ServletException("Error loading job for edit", e);
+            }
+        } catch (Exception e) {
+            log.error("Unexpected error in doGet", e);
             throw new ServletException("Error loading job for edit", e);
         }
     }

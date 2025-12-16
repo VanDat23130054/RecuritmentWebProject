@@ -21,4 +21,5 @@ public class RecentApplicationDTO implements Serializable {
     private Timestamp appliedAt;
     private String status;
     private String fileUrl;
+    private Integer resumeId;
 }

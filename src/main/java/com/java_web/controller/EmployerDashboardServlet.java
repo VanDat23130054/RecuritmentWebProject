@@ -23,7 +23,10 @@ import com.java_web.model.dto.RecruiterDashboardStatsDTO;
 import com.java_web.model.dto.RecruiterJobDTO;
 import com.java_web.model.employer.Recruiter;
 
+import lombok.extern.slf4j.Slf4j;
+
 @WebServlet("/employer/dashboard")
+@Slf4j
 public class EmployerDashboardServlet extends HttpServlet {
 
     private RecruiterDAO recruiterDAO;
@@ -76,27 +79,28 @@ public class EmployerDashboardServlet extends HttpServlet {
 
             // Get dashboard statistics
             RecruiterDashboardStatsDTO stats = recruiterDAO.getDashboardStats(recruiter.getRecruiterId());
-            System.out.println(stats);
+            log.info("Dashboard stats: {}", stats);
+
             // Get recruiter's jobs (first 10 for dashboard)
             List<RecruiterJobDTO> recentJobs = jobDAO.getRecruiterJobs(
                     recruiter.getRecruiterId(), null, null, 1, 10);
-            System.out.println(recentJobs);
+            log.info("Recent jobs count: {}", recentJobs.size());
 
             // Get recent applications (last 10)
             List<RecentApplicationDTO> recentApplications = recruiterDAO.getRecentApplications(
                     recruiter.getRecruiterId(), 10);
-            System.out.println(recentApplications);
+            log.info("Recent applications count: {}", recentApplications.size());
 
             // Get application statistics by status
             List<ApplicationStatusStatDTO> applicationStats = recruiterDAO.getApplicationStatsByStatus(
                     recruiter.getRecruiterId());
-            System.out.println(applicationStats);
+            log.info("Application stats count: {}", applicationStats.size());
 
             // Get company information
             CompanyDetailDTO company = null;
             if (recruiter.getCompanyId() != null) {
                 company = companyDAO.getCompanyDetail(recruiter.getCompanyId());
-                System.out.println(company);
+                log.info("Company: {}", company != null ? company.getName() : "null");
             }
 
             // Set attributes for JSP
@@ -108,11 +112,14 @@ public class EmployerDashboardServlet extends HttpServlet {
             request.setAttribute("company", company);
             request.setAttribute("user", user);
 
+            log.info("Forwarding to dashboard.jsp");
+
             // Forward to dashboard view
             request.getRequestDispatcher("/WEB-INF/views/employer/dashboard.jsp")
                     .forward(request, response);
 
         } catch (SQLException e) {
+            log.error("Error loading employer dashboard", e);
             throw new ServletException("Error loading employer dashboard", e);
         }
     }

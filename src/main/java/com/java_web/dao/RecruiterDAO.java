@@ -91,6 +91,7 @@ public class RecruiterDAO {
                     app.setCandidateEmail(rs.getString("CandidateEmail"));
 
                     app.setAppliedAt(rs.getTimestamp("AppliedAt"));
+                    app.setResumeId(rs.getInt("ResumeId"));
 
                     app.setStatus(rs.getString("Status"));
                     app.setFileUrl(rs.getString("FileUrl"));

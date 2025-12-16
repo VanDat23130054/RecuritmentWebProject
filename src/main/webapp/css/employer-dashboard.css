@@ -307,6 +307,9 @@
 /* Company Info */
 .company-info {
   text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
 }
 
 .company-logo {
@@ -316,11 +319,47 @@
   border-radius: 8px;
   margin-bottom: 1rem;
 }
+.company-logo-container {
+  text-align: center;
+  padding: 15px;
+  background: #f8f9fa;
+  border-radius: 8px;
+}
+
+.company-logo-container img {
+  max-width: 120px;
+  max-height: 120px;
+  object-fit: contain;
+}
+.company-details {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  padding: 10px 0;
+  border-top: 1px solid #e5e7eb;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.company-details i {
+  color: #6366f1;
+  width: 16px;
+}
+.company-detail-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.875rem;
+}
 
 .company-info h4 {
   margin: 0 0 0.5rem 0;
   font-size: 1.125rem;
   color: #1f2937;
+}
+.company-description {
+  font-size: 0.875rem;
+  color: #6b7280;
+  line-height: 1.5;
 }
 
 .company-location,

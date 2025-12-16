@@ -1,6 +1,7 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -119,9 +120,9 @@
                     <div class="card-body">
                         <c:choose>
                             <c:when test="${not empty applicationStats}">
-                                <div class="status-chart" style="display: flex; flex-direction: column; gap: 12px;">
+                                <div class="status-chart">
                                     <c:forEach items="${applicationStats}" var="stat">
-                                        <div class="status-item" style="display: flex; justify-content: space-between; align-items: center; padding: 10px; background: #f8f9fa; border-radius: 6px;">
+                                        <div class="status-item">
                                             <div class="status-label">
                                                 <c:choose>
                                                     <c:when test="${stat.status == 'Applied'}">
@@ -133,9 +134,6 @@
                                                     <c:when test="${stat.status == 'Interview Scheduled'}">
                                                         <span class="badge bg-warning">${stat.status}</span>
                                                     </c:when>
-                                                    <c:when test="${stat.status == 'Offer Extended'}">
-                                                        <span class="badge bg-success">${stat.status}</span>
-                                                    </c:when>
                                                     <c:when test="${stat.status == 'Rejected'}">
                                                         <span class="badge bg-danger">${stat.status}</span>
                                                     </c:when>
@@ -144,7 +142,7 @@
                                                     </c:otherwise>
                                                 </c:choose>
                                             </div>
-                                            <div class="status-count" style="font-size: 1.5rem; font-weight: 600; color: #1f2937;">${stat.count}</div>
+                                            <div class="status-count">${stat.count}</div>
                                         </div>
                                     </c:forEach>
                                 </div>
@@ -167,58 +165,62 @@
                     <div class="card-body">
                         <c:choose>
                             <c:when test="${not empty company}">
-                                <div class="company-info" style="display: flex; flex-direction: column; gap: 15px;">
+                                <div class="company-info">
                                     <c:if test="${not empty company.logoUrl}">
-                                        <div style="text-align: center; padding: 15px; background: #f8f9fa; border-radius: 8px;">
-                                            <img src="${company.logoUrl}" alt="${company.name}" class="company-logo" 
-                                                 style="max-width: 120px; max-height: 120px; object-fit: contain;">
+                                        <div class="company-logo-container">
+                                            <img src="${company.logoUrl}" alt="${company.name}" class="company-logo">
                                         </div>
                                     </c:if>
-                                    <div style="text-align: center;">
-                                        <h4 style="margin: 0; color: #1f2937; font-size: 1.25rem;">${company.name}</h4>
+                                    <div class="company-name">
+                                        <h4>${company.name}</h4>
                                     </div>
-                                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 10px 0; border-top: 1px solid #e5e7eb; border-bottom: 1px solid #e5e7eb;">
+                                    <div class="company-details">
                                         <c:if test="${not empty company.cityName}">
-                                            <div style="display: flex; align-items: center; gap: 8px; font-size: 0.875rem;">
-                                                <i class="fas fa-map-marker-alt" style="color: #6366f1; width: 16px;"></i>
-                                                <span style="color: #4b5563;">${company.cityName}</span>
+                                            <div class="company-detail-item">
+                                                <i class="fas fa-map-marker-alt"></i>
+                                                <span>${company.cityName}</span>
                                             </div>
                                         </c:if>
                                         <c:if test="${not empty company.industry}">
-                                            <div style="display: flex; align-items: center; gap: 8px; font-size: 0.875rem;">
-                                                <i class="fas fa-industry" style="color: #6366f1; width: 16px;"></i>
-                                                <span style="color: #4b5563;">${company.industry}</span>
+                                            <div class="company-detail-item">
+                                                <i class="fas fa-industry"></i>
+                                                <span>${company.industry}</span>
                                             </div>
                                         </c:if>
-                                        <c:if test="${not empty company.companySize}">
-                                            <div style="display: flex; align-items: center; gap: 8px; font-size: 0.875rem;">
-                                                <i class="fas fa-users" style="color: #6366f1; width: 16px;"></i>
-                                                <span style="color: #4b5563;">${company.companySize}</span>
+                                        <c:if test="${not empty company.sizeRange}">
+                                            <div class="company-detail-item">
+                                                <i class="fas fa-users"></i>
+                                                <span>${company.sizeRange}</span>
                                             </div>
                                         </c:if>
                                         <c:if test="${not empty company.websiteUrl}">
-                                            <div style="display: flex; align-items: center; gap: 8px; font-size: 0.875rem;">
-                                                <i class="fas fa-globe" style="color: #6366f1; width: 16px;"></i>
-                                                <a href="${company.websiteUrl}" target="_blank" style="color: #3b82f6; text-decoration: none; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
-                                                    Website
-                                                </a>
+                                            <div class="company-detail-item">
+                                                <i class="fas fa-globe"></i>
+                                                <a href="${company.websiteUrl}" target="_blank">Website</a>
                                             </div>
                                         </c:if>
                                     </div>
                                     <c:if test="${not empty company.description}">
-                                        <div style="font-size: 0.875rem; color: #6b7280; line-height: 1.5;">
-                                            ${company.description.length() > 150 ? company.description.substring(0, 150).concat('...') : company.description}
+                                        <div class="company-description">
+                                            <c:choose>
+                                                <c:when test="${fn:length(company.description) > 150}">
+                                                    ${fn:substring(company.description, 0, 150)}...
+                                                </c:when>
+                                                <c:otherwise>
+                                                    ${company.description}
+                                                </c:otherwise>
+                                            </c:choose>
                                         </div>
                                     </c:if>
-                                    <div style="text-align: center; margin-top: 5px;">
+                                    <div class="company-actions">
                                         <c:choose>
                                             <c:when test="${user.role == 'EmployerAdmin'}">
-                                                <a href="${pageContext.request.contextPath}/employer/company-profile" class="btn btn-sm btn-outline-primary" style="width: 100%;">
+                                                <a href="${pageContext.request.contextPath}/employer/company-profile" class="btn btn-sm btn-outline-primary w-100">
                                                     <i class="fas fa-edit"></i> Edit Company Profile
                                                 </a>
                                             </c:when>
                                             <c:otherwise>
-                                                <a href="${pageContext.request.contextPath}/employer/company-profile" class="btn btn-primary" style="width: 100%;">
+                                                <a href="${pageContext.request.contextPath}/employer/company-profile" class="btn btn-primary w-100">
                                                     <i class="fas fa-eye"></i> View Company Profile
                                                 </a>
                                             </c:otherwise>
@@ -279,12 +281,25 @@
                                                 </td>
                                                 <td>${job.cityName}</td>
                                                 <td>
-                                                    <span class="badge badge-${job.statusId == 1 ? 'active' : job.statusId == 2 ? 'closed' : 'draft'}">
-                                                        ${job.status}
-                                                    </span>
+                                                    <c:choose>
+                                                        <c:when test="${job.statusId == 2}">
+                                                            <span class="badge badge-active">${job.status}</span>
+                                                        </c:when>
+                                                        <c:when test="${job.statusId == 3}">
+                                                            <span class="badge badge-closed">${job.status}</span>
+                                                        </c:when>
+                                                        <c:otherwise>
+                                                            <span class="badge badge-draft">${job.status}</span>
+                                                        </c:otherwise>
+                                                    </c:choose>
                                                 </td>
                                                 <td>
-                                                    <fmt:formatDate value="${job.postedAt}" pattern="MMM dd, yyyy" />
+                                                    <c:choose>
+                                                        <c:when test="${job.postedAt != null}">
+                                                            <fmt:formatDate value="${job.postedAt}" pattern="MMM dd, yyyy" />
+                                                        </c:when>
+                                                        <c:otherwise>-</c:otherwise>
+                                                    </c:choose>
                                                 </td>
                                                 <td>${job.viewsCount}</td>
                                                 <td>
