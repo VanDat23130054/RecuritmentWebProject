@@ -208,7 +208,7 @@
                             <div class="form-group">
                                 <label for="expiresAt">Expiration Date</label>
                                 <input type="date" id="expiresAt" name="expiresAt" 
-                                       value="${job.expiresAtFormatted}">
+                                       value="${job.expiresAt}">
                             </div>
 
                             <div class="form-group">

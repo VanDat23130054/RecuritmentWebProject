@@ -70,7 +70,7 @@ public class EditJobServlet extends HttpServlet {
         // Format expiresAt for date input
         if (job.getExpiresAt() != null) {
             Timestamp expiresAt = job.getExpiresAt();
-            request.setAttribute("expiresAtFormatted", expiresAt);
+            request.setAttribute("expiresAt", expiresAt);
         }
 
         request.setAttribute("job", job);
