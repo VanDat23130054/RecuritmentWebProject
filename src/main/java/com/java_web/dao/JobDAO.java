@@ -6,7 +6,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.java_web.config.DB;
 import com.java_web.model.dto.JobDetailDTO;
@@ -228,7 +230,7 @@ public class JobDAO {
         return jobs;
     }
 
-}
+
     /**
      * Get total job count for a recruiter with optional filters
      */
