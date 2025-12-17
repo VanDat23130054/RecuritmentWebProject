@@ -86,6 +86,10 @@
         <filter-name>AuthenticationFilter</filter-name>
         <url-pattern>/saved-jobs/*</url-pattern>
     </filter-mapping>
+        <filter-mapping>
+        <filter-name>AuthenticationFilter</filter-name>
+        <url-pattern>/jobs/*</url-pattern>
+    </filter-mapping>
 
     <!-- ============================================ -->
     <!-- STATIC RESOURCES                             -->

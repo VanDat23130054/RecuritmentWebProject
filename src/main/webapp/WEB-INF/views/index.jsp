@@ -110,7 +110,7 @@
                     <div class="job-card-footer">
                         <a href="${pageContext.request.contextPath}/job/${job.jobId}" class="btn btn-primary">View Details</a>
                         <c:choose>
-                            <c:when test="${not empty sessionScope.user}">
+                            <c:when test="${not empty sessionScope.user && sessionScope.user.role == 'Candidate'}">
                                 <c:choose>
                                     <c:when test="${job.isSaved}">
                                         <button class="btn btn-secondary save-job-btn saved" data-job-id="${job.jobId}">
@@ -124,11 +124,11 @@
                                     </c:otherwise>
                                 </c:choose>
                             </c:when>
-                            <c:otherwise>
+                            <c:when test="${empty sessionScope.user}">
                                 <a href="${pageContext.request.contextPath}/login" class="btn btn-secondary">
                                     <i class="far fa-bookmark"></i> Save
                                 </a>
-                            </c:otherwise>
+                            </c:when>
                         </c:choose>
                     </div>
                 </div>

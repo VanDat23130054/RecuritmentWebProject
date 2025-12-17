@@ -1,0 +1,561 @@
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Employer Dashboard - JobHunter</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/employer-dashboard.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/alert.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body>
+    <jsp:include page="../common/header.jsp" />
+
+    <div class="dashboard-container">
+        <!-- Sidebar Navigation -->
+        <aside class="dashboard-sidebar">
+            <div class="sidebar-header">
+                <h3><i class="fas fa-building"></i> Employer Portal</h3>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <a href="${pageContext.request.contextPath}/employer/dashboard" class="nav-item active">
+                    <i class="fas fa-chart-line"></i> Dashboard
+                </a>
+                <a href="${pageContext.request.contextPath}/employer/jobs" class="nav-item">
+                    <i class="fas fa-briefcase"></i> My Jobs
+                </a>
+                <a href="${pageContext.request.contextPath}/employer/post-job" class="nav-item">
+                    <i class="fas fa-plus-circle"></i> Post New Job
+                </a>
+                <a href="${pageContext.request.contextPath}/employer/applications" class="nav-item">
+                    <i class="fas fa-file-alt"></i> Applications
+                </a>
+                <a href="${pageContext.request.contextPath}/employer/company-profile" class="nav-item">
+                    <i class="fas fa-building"></i> Company Profile
+                </a>
+                <a href="${pageContext.request.contextPath}/employer/graph" class="nav-item">
+                    <i class="fa-solid fa-chart-line"></i> Analytics
+                </a>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="dashboard-main">
+            <!-- Page Header -->
+            <div class="dashboard-header">
+                <div class="header-content">
+                    <h1>Dashboard Overview</h1>
+                    <p class="text-muted">Welcome back, ${user.email}</p>
+                </div>
+                <div class="header-actions">
+                    <a href="${pageContext.request.contextPath}/employer/post-job" class="btn btn-primary">
+                        <i class="fas fa-plus"></i> Post New Job
+                    </a>
+                </div>
+            </div>
+
+            <!-- Statistics Cards -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon" style="background: #4F46E5;">
+                        <i class="fas fa-briefcase"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3>${stats.activeJobs != null ? stats.activeJobs : 0}</h3>
+                        <p>Active Jobs</p>
+                        <span class="stat-detail">of ${stats.totalJobs != null ? stats.totalJobs : 0} total</span>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon" style="background: #10B981;">
+                        <i class="fas fa-file-alt"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3>${stats.totalApplications != null ? stats.totalApplications : 0}</h3>
+                        <p>Total Applications</p>
+                        <c:if test="${stats.newApplications != null && stats.newApplications > 0}">
+                            <span class="stat-badge new">${stats.newApplications} new</span>
+                        </c:if>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon" style="background: #F59E0B;">
+                        <i class="fas fa-calendar-check"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3>${stats.interviewsScheduled != null ? stats.interviewsScheduled : 0}</h3>
+                        <p>Interviews Scheduled</p>
+                        <span class="stat-detail">Upcoming</span>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon" style="background: #6366F1;">
+                        <i class="fas fa-eye"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3>${stats.totalViews != null ? stats.totalViews : 0}</h3>
+                        <p>Total Job Views</p>
+                        <span class="stat-detail">All time</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Charts Section -->
+            <div class="dashboard-row">
+                <!-- Application Status Chart -->
+                <div class="dashboard-card chart-card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-chart-pie"></i> Application Status</h3>
+                    </div>
+                    <div class="card-body">
+                        <c:choose>
+                            <c:when test="${not empty applicationStats}">
+                                <div class="status-chart">
+                                    <c:forEach items="${applicationStats}" var="stat">
+                                        <div class="status-item">
+                                            <div class="status-label">
+                                                <c:choose>
+                                                    <c:when test="${stat.status == 'Applied'}">
+                                                        <span class="badge bg-primary">${stat.status}</span>
+                                                    </c:when>
+                                                    <c:when test="${stat.status == 'Under Review'}">
+                                                        <span class="badge bg-info">${stat.status}</span>
+                                                    </c:when>
+                                                    <c:when test="${stat.status == 'Interview Scheduled'}">
+                                                        <span class="badge bg-warning">${stat.status}</span>
+                                                    </c:when>
+                                                    <c:when test="${stat.status == 'Rejected'}">
+                                                        <span class="badge bg-danger">${stat.status}</span>
+                                                    </c:when>
+                                                    <c:otherwise>
+                                                        <span class="badge bg-secondary">${stat.status}</span>
+                                                    </c:otherwise>
+                                                </c:choose>
+                                            </div>
+                                            <div class="status-count">${stat.count}</div>
+                                        </div>
+                                    </c:forEach>
+                                </div>
+                            </c:when>
+                            <c:otherwise>
+                                <div class="empty-state">
+                                    <i class="fas fa-chart-pie"></i>
+                                    <p>No application data available</p>
+                                </div>
+                            </c:otherwise>
+                        </c:choose>
+                    </div>
+                </div>
+
+                <!-- Company Info -->
+                <div class="dashboard-card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-building"></i> Company Information</h3>
+                    </div>
+                    <div class="card-body">
+                        <c:choose>
+                            <c:when test="${not empty company}">
+                                <div class="company-info">
+                                    <c:if test="${not empty company.logoUrl}">
+                                        <div class="company-logo-container">
+                                            <img src="${company.logoUrl}" alt="${company.name}" class="company-logo">
+                                        </div>
+                                    </c:if>
+                                    <div class="company-name">
+                                        <h4>${company.name}</h4>
+                                    </div>
+                                    <div class="company-details">
+                                        <c:if test="${not empty company.cityName}">
+                                            <div class="company-detail-item">
+                                                <i class="fas fa-map-marker-alt"></i>
+                                                <span>${company.cityName}</span>
+                                            </div>
+                                        </c:if>
+                                        <c:if test="${not empty company.industry}">
+                                            <div class="company-detail-item">
+                                                <i class="fas fa-industry"></i>
+                                                <span>${company.industry}</span>
+                                            </div>
+                                        </c:if>
+                                        <c:if test="${not empty company.sizeRange}">
+                                            <div class="company-detail-item">
+                                                <i class="fas fa-users"></i>
+                                                <span>${company.sizeRange}</span>
+                                            </div>
+                                        </c:if>
+                                        <c:if test="${not empty company.websiteUrl}">
+                                            <div class="company-detail-item">
+                                                <i class="fas fa-globe"></i>
+                                                <a href="${company.websiteUrl}" target="_blank">Website</a>
+                                            </div>
+                                        </c:if>
+                                    </div>
+                                    <c:if test="${not empty company.description}">
+                                        <div class="company-description">
+                                            <c:choose>
+                                                <c:when test="${fn:length(company.description) > 150}">
+                                                    ${fn:substring(company.description, 0, 150)}...
+                                                </c:when>
+                                                <c:otherwise>
+                                                    ${company.description}
+                                                </c:otherwise>
+                                            </c:choose>
+                                        </div>
+                                    </c:if>
+                                    <div class="company-actions">
+                                        <c:choose>
+                                            <c:when test="${user.role == 'EmployerAdmin'}">
+                                                <a href="${pageContext.request.contextPath}/employer/company-profile" class="btn btn-sm btn-outline-primary w-100">
+                                                    <i class="fas fa-edit"></i> Edit Company Profile
+                                                </a>
+                                            </c:when>
+                                            <c:otherwise>
+                                                <a href="${pageContext.request.contextPath}/employer/company-profile" class="btn btn-primary w-100">
+                                                    <i class="fas fa-eye"></i> View Company Profile
+                                                </a>
+                                            </c:otherwise>
+                                        </c:choose>
+                                    </div>
+                                </div>
+                            </c:when>
+                            <c:otherwise>
+                                <div class="empty-state">
+                                    <i class="fas fa-building"></i>
+                                    <p>Company profile not set up</p>
+                                    <c:if test="${user.role == 'EmployerAdmin'}">
+                                        <a href="${pageContext.request.contextPath}/employer/company-profile" class="btn btn-sm btn-primary">
+                                            <i class="fas fa-plus"></i> Set Up Company
+                                        </a>
+                                    </c:if>
+                                </div>
+                            </c:otherwise>
+                        </c:choose>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Jobs -->
+            <div class="dashboard-card">
+                <div class="card-header">
+                    <h3><i class="fas fa-briefcase"></i> Recent Jobs</h3>
+                    <a href="${pageContext.request.contextPath}/employer/jobs" class="btn btn-sm btn-outline">
+                        View All
+                    </a>
+                </div>
+                <div class="card-body">
+                    <c:choose>
+                        <c:when test="${not empty recentJobs}">
+                            <div class="table-responsive">
+                                <table class="dashboard-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Job Title</th>
+                                            <th>Location</th>
+                                            <th>Status</th>
+                                            <th>Posted</th>
+                                            <th>Views</th>
+                                            <th>Applications</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <c:forEach items="${recentJobs}" var="job">
+                                            <tr>
+                                                <td>
+                                                    <div class="job-title-cell">
+                                                        <strong>${job.title}</strong>
+                                                        <c:if test="${job.isFeatured}">
+                                                            <span class="badge badge-featured">Featured</span>
+                                                        </c:if>
+                                                    </div>
+                                                </td>
+                                                <td>${job.cityName}</td>
+                                                <td>
+                                                    <c:choose>
+                                                        <c:when test="${job.statusId == 2}">
+                                                            <span class="badge badge-active">${job.status}</span>
+                                                        </c:when>
+                                                        <c:when test="${job.statusId == 3}">
+                                                            <span class="badge badge-closed">${job.status}</span>
+                                                        </c:when>
+                                                        <c:otherwise>
+                                                            <span class="badge badge-draft">${job.status}</span>
+                                                        </c:otherwise>
+                                                    </c:choose>
+                                                </td>
+                                                <td>
+                                                    <c:choose>
+                                                        <c:when test="${job.postedAt != null}">
+                                                            <fmt:formatDate value="${job.postedAt}" pattern="MMM dd, yyyy" />
+                                                        </c:when>
+                                                        <c:otherwise>-</c:otherwise>
+                                                    </c:choose>
+                                                </td>
+                                                <td>${job.viewsCount}</td>
+                                                <td>
+                                                    <a href="${pageContext.request.contextPath}/employer/applications?jobId=${job.jobId}" class="applications-link">
+                                                        ${job.applicationsCount}
+                                                    </a>
+                                                </td>
+                                                <td>
+                                                    <div class="action-buttons">
+                                                        <a href="${pageContext.request.contextPath}/job/${job.jobId}" 
+                                                           class="btn-icon" title="View">
+                                                            <i class="fas fa-eye"></i>
+                                                        </a>
+                                                        <a href="${pageContext.request.contextPath}/employer/edit-job/${job.jobId}" 
+                                                           class="btn-icon" title="Edit">
+                                                            <i class="fas fa-edit"></i>
+                                                        </a>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        </c:forEach>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </c:when>
+                        <c:otherwise>
+                            <div class="empty-state">
+                                <i class="fas fa-briefcase"></i>
+                                <p>You haven't posted any jobs yet</p>
+                                <a href="${pageContext.request.contextPath}/employer/post-job" class="btn btn-primary">
+                                    Post Your First Job
+                                </a>
+                            </div>
+                        </c:otherwise>
+                    </c:choose>
+                </div>
+            </div>
+
+            <!-- Recent Applications -->
+            <div class="dashboard-card">
+                <div class="card-header">
+                    <h3><i class="fas fa-users"></i> Recent Applications</h3>
+                    <a href="${pageContext.request.contextPath}/employer/applications" class="btn btn-sm btn-outline">
+                        View All
+                    </a>
+                </div>
+                <div class="card-body">
+                    <c:choose>
+                        <c:when test="${not empty recentApplications}">
+                            <div class="table-responsive">
+                                <table class="dashboard-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Candidate</th>
+                                            <th>Job Title</th>
+                                            <th>Applied Date</th>
+                                            <th>Status</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <c:forEach items="${recentApplications}" var="app">
+                                            <tr>
+                                                <td>
+                                                    <div class="candidate-cell">
+                                                        <strong>${app.candidateName}</strong>
+                                                        <span class="candidate-email">${app.candidateEmail}</span>
+                                                    </div>
+                                                </td>
+                                                <td>${app.jobTitle}</td>
+                                                <td>
+                                                    <fmt:formatDate value="${app.appliedAt}" pattern="MMM dd, yyyy HH:mm" />
+                                                </td>
+                                                <td>
+                                                    <c:choose>
+                                                        <c:when test="${app.status == 'Applied'}">
+                                                            <span class="badge bg-primary">${app.status}</span>
+                                                        </c:when>
+                                                        <c:when test="${app.status == 'Under Review'}">
+                                                            <span class="badge bg-info">${app.status}</span>
+                                                        </c:when>
+                                                        <c:when test="${app.status == 'Interview Scheduled'}">
+                                                            <span class="badge bg-warning text-dark">${app.status}</span>
+                                                        </c:when>
+                                                        <c:when test="${app.status == 'Offer Extended'}">
+                                                            <span class="badge bg-success">${app.status}</span>
+                                                        </c:when>
+                                                        <c:when test="${app.status == 'Rejected'}">
+                                                            <span class="badge bg-danger">${app.status}</span>
+                                                        </c:when>
+                                                        <c:otherwise>
+                                                            <span class="badge bg-secondary">${app.status}</span>
+                                                        </c:otherwise>
+                                                    </c:choose>
+                                                </td>
+                                                <td>
+                                                    <div class="action-buttons">
+                                                        <button type="button" class="btn-icon" 
+                                                                onclick="viewApplication(${app.applicationId})" 
+                                                                title="View Application">
+                                                            <i class="fas fa-eye"></i>
+                                                        </button>
+                                                        <c:if test="${not empty app.resumeId}">
+                                                            <button type="button" class="btn-icon" 
+                                                                    onclick="downloadResume(${app.resumeId})" 
+                                                                    title="Download Resume">
+                                                                <i class="fas fa-download"></i>
+                                                            </button>
+                                                        </c:if>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        </c:forEach>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </c:when>
+                        <c:otherwise>
+                            <div class="empty-state">
+                                <i class="fas fa-users"></i>
+                                <p>No applications received yet</p>
+                            </div>
+                        </c:otherwise>
+                    </c:choose>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <jsp:include page="../common/footer.jsp" />
+
+    <!-- Application Detail Modal -->
+    <div class="modal fade" id="applicationModal" tabindex="-1" aria-labelledby="applicationModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="applicationModalLabel">Application Details</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" id="applicationDetails">
+                    <div class="text-center py-5">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="${pageContext.request.contextPath}/js/alert.js"></script>
+    <script>
+        // View application details
+        function viewApplication(applicationId) {
+            console.log('viewApplication called:', applicationId);
+            
+            // Bootstrap 5 modal syntax
+            const modalElement = document.getElementById('applicationModal');
+            const modal = new bootstrap.Modal(modalElement);
+            modal.show();
+            
+            const url = '${pageContext.request.contextPath}/employer/applications/detail?id=' + applicationId;
+            console.log('Fetching application details from:', url);
+            
+            fetch(url)
+                .then(response => {
+                    console.log('Response status:', response.status);
+                    return response.json();
+                })
+                .then(data => {
+                    console.log('Response data:', data);
+                    if (data.success) {
+                        const app = data.application;
+                        console.log('Application data:', app);
+                        
+                        // Format date
+                        let appliedDate = 'N/A';
+                        if (app.appliedAt) {
+                            try {
+                                const date = new Date(app.appliedAt);
+                                appliedDate = date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+                            } catch (e) {
+                                appliedDate = app.appliedAt;
+                            }
+                        }
+                        
+                        const summaryHtml = app.candidateSummary
+                            ? `<p class="mb-0">${'$'}{app.candidateSummary}</p>`
+                            : '<p class="text-muted mb-0">No candidate summary provided.</p>';
+                        
+                        const resumeHtml = app.resumeFileUrl
+                            ? `<a href="${pageContext.request.contextPath}${'$'}{app.resumeFileUrl}" target="_blank" class="btn btn-outline-primary btn-sm">
+                                    <i class="fas fa-file-download me-1"></i>${'$'}{app.resumeFileName || 'Download Resume'}
+                               </a>`
+                            : '<span class="text-muted">No resume uploaded</span>';
+                        
+                        document.getElementById('applicationDetails').innerHTML = `
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <h6 class="text-muted">Candidate Information</h6>
+                                    <p class="mb-1"><strong>Name:</strong> ${'$'}{app.candidateName || 'N/A'}</p>
+                                    <p class="mb-1"><strong>Email:</strong> ${'$'}{app.candidateEmail || 'N/A'}</p>
+                                    <p class="mb-1"><strong>Location:</strong> ${'$'}{app.candidateCity || 'N/A'}</p>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <h6 class="text-muted">Job Information</h6>
+                                    <p class="mb-1"><strong>Position:</strong> ${'$'}{app.jobTitle || 'N/A'}</p>
+                                    <p class="mb-1"><strong>Company:</strong> ${'$'}{app.companyName || 'N/A'}</p>
+                                    <p class="mb-1"><strong>Applied:</strong> ${'$'}{appliedDate}</p>
+                                    <p class="mb-1"><strong>Source:</strong> ${'$'}{app.source || 'N/A'}</p>
+                                </div>
+                                <div class="col-12 mb-3">
+                                    <h6 class="text-muted">Candidate Summary</h6>
+                                    <div class="border rounded p-3 bg-light">
+                                        ${'$'}{summaryHtml}
+                                    </div>
+                                </div>
+                                <div class="col-12 mb-3">
+                                    <h6 class="text-muted">Cover Letter</h6>
+                                    <div class="border rounded p-3 bg-light">
+                                        ${'$'}{app.coverLetter || '<em class="text-muted">No cover letter provided</em>'}
+                                    </div>
+                                </div>
+                                <div class="col-12 mb-3">
+                                    <h6 class="text-muted">Resume</h6>
+                                    ${'$'}{resumeHtml}
+                                </div>
+                                <div class="col-12">
+                                    <h6 class="text-muted">Application Status</h6>
+                                    <p><span class="badge bg-primary">${'$'}{app.status || 'Unknown'}</span></p>
+                                </div>
+                            </div>
+                        `;
+                    } else {
+                        console.error('Error from server:', data.message);
+                        document.getElementById('applicationDetails').innerHTML = `
+                            <div class="alert alert-danger">${'$'}{data.message}</div>
+                        `;
+                    }
+                })
+                .catch(error => {
+                    console.error('Fetch error:', error);
+                    document.getElementById('applicationDetails').innerHTML = `
+                        <div class="alert alert-danger">Failed to load application details. Error: ${'$'}{error.message}</div>
+                    `;
+                });
+        }
+
+        // Download resume
+        function downloadResume(resumeId) {
+            window.location.href = '${pageContext.request.contextPath}/employer/applications/resume?id=' + resumeId;
+        }
+    </script>
+</body>
+</html>
