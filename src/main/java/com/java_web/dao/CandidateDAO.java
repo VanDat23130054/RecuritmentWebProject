@@ -2,6 +2,7 @@ package com.java_web.dao;
 
 import java.sql.CallableStatement;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
@@ -43,4 +44,15 @@ public class CandidateDAO {
         }
         return null;
     }
+
+    public boolean updateResumeUrlByUserId(Integer userId, String resumeUrl) throws SQLException {
+        String sql = "UPDATE candidate.Candidates SET ResumeUrl = ? WHERE UserID = ?";
+        try (Connection conn = DB.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, resumeUrl);
+            ps.setInt(2, userId);
+            int updated = ps.executeUpdate();
+            return updated > 0;
+        }
+    }
+
 }
