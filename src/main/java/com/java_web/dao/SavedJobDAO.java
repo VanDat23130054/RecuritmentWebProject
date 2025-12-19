@@ -26,7 +26,7 @@ public class SavedJobDAO {
             stmt.registerOutParameter(3, Types.INTEGER);
 
             stmt.execute();
-            
+
             int savedJobId = stmt.getInt(3);
             return savedJobId > 0;
         }
@@ -55,7 +55,7 @@ public class SavedJobDAO {
         if (userId == null || jobId == null) {
             return false;
         }
-        
+
         String sql = "{call candidate.sp_IsJobSaved(?, ?)}";
 
         try (Connection conn = DB.getConnection(); CallableStatement stmt = conn.prepareCall(sql)) {
@@ -89,7 +89,12 @@ public class SavedJobDAO {
                     savedJob.setSavedJobId(rs.getInt("SavedJobID"));
                     savedJob.setUserId(rs.getInt("UserID"));
                     savedJob.setJobId(rs.getInt("JobID"));
-                    savedJob.setSavedAt(rs.getTimestamp("SavedAt").toLocalDateTime());
+                    java.sql.Timestamp ts = rs.getTimestamp("SavedAt");
+                    if (ts != null) {
+                        savedJob.setSavedAt(ts); // java.sql.Timestamp extends java.util.Date
+                    } else {
+                        savedJob.setSavedAt(null);
+                    }
                     savedJobs.add(savedJob);
                 }
             }

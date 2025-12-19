@@ -30,13 +30,16 @@ public class CandidateDAO {
                     c.setCityId(rs.getObject("CityID") != null ? rs.getInt("CityID") : null);
                     c.setCountryId(rs.getObject("CountryID") != null ? rs.getInt("CountryID") : null);
                     c.setAvatarUrl(rs.getString("AvatarUrl"));
-                    c.setPublicProfile(rs.getBoolean("IsPublicProfile"));
 
                     Timestamp createdAt = rs.getTimestamp("CreatedAt");
-                    if (createdAt != null) c.setCreatedAt(createdAt.toLocalDateTime());
+                    if (createdAt != null) {
+                        c.setCreatedAt(createdAt.toLocalDateTime());
+                    }
 
                     Timestamp updatedAt = rs.getTimestamp("UpdatedAt");
-                    if (updatedAt != null) c.setUpdatedAt(updatedAt.toLocalDateTime());
+                    if (updatedAt != null) {
+                        c.setUpdatedAt(updatedAt.toLocalDateTime());
+                    }
 
                     return c;
                 }

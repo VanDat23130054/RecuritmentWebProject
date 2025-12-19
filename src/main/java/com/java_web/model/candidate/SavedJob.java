@@ -4,20 +4,20 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
-import java.time.LocalDateTime;
+import java.util.Date;
 
 @Data
 @NoArgsConstructor
 public class SavedJob implements Serializable {
+
     private static final long serialVersionUID = 1L;
     private Integer savedJobId;
     private Integer userId;
     private Integer jobId;
-    private LocalDateTime savedAt;
+    private Date savedAt;
 
     public SavedJob(Integer savedJobId) {
         this.savedJobId = savedJobId;
     }
-
 
 }
