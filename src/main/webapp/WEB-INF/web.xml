@@ -60,36 +60,7 @@
         <url-pattern>/api/*</url-pattern>
     </filter-mapping>
 
-    <!-- Authentication Filter - Protect authenticated routes -->
-    <filter>
-        <filter-name>AuthenticationFilter</filter-name>
-        <filter-class>com.java_web.filter.AuthenticationFilter</filter-class>
-    </filter>
-    
-    <!-- Apply authentication filter to protected paths -->
-    <filter-mapping>
-        <filter-name>AuthenticationFilter</filter-name>
-        <url-pattern>/profile/*</url-pattern>
-    </filter-mapping>
-    
-    <filter-mapping>
-        <filter-name>AuthenticationFilter</filter-name>
-        <url-pattern>/dashboard/*</url-pattern>
-    </filter-mapping>
-    
-    <filter-mapping>
-        <filter-name>AuthenticationFilter</filter-name>
-        <url-pattern>/apply/*</url-pattern>
-    </filter-mapping>
-    
-    <filter-mapping>
-        <filter-name>AuthenticationFilter</filter-name>
-        <url-pattern>/saved-jobs/*</url-pattern>
-    </filter-mapping>
-        <filter-mapping>
-        <filter-name>AuthenticationFilter</filter-name>
-        <url-pattern>/jobs/*</url-pattern>
-    </filter-mapping>
+    <!-- AuthenticationFilter removed: AuthorizationFilter (annotated) handles auth+role checks -->
 
     <!-- ============================================ -->
     <!-- STATIC RESOURCES                             -->

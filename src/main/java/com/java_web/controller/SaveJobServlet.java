@@ -43,14 +43,14 @@ public class SaveJobServlet extends HttpServlet {
             }
 
             User user = (User) session.getAttribute("user");
-            
+
             // Check if user is a candidate - only candidates can save jobs
             if (!"Candidate".equals(user.getRole())) {
                 response.setStatus(HttpServletResponse.SC_FORBIDDEN);
                 out.print("{\"success\": false, \"message\": \"Only candidates can save jobs\"}");
                 return;
             }
-            
+
             String jobIdStr = request.getParameter("jobId");
             String action = request.getParameter("action"); // "save" or "unsave"
 
@@ -70,13 +70,13 @@ public class SaveJobServlet extends HttpServlet {
             }
 
             if (success) {
-                out.print("{\"success\": true, \"message\": \"" + 
-                         ("unsave".equals(action) ? "Job removed from saved list" : "Job saved successfully") + 
-                         "\"}");
+                out.print("{\"success\": true, \"message\": \""
+                        + ("unsave".equals(action) ? "Job removed from saved list" : "Job saved successfully")
+                        + "\"}");
             } else {
                 response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-                out.print("{\"success\": false, \"message\": \"Failed to " + 
-                         ("unsave".equals(action) ? "unsave" : "save") + " job\"}");
+                out.print("{\"success\": false, \"message\": \"Failed to "
+                        + ("unsave".equals(action) ? "unsave" : "save") + " job\"}");
             }
 
         } catch (SQLException e) {
