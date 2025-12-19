@@ -14,7 +14,6 @@ import javax.servlet.http.HttpSession;
 import org.apache.commons.lang3.StringUtils;
 
 import com.java_web.dao.JobDAO;
-import com.java_web.model.auth.User;
 
 import lombok.extern.slf4j.Slf4j;
 

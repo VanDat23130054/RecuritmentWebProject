@@ -15,7 +15,6 @@ import org.apache.commons.lang3.StringUtils;
 
 import com.java_web.dao.ApplicationDAO;
 import com.java_web.dao.JobDAO;
-import com.java_web.model.auth.User;
 import com.java_web.model.dto.ApplicationListDTO;
 import com.java_web.model.dto.ApplicationStatusCountsDTO;
 import com.java_web.model.dto.RecruiterJobDTO;
