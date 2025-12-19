@@ -56,21 +56,8 @@ public class UploadResumeServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        // Check authentication
-        HttpSession session = request.getSession(false);
-        if (session == null || session.getAttribute("userId") == null) {
-            response.sendRedirect(request.getContextPath() + "/login?error=unauthorized");
-            return;
-        }
-
-        // Check if user is a candidate
-        String userRole = (String) session.getAttribute("userRole");
-        if (!"Candidate".equals(userRole)) {
-            response.sendRedirect(request.getContextPath() + "/home?error=notCandidate");
-            return;
-        }
-
-        // Get userId and lookup the actual CandidateId from Candidates table
+        // Get session (guaranteed to exist by AuthorizationFilter)
+        HttpSession session = request.getSession();
         Integer userId = (Integer) session.getAttribute("userId");
         Integer candidateId = null;
 

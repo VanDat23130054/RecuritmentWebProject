@@ -16,7 +16,6 @@ import org.apache.commons.lang3.StringUtils;
 
 import com.java_web.dao.CommonDAO;
 import com.java_web.dao.JobDAO;
-import com.java_web.model.auth.User;
 import com.java_web.model.common.City;
 import com.java_web.model.common.EmploymentType;
 import com.java_web.model.common.RemoteType;
@@ -56,7 +55,7 @@ public class EditJobServlet extends HttpServlet {
         }
 
         log.info("Job details: title={}, recruiterId={}", job.getTitle(), job.getRecruiterId());
-
+        
         // Load all form data
         List<City> cities = commonDAO.getAllCities();
         List<Skill> skills = commonDAO.getTopSkills(100);
@@ -87,20 +86,8 @@ public class EditJobServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        // Check authentication and role
-        HttpSession session = request.getSession(false);
-        if (session == null || session.getAttribute("user") == null) {
-            response.sendRedirect(request.getContextPath() + "/login?returnUrl=" + request.getRequestURI());
-            return;
-        }
-
-        User user = (User) session.getAttribute("user");
-        if (!"Recruiter".equals(user.getRole()) && !"EmployerAdmin".equals(user.getRole())) {
-            response.sendError(HttpServletResponse.SC_FORBIDDEN, "Access denied");
-            return;
-        }
-
-        // Get recruiterId from session
+        // Get session (guaranteed to exist by AuthorizationFilter)
+        HttpSession session = request.getSession();
         Integer recruiterId = (Integer) session.getAttribute("recruiterId");
         if (recruiterId == null) {
             response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Recruiter profile not found");
@@ -154,20 +141,8 @@ public class EditJobServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        // Check authentication and role
-        HttpSession session = request.getSession(false);
-        if (session == null || session.getAttribute("user") == null) {
-            response.sendRedirect(request.getContextPath() + "/login");
-            return;
-        }
-
-        User user = (User) session.getAttribute("user");
-        if (!"Recruiter".equals(user.getRole()) && !"EmployerAdmin".equals(user.getRole())) {
-            response.sendError(HttpServletResponse.SC_FORBIDDEN, "Access denied");
-            return;
-        }
-
-        // Get recruiterId from session
+        // Get session (guaranteed to exist by AuthorizationFilter)
+        HttpSession session = request.getSession();
         Integer recruiterId = (Integer) session.getAttribute("recruiterId");
         if (recruiterId == null) {
             response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Recruiter profile not found");

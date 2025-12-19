@@ -38,22 +38,8 @@ public class DeleteJobServlet extends HttpServlet {
         response.setCharacterEncoding("UTF-8");
         PrintWriter out = response.getWriter();
 
-        // Check authentication and role
-        HttpSession session = request.getSession(false);
-        if (session == null || session.getAttribute("user") == null) {
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            out.print("{\"success\":false,\"message\":\"Not authenticated\"}");
-            return;
-        }
-
-        User user = (User) session.getAttribute("user");
-        if (!"Recruiter".equals(user.getRole()) && !"EmployerAdmin".equals(user.getRole())) {
-            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-            out.print("{\"success\":false,\"message\":\"Access denied\"}");
-            return;
-        }
-
-        // Get recruiterId from session
+        // Get session (guaranteed to exist by AuthorizationFilter)
+        HttpSession session = request.getSession();
         Integer recruiterId = (Integer) session.getAttribute("recruiterId");
         if (recruiterId == null) {
             out.print("{\"success\":false,\"message\":\"Recruiter profile not found\"}");

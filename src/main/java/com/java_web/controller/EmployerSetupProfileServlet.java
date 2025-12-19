@@ -33,18 +33,9 @@ public class EmployerSetupProfileServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        HttpSession session = request.getSession(false);
-        if (session == null || session.getAttribute("user") == null) {
-            response.sendRedirect(request.getContextPath() + "/login");
-            return;
-        }
-
+        // Get session (guaranteed to exist by AuthorizationFilter)
+        HttpSession session = request.getSession();
         User user = (User) session.getAttribute("user");
-
-        if (!"Recruiter".equals(user.getRole()) && !"EmployerAdmin".equals(user.getRole())) {
-            response.sendError(HttpServletResponse.SC_FORBIDDEN, "Access denied");
-            return;
-        }
 
         try {
             // Get top employers for selection
@@ -64,12 +55,8 @@ public class EmployerSetupProfileServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        HttpSession session = request.getSession(false);
-        if (session == null || session.getAttribute("user") == null) {
-            response.sendRedirect(request.getContextPath() + "/login");
-            return;
-        }
-
+        // Get session (guaranteed to exist by AuthorizationFilter)
+        HttpSession session = request.getSession();
         User user = (User) session.getAttribute("user");
 
         String companyIdStr = request.getParameter("companyId");

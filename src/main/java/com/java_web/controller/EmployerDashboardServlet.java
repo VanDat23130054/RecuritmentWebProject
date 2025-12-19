@@ -51,21 +51,9 @@ public class EmployerDashboardServlet extends HttpServlet {
         response.setHeader("Pragma", "no-cache");
         response.setDateHeader("Expires", 0);
 
-        HttpSession session = request.getSession(false);
-        if (session == null || session.getAttribute("user") == null) {
-            response.sendRedirect(request.getContextPath() + "/login?returnUrl="
-                    + request.getRequestURI());
-            return;
-        }
-
+        // Get session (guaranteed to exist by AuthorizationFilter)
+        HttpSession session = request.getSession();
         User user = (User) session.getAttribute("user");
-
-        // Check if user is a recruiter
-        if (!"Recruiter".equals(user.getRole()) && !"EmployerAdmin".equals(user.getRole())) {
-            response.sendError(HttpServletResponse.SC_FORBIDDEN,
-                    "Access denied. This page is only for recruiters.");
-            return;
-        }
 
         try {
             // Get recruiter profile

@@ -42,19 +42,6 @@ public class PostJobServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        // Check authentication and role
-        HttpSession session = request.getSession(false);
-        if (session == null || session.getAttribute("user") == null) {
-            response.sendRedirect(request.getContextPath() + "/login?returnUrl=/employer/post-job");
-            return;
-        }
-
-        User user = (User) session.getAttribute("user");
-        if (!"Recruiter".equals(user.getRole()) && !"EmployerAdmin".equals(user.getRole())) {
-            response.sendError(HttpServletResponse.SC_FORBIDDEN, "Access denied");
-            return;
-        }
-
         try {
             // Get form data
             List<City> cities = commonDAO.getAllCities();

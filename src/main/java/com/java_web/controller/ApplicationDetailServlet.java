@@ -26,14 +26,8 @@ public class ApplicationDetailServlet extends HttpServlet {
         response.setCharacterEncoding("UTF-8");
         PrintWriter out = response.getWriter();
 
-        // Check authentication
-        HttpSession session = request.getSession(false);
-        if (session == null || session.getAttribute("userId") == null) {
-            out.print("{\"success\": false, \"message\": \"Please login first\"}");
-            return;
-        }
-
-        // Get recruiter ID - this serves as role check too
+        // Get session (guaranteed to exist by AuthorizationFilter)
+        HttpSession session = request.getSession();
         Integer recruiterId = (Integer) session.getAttribute("recruiterId");
         if (recruiterId == null) {
             out.print("{\"success\": false, \"message\": \"Access denied. Only recruiters can view application details.\"}");
