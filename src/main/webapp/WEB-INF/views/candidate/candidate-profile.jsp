@@ -21,34 +21,79 @@
         <c:if test="${not empty user}">
             <c:if test="${user.role == 'Candidate'}">
                 <c:if test="${not empty candidate}">
+                    <!-- Candidate card uses shared styles from style.css -->
                     <div class="candidate-card">
-                        <c:if test="${not empty candidate.avatarUrl}">
-                            <img src="${candidate.avatarUrl}" alt="Avatar" class="avatar img-thumbnail" style="max-width:120px;" />
-                        </c:if>
-                        <h3>${candidate.fullName}</h3>
-                        <p class="headline">${candidate.headline}</p>
-                        <p class="summary">${candidate.summary}</p>
-                        <p><strong>Experience:</strong> <c:out value="${candidate.yearsOfExperience}"/> years</p>
-                        <p><strong>Profile visibility:</strong> <c:out value="${candidate.publicProfile}"/></p>
+                        <div class="top">
+                            <c:if test="${not empty candidate.avatarUrl}">
+                                <img src="${candidate.avatarUrl}" alt="Avatar" class="avatar img-thumbnail" />
+                            </c:if>
+                            <div>
+                                <h3 class="mb-1">${candidate.fullName}</h3>
+                                <p class="headline mb-1">${candidate.headline}</p>
+                                <p class="text-muted mb-0"><strong>Experience:</strong> <c:out value="${candidate.yearsOfExperience}"/> years</p>
+                                <p class="text-muted"><strong>Profile visibility:</strong> <c:out value="${candidate.publicProfile}"/></p>
+                            </div>
+                        </div>
+
+                        <hr />
+
+                        <div class="summary">
+                            <h5>About</h5>
+                            <p>${candidate.summary}</p>
+                        </div>
+
+                        <div class="mt-3">
+                            <a class="btn btn-primary" href="${pageContext.request.contextPath}/candidate/profile/edit">Edit Profile</a>
+                            <a class="btn btn-secondary" href="${pageContext.request.contextPath}/candidate/applications">My Applications</a>
+                        </div>
                     </div>
                 </c:if>
 
-                <h3>Saved Jobs</h3>
+                <h3 class="mt-4">Saved Jobs</h3>
                 <c:choose>
                     <c:when test="${not empty savedJobs}">
-                        <ul class="saved-jobs">
-                            <c:forEach var="s" items="${savedJobs}">
-                                <li>
-                                    <a href="${pageContext.request.contextPath}/job/${s.jobId}">Job #${s.jobId}</a>
-                                    <small> - saved at <fmt:formatDate value="${s.savedAt}" pattern="yyyy-MM-dd HH:mm"/></small>
-                                </li>
+                        <div class="job-listings">
+                            <c:forEach items="${savedJobs}" var="job" varStatus="s">
+                                <c:if test="${s.index < 3}">
+                                    <div class="job-card mb-3">
+                                        <div class="job-card-header">
+                                            <img src="${job.logoUrl}" alt="${job.companyName}" class="company-logo">
+                                            <div class="job-info">
+                                                <h3 class="mb-1">
+                                                    <a href="${pageContext.request.contextPath}/job/${job.jobId}">${job.title}</a>
+                                                </h3>
+                                                <p class="company-name mb-0"><i class="fas fa-building"></i> ${job.companyName}</p>
+                                            </div>
+                                        </div>
+
+                                        <div class="job-card-body">
+                                            <div class="job-meta">
+                                                <span class="job-location"><i class="fas fa-map-marker-alt"></i> ${job.cityName}</span>
+                                                <c:if test="${not empty job.salaryMin && not empty job.salaryMax}">
+                                                    <span class="job-salary"><i class="fas fa-dollar-sign"></i>
+                                                        <fmt:formatNumber value="${job.salaryMin}" type="number"/> - 
+                                                        <fmt:formatNumber value="${job.salaryMax}" type="number"/> ${job.currency}
+                                                    </span>
+                                                </c:if>
+                                            </div>
+                                        </div>
+
+                                        <div class="job-card-footer">
+                                            <a href="${pageContext.request.contextPath}/job/${job.jobId}" class="btn btn-primary">View Details</a>
+                                        </div>
+                                    </div>
+                                </c:if>
                             </c:forEach>
-                        </ul>
-                    </c:when>
-                    <c:otherwise>
-                        <p>You have no saved jobs.</p>
-                    </c:otherwise>
-                </c:choose>
+
+                            <div class="mt-2">
+                                <a href="${pageContext.request.contextPath}/candidate/saved-jobs" class="btn btn-outline-primary">See all saved jobs</a>
+                            </div>
+                        </div>
+                     </c:when>
+                     <c:otherwise>
+                         <p>You have no saved jobs.</p>
+                     </c:otherwise>
+                 </c:choose>
             </c:if>
 
             <c:if test="${user.role != 'Candidate'}">
@@ -64,5 +109,50 @@
     </div>
 
     <jsp:include page="../common/footer.jsp" />
+    <script src="${pageContext.request.contextPath}/js/alert.js"></script>
+    <script>
+        // Save/unsave handler (same behavior as job listings)
+        document.querySelectorAll('.save-job-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const jobId = this.dataset.jobId;
+                const isSaved = this.classList.contains('saved');
+                const action = isSaved ? 'unsave' : 'save';
+                const button = this;
+
+                fetch('${pageContext.request.contextPath}/api/save-job', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: 'jobId=' + jobId + '&action=' + action
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        if (action === 'save') {
+                            button.innerHTML = '<i class="fas fa-bookmark"></i> Saved';
+                            button.classList.add('saved');
+                            showSuccess('Job saved successfully!', 'Saved');
+                        } else {
+                            button.innerHTML = '<i class="far fa-bookmark"></i> Save';
+                            button.classList.remove('saved');
+                            showInfo('Job removed from saved list', 'Removed');
+                        }
+                    } else {
+                        if (data.message && data.message.includes('login')) {
+                            showWarning('Please login to save jobs', 'Login Required');
+                            setTimeout(() => {
+                                window.location.href = '${pageContext.request.contextPath}/login?redirect=' + encodeURIComponent(window.location.pathname + window.location.search);
+                            }, 1500);
+                        } else {
+                            showError(data.message || 'Failed to save job', 'Error');
+                        }
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showError('An error occurred. Please try again.', 'Network Error');
+                });
+            });
+        });
+    </script>
 </body>
 </html>
