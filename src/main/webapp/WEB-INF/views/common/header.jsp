@@ -49,14 +49,12 @@
                                         <a href="${pageContext.request.contextPath}/employer/company-profile">
                                             <i class="fa-solid fa-building"></i> Company Profile
                                         </a>
-                                        <hr>
-                                        <a href="${pageContext.request.contextPath}/candidate/profile"><i class="fa-solid fa-user"></i> My Profile</a>
                                     </c:when>
                                     <c:otherwise>
                                         <!-- Candidate Menu -->
                                         <a href="${pageContext.request.contextPath}/candidate/profile"><i class="fa-solid fa-user"></i> My Profile</a>
-                                        <a href="${pageContext.request.contextPath}/applications"><i class="fa-solid fa-file-alt"></i> My Applications</a>
-                                        <a href="${pageContext.request.contextPath}/saved-jobs"><i class="fa-solid fa-bookmark"></i> Saved Jobs</a>
+                                        <a href="${pageContext.request.contextPath}/candidate/applications"><i class="fa-solid fa-file-alt"></i> My Applications</a>
+                                        <a href="${pageContext.request.contextPath}/candidate/saved-jobs"><i class="fa-solid fa-bookmark"></i> Saved Jobs</a>
                                     </c:otherwise>
                                 </c:choose>
                                 <hr>

@@ -2,6 +2,7 @@ package com.java_web.dao;
 
 import java.sql.CallableStatement;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
@@ -247,5 +248,96 @@ public class ApplicationDAO {
             }
         }
         return null;
+    }
+
+    /**
+     * Get applications for a specific candidate with optional status and pagination
+     */
+    public List<ApplicationListDTO> getApplicationsByCandidate(Integer candidateId, String status, int pageNumber, int pageSize) throws SQLException {
+        List<ApplicationListDTO> applications = new ArrayList<>();
+        String sql = "SELECT a.ApplicationId, a.JobId, j.Title AS JobTitle, a.CandidateId, c.FullName AS CandidateName, u.Email AS CandidateEmail, e.Name AS CompanyName, a.CoverLetter, a.Source, a.AppliedAt, a.Status, a.ResumeId, r.FileUrl, r.FileName "
+                   + "FROM candidate.Applications a "
+                   + "LEFT JOIN candidate.Candidates c ON a.CandidateId = c.CandidateId "
+                   + "LEFT JOIN auth.Users u ON c.UserID = u.UserID "
+                   + "LEFT JOIN employer.Jobs j ON a.JobId = j.JobId "
+                   + "LEFT JOIN employer.Companies e ON j.CompanyID = e.CompanyID "
+                   + "LEFT JOIN candidate.Resumes r ON a.ResumeId = r.ResumeId "
+                   + "WHERE a.CandidateId = ? ";
+
+        if (status != null && !status.trim().isEmpty()) {
+            sql += " AND a.Status = ? ";
+        }
+
+        sql += " ORDER BY a.AppliedAt DESC OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
+
+        try (Connection conn = DB.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            int idx = 1;
+            ps.setInt(idx++, candidateId);
+            if (status != null && !status.trim().isEmpty()) {
+                ps.setString(idx++, status);
+            }
+            int offset = (pageNumber - 1) * pageSize;
+            ps.setInt(idx++, offset);
+            ps.setInt(idx++, pageSize);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    ApplicationListDTO app = new ApplicationListDTO();
+                    app.setApplicationId(rs.getInt("ApplicationId"));
+                    app.setJobId(rs.getInt("JobId"));
+                    app.setJobTitle(rs.getString("JobTitle"));
+                    app.setCandidateId(rs.getInt("CandidateId"));
+                    app.setCandidateName(rs.getString("CandidateName"));
+                    app.setCandidateEmail(rs.getString("CandidateEmail"));
+                    app.setCompanyName(rs.getString("CompanyName"));
+                    app.setCoverLetter(rs.getString("CoverLetter"));
+                    app.setSource(rs.getString("Source"));
+                    app.setAppliedAt(rs.getTimestamp("AppliedAt"));
+                    app.setStatus(rs.getString("Status"));
+                    app.setResumeId((Integer) rs.getObject("ResumeId"));
+                    app.setFileUrl(rs.getString("FileUrl"));
+                    app.setFileName(rs.getString("FileName"));
+                    applications.add(app);
+                }
+            }
+        }
+        return applications;
+    }
+
+    /**
+     * Get total application count for a candidate (for pagination)
+     */
+    public int getApplicationCountByCandidate(Integer candidateId, String status) throws SQLException {
+        String sql = "SELECT COUNT(*) AS cnt FROM candidate.Applications a WHERE a.CandidateId = ?";
+        if (status != null && !status.trim().isEmpty()) {
+            sql += " AND a.Status = ?";
+        }
+
+        try (Connection conn = DB.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            int idx = 1;
+            ps.setInt(idx++, candidateId);
+            if (status != null && !status.trim().isEmpty()) {
+                ps.setString(idx++, status);
+            }
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt("cnt");
+                }
+            }
+        }
+        return 0;
+    }
+
+    /**
+     * Allow candidate to withdraw an application. Only allow if the application belongs to candidate.
+     */
+    public boolean withdrawApplication(Integer applicationId, Integer candidateId) throws SQLException {
+        String sql = "UPDATE candidate.Applications SET Status = 'Withdrawn' WHERE ApplicationId = ? AND CandidateId = ? AND Status IN ('Applied', 'Under Review')";
+        try (Connection conn = DB.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, applicationId);
+            ps.setInt(2, candidateId);
+            int updated = ps.executeUpdate();
+            return updated > 0;
+        }
     }
 }
