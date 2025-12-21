@@ -49,8 +49,6 @@
                                         <a href="${pageContext.request.contextPath}/employer/company-profile">
                                             <i class="fa-solid fa-building"></i> Company Profile
                                         </a>
-                                        <hr>
-                                        <a href="${pageContext.request.contextPath}/candidate/profile"><i class="fa-solid fa-user"></i> My Profile</a>
                                     </c:when>
                                     <c:otherwise>
                                         <!-- Candidate Menu -->

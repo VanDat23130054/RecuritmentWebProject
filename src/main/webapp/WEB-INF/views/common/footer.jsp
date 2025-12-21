@@ -30,7 +30,9 @@
                 <ul>
                     <li><a href="${pageContext.request.contextPath}/jobs"><i class="fa-solid fa-angle-right"></i> Browse Jobs</a></li>
                     <li><a href="${pageContext.request.contextPath}/companies"><i class="fa-solid fa-angle-right"></i> Companies</a></li>
-                    <li><a href="${pageContext.request.contextPath}/candidate/profile"><i class="fa-solid fa-angle-right"></i> My Profile</a></li>
+                    <c:if test="${sessionScope.userRole == 'Candidate'}">
+                        <li><a href="${pageContext.request.contextPath}/candidate/profile"><i class="fa-solid fa-angle-right"></i> My Profile</a></li>
+                    </c:if>
                     <li><a href="${pageContext.request.contextPath}/saved-jobs"><i class="fa-solid fa-angle-right"></i> Saved Jobs</a></li>
                 </ul>
             </div>
