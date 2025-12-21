@@ -29,7 +29,7 @@ public class GoogleDriveConfig {
 
     private static final String APPLICATION_NAME = "Recruitment Platform";
     private static final JsonFactory JSON_FACTORY = GsonFactory.getDefaultInstance();
-    private static final String TOKENS_DIRECTORY_PATH = "tokens";
+    private static final String TOKENS_DIRECTORY_PATH = System.getProperty("user.home") + "/.recruitment-tokens";
 
     /**
      * Path to credentials.json file downloaded from Google Cloud Console Place
