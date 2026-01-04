@@ -115,7 +115,8 @@ public class UploadResumeServlet extends HttpServlet {
             System.out.println("Resume saved to database. ID: " + resumeId);
 
             // Redirect with success message
-            response.sendRedirect(request.getContextPath() + "/candidate/uploadResume?success=resumeUploaded");
+            // Redirect to resume listing so user sees uploaded resume immediately
+            response.sendRedirect(request.getContextPath() + "/candidate/resume?success=resumeUploaded");
 
         } catch (Exception e) {
             e.printStackTrace();
