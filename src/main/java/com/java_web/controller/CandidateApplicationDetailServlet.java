@@ -120,6 +120,7 @@ public class CandidateApplicationDetailServlet extends HttpServlet {
             json.append("}}");
 
             out.print(json.toString());
+        } catch (NumberFormatException e) {
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             out.print("{\"success\": false, \"message\": \"Invalid application ID\"}");
         } catch (SQLException e) {
