@@ -585,6 +585,60 @@
   font-size: 0.8125rem;
 }
 
+/* Candidate profile card tweaks */
+.candidate-card {
+  background: #fff;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  position: relative; /* needed for absolute-positioned edit button */
+  overflow: visible;
+}
+
+.candidate-card .top {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  justify-content: space-between; /* ensure edit button aligns to right on the same row */
+}
+
+.candidate-card .avatar {
+  width: 96px;
+  height: 96px;
+  object-fit: cover;
+  border-radius: 10px;
+  flex-shrink: 0;
+}
+
+.candidate-card .candidate-info {
+  flex: 1 1 auto; /* allow info to grow so button stays to the far right */
+  min-width: 0; /* allow text truncation if needed */
+}
+
+/* Move edit button to top-right of the card */
+.edit-profile-btn {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  z-index: 20;
+  padding: 0.5rem 0.9rem;
+}
+
+@media (max-width: 576px) {
+  .edit-profile-btn {
+    position: static;
+    display: inline-block;
+    margin-bottom: 1rem;
+    float: none;
+    width: auto;
+  }
+}
+
+/* Reduce prominence of previously-found saved jobs area (removed in JSP) */
+.job-listings, .job-card {
+  display: none !important;
+}
+
 /* Responsive Design */
 @media (max-width: 1024px) {
   .dashboard-sidebar {

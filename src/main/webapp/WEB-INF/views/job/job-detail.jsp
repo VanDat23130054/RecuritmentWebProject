@@ -17,7 +17,30 @@
 </head>
 <body>
     <jsp:include page="../common/header.jsp" />
-    
+
+    <!-- Notifications: show messages when redirected from apply action -->
+    <c:if test="${param.success == 'applied'}">
+        <div class="container my-3">
+            <div class="alert alert-success" role="alert">
+                <strong>Success!</strong> You have successfully applied to this job.
+            </div>
+        </div>
+    </c:if>
+    <c:if test="${param.error == 'alreadyApplied'}">
+        <div class="container my-3">
+            <div class="alert alert-info" role="alert">
+                <strong>Notice:</strong> You have already applied for this job.
+            </div>
+        </div>
+    </c:if>
+    <c:if test="${param.error == 'applyFailed'}">
+        <div class="container my-3">
+            <div class="alert alert-danger" role="alert">
+                <strong>Error:</strong> Failed to apply for the job. Please try again later.
+            </div>
+        </div>
+    </c:if>
+
     <div class="container job-detail-container">
         <div class="job-detail-main">
             <!-- Job Header -->
@@ -324,6 +347,39 @@
                 }
             });
         });
+    </script>
+
+    <!-- Show toast notifications for apply result using alert.js -->
+    <script>
+        (function() {
+            try {
+                var urlParams = new URLSearchParams(window.location.search);
+                var success = urlParams.get('success');
+                var error = urlParams.get('error');
+
+                if (success === 'applied') {
+                    if (typeof showSuccess === 'function') {
+                        showSuccess('You have successfully applied to this job.', 'Applied');
+                    } else {
+                        alert('You have successfully applied to this job.');
+                    }
+                } else if (error === 'alreadyApplied') {
+                    if (typeof showInfo === 'function') {
+                        showInfo('You have already applied for this job.', 'Already Applied');
+                    } else {
+                        alert('You have already applied for this job.');
+                    }
+                } else if (error === 'applyFailed') {
+                    if (typeof showError === 'function') {
+                        showError('Failed to apply for the job. Please try again later.', 'Apply Failed');
+                    } else {
+                        alert('Failed to apply for the job. Please try again later.');
+                    }
+                }
+            } catch (e) {
+                console.error('Notification script error', e);
+            }
+        })();
     </script>
 </body>
 </html>
