@@ -16,10 +16,13 @@ import org.apache.commons.lang3.StringUtils;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.java_web.dao.ApplicationDAO;
+import com.java_web.dao.CandidateDAO;
 import com.java_web.dao.CompanyDAO;
 import com.java_web.dao.JobDAO;
 import com.java_web.dao.SavedJobDAO;
 import com.java_web.model.auth.User;
+import com.java_web.model.candidate.Candidate;
 import com.java_web.model.dto.CompanyDetailDTO;
 import com.java_web.model.dto.JobDetailDTO;
 import com.java_web.model.dto.RelatedJobDTO;
@@ -30,6 +33,8 @@ public class JobDetailServlet extends HttpServlet {
     private JobDAO jobDAO;
     private CompanyDAO companyDAO;
     private SavedJobDAO savedJobDAO;
+    private ApplicationDAO applicationDAO;
+    private CandidateDAO candidateDAO;
     private ObjectMapper objectMapper;
 
     @Override
@@ -37,6 +42,8 @@ public class JobDetailServlet extends HttpServlet {
         jobDAO = new JobDAO();
         companyDAO = new CompanyDAO();
         savedJobDAO = new SavedJobDAO();
+        applicationDAO = new ApplicationDAO();
+        candidateDAO = new CandidateDAO();
         objectMapper = new ObjectMapper();
     }
 
@@ -88,11 +95,19 @@ public class JobDetailServlet extends HttpServlet {
 
             // Check if job is saved for logged-in candidate
             HttpSession session = request.getSession(false);
+            boolean isAlreadyApplied = false;
             if (session != null && session.getAttribute("user") != null) {
                 User user = (User) session.getAttribute("user");
                 if ("Candidate".equals(user.getRole())) {
                     boolean isSaved = savedJobDAO.isJobSaved(user.getUserId(), jobId);
                     job.setIsSaved(isSaved);
+
+                    // Check if candidate already applied
+                    Integer userId = user.getUserId();
+                    Candidate candidate = candidateDAO.getCandidateByUserId(userId);
+                    if (candidate != null) {
+                        isAlreadyApplied = applicationDAO.hasApplied(candidate.getCandidateId(), jobId);
+                    }
                 } else {
                     job.setIsSaved(false);
                 }
@@ -103,6 +118,7 @@ public class JobDetailServlet extends HttpServlet {
             request.setAttribute("job", job);
             request.setAttribute("company", company);
             request.setAttribute("relatedJobs", relatedJobs);
+            request.setAttribute("isAlreadyApplied", isAlreadyApplied);
 
             request.getRequestDispatcher("/WEB-INF/views/job/job-detail.jsp").forward(request, response);
 

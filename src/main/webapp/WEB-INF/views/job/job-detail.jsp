@@ -77,6 +77,11 @@
                 
                 <div class="job-actions">
                     <c:choose>
+                        <c:when test="${isAlreadyApplied}">
+                            <button class="btn btn-secondary btn-lg" disabled>
+                                <i class="fas fa-check-circle"></i> Already Applied
+                            </button>
+                        </c:when>
                         <c:when test="${not empty sessionScope.user && sessionScope.user.role == 'Candidate'}">
                             <a href="${pageContext.request.contextPath}/apply/${job.jobId}" 
                                class="btn btn-primary btn-lg">

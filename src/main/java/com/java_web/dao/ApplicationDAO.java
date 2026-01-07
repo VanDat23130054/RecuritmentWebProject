@@ -251,18 +251,19 @@ public class ApplicationDAO {
     }
 
     /**
-     * Get applications for a specific candidate with optional status and pagination
+     * Get applications for a specific candidate with optional status and
+     * pagination
      */
     public List<ApplicationListDTO> getApplicationsByCandidate(Integer candidateId, String status, int pageNumber, int pageSize) throws SQLException {
         List<ApplicationListDTO> applications = new ArrayList<>();
         String sql = "SELECT a.ApplicationId, a.JobId, j.Title AS JobTitle, a.CandidateId, c.FullName AS CandidateName, u.Email AS CandidateEmail, e.Name AS CompanyName, a.CoverLetter, a.Source, a.AppliedAt, a.Status, a.ResumeId, r.FileUrl, r.FileName "
-                   + "FROM candidate.Applications a "
-                   + "LEFT JOIN candidate.Candidates c ON a.CandidateId = c.CandidateId "
-                   + "LEFT JOIN auth.Users u ON c.UserID = u.UserID "
-                   + "LEFT JOIN employer.Jobs j ON a.JobId = j.JobId "
-                   + "LEFT JOIN employer.Companies e ON j.CompanyID = e.CompanyID "
-                   + "LEFT JOIN candidate.Resumes r ON a.ResumeId = r.ResumeId "
-                   + "WHERE a.CandidateId = ? ";
+                + "FROM candidate.Applications a "
+                + "LEFT JOIN candidate.Candidates c ON a.CandidateId = c.CandidateId "
+                + "LEFT JOIN auth.Users u ON c.UserID = u.UserID "
+                + "LEFT JOIN employer.Jobs j ON a.JobId = j.JobId "
+                + "LEFT JOIN employer.Companies e ON j.CompanyID = e.CompanyID "
+                + "LEFT JOIN candidate.Resumes r ON a.ResumeId = r.ResumeId "
+                + "WHERE a.CandidateId = ? ";
 
         if (status != null && !status.trim().isEmpty()) {
             sql += " AND a.Status = ? ";
@@ -329,7 +330,8 @@ public class ApplicationDAO {
     }
 
     /**
-     * Allow candidate to withdraw an application. Only allow if the application belongs to candidate.
+     * Allow candidate to withdraw an application. Only allow if the application
+     * belongs to candidate.
      */
     public boolean withdrawApplication(Integer applicationId, Integer candidateId) throws SQLException {
         String sql = "UPDATE candidate.Applications SET Status = 'Withdrawn' WHERE ApplicationId = ? AND CandidateId = ? AND Status IN ('Applied', 'Under Review')";
@@ -339,5 +341,22 @@ public class ApplicationDAO {
             int updated = ps.executeUpdate();
             return updated > 0;
         }
+    }
+
+    /**
+     * Check if a candidate has already applied for a job
+     */
+    public boolean hasApplied(Integer candidateId, Integer jobId) throws SQLException {
+        String sql = "SELECT COUNT(*) AS cnt FROM candidate.Applications WHERE CandidateId = ? AND JobId = ?";
+        try (Connection conn = DB.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, candidateId);
+            ps.setInt(2, jobId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt("cnt") > 0;
+                }
+            }
+        }
+        return false;
     }
 }
