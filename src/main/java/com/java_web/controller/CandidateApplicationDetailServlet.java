@@ -2,9 +2,6 @@ package com.java_web.controller;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import javax.servlet.ServletException;
@@ -14,17 +11,19 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import com.java_web.config.DB;
+import com.java_web.dao.ApplicationDAO;
 import com.java_web.dao.CandidateDAO;
 import com.java_web.dao.UserDAO;
 import com.java_web.model.auth.User;
 import com.java_web.model.candidate.Candidate;
+import com.java_web.model.dto.ApplicationDetailDTO;
 
 @WebServlet("/candidate/application/detail")
 public class CandidateApplicationDetailServlet extends HttpServlet {
 
     private UserDAO userDAO = new UserDAO();
     private CandidateDAO candidateDAO = new CandidateDAO();
+    private ApplicationDAO applicationDAO = new ApplicationDAO();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -74,81 +73,53 @@ public class CandidateApplicationDetailServlet extends HttpServlet {
 
             int applicationId = Integer.parseInt(idParam);
 
-            // Query application details directly (no DAO/DTO changes)
-            String sql = "SELECT a.ApplicationId, a.JobId, j.Title AS jobTitle, e.Name AS companyName, a.AppliedAt, a.Status, a.CoverLetter, r.FileName AS resumeFileName, r.FileUrl AS resumeFileUrl, a.RecruiterNote "
-                       + "FROM candidate.Applications a "
-                       + "LEFT JOIN employer.Jobs j ON a.JobId = j.JobId "
-                       + "LEFT JOIN employer.Companies e ON j.CompanyID = e.CompanyID "
-                       + "LEFT JOIN candidate.Resumes r ON a.ResumeId = r.ResumeId "
-                       + "WHERE a.ApplicationId = ? AND a.CandidateId = ?";
+            // Use ApplicationDAO to get application detail
+            ApplicationDetailDTO app = applicationDAO.getApplicationDetailByCandidate(applicationId, candidateId);
 
-            try (Connection conn = DB.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
-                ps.setInt(1, applicationId);
-                ps.setInt(2, candidateId);
-                try (ResultSet rs = ps.executeQuery()) {
-                    if (!rs.next()) {
-                        out.print("{\"success\": false, \"message\": \"Application not found\"}");
-                        return;
-                    }
-
-                    String jobTitle = rs.getString("jobTitle");
-                    String companyName = rs.getString("companyName");
-                    java.sql.Timestamp appliedAt = rs.getTimestamp("AppliedAt");
-                    String status = rs.getString("Status");
-                    String coverLetter = rs.getString("CoverLetter");
-                    String resumeFileName = rs.getString("resumeFileName");
-                    String resumeFileUrl = rs.getString("resumeFileUrl");
-                    String recruiterNote = null;
-                    try {
-                        recruiterNote = rs.getString("RecruiterNote");
-                    } catch (Exception ex) {
-                        // Column might not exist; ignore and continue
-                        recruiterNote = null;
-                    }
-
-                    StringBuilder json = new StringBuilder();
-                    json.append("{\"success\": true, \"application\": {");
-                    json.append("\"applicationId\": ").append(rs.getInt("ApplicationId")).append(',');
-                    json.append("\"jobId\": ").append(rs.getInt("JobId")).append(',');
-                    json.append("\"jobTitle\": \"").append(escapeJson(jobTitle)).append('\"').append(',');
-                    json.append("\"companyName\": \"").append(escapeJson(companyName)).append('\"').append(',');
-                    json.append("\"appliedAt\": \"").append(appliedAt).append('\"').append(',');
-                    json.append("\"status\": \"").append(escapeJson(status)).append('\"').append(',');
-
-                    json.append("\"coverLetter\": ");
-                    if (coverLetter != null) {
-                        json.append('\"').append(escapeJson(coverLetter)).append('\"').append(',');
-                    } else {
-                        json.append("null,");
-                    }
-
-                    json.append("\"resumeFileName\": ");
-                    if (resumeFileName != null) {
-                        json.append('\"').append(escapeJson(resumeFileName)).append('\"').append(',');
-                    } else {
-                        json.append("null,");
-                    }
-
-                    json.append("\"resumeFileUrl\": ");
-                    if (resumeFileUrl != null) {
-                        json.append('\"').append(escapeJson(resumeFileUrl)).append('\"').append(',');
-                    } else {
-                        json.append("null,");
-                    }
-
-                    json.append("\"recruiterNote\": ");
-                    if (recruiterNote != null) {
-                        json.append('\"').append(escapeJson(recruiterNote)).append('\"');
-                    } else {
-                        json.append("null");
-                    }
-                    json.append("}}");
-
-                    out.print(json.toString());
-                }
+            if (app == null) {
+                out.print("{\"success\": false, \"message\": \"Application not found\"}");
+                return;
             }
 
-        } catch (NumberFormatException e) {
+            StringBuilder json = new StringBuilder();
+            json.append("{\"success\": true, \"application\": {");
+            json.append("\"applicationId\": ").append(app.getApplicationId()).append(',');
+            json.append("\"jobId\": ").append(app.getJobId()).append(',');
+            json.append("\"jobTitle\": \"").append(escapeJson(app.getJobTitle())).append('\"').append(',');
+            json.append("\"companyName\": \"").append(escapeJson(app.getCompanyName())).append('\"').append(',');
+            json.append("\"appliedAt\": \"").append(app.getAppliedAt()).append('\"').append(',');
+            json.append("\"status\": \"").append(escapeJson(app.getStatus())).append('\"').append(',');
+
+            json.append("\"coverLetter\": ");
+            if (app.getCoverLetter() != null) {
+                json.append('\"').append(escapeJson(app.getCoverLetter())).append('\"').append(',');
+            } else {
+                json.append("null,");
+            }
+
+            json.append("\"resumeFileName\": ");
+            if (app.getResumeFileName() != null) {
+                json.append('\"').append(escapeJson(app.getResumeFileName())).append('\"').append(',');
+            } else {
+                json.append("null,");
+            }
+
+            json.append("\"resumeFileUrl\": ");
+            if (app.getResumeFileUrl() != null) {
+                json.append('\"').append(escapeJson(app.getResumeFileUrl())).append('\"').append(',');
+            } else {
+                json.append("null,");
+            }
+
+            json.append("\"recruiterNote\": ");
+            if (app.getRecruiterNote() != null) {
+                json.append('\"').append(escapeJson(app.getRecruiterNote())).append('\"');
+            } else {
+                json.append("null");
+            }
+            json.append("}}");
+
+            out.print(json.toString());
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             out.print("{\"success\": false, \"message\": \"Invalid application ID\"}");
         } catch (SQLException e) {
@@ -158,7 +129,9 @@ public class CandidateApplicationDetailServlet extends HttpServlet {
     }
 
     private String escapeJson(Object value) {
-        if (value == null) return "";
+        if (value == null) {
+            return "";
+        }
         return value.toString().replace("\\", "\\\\").replace("\"", "\\\"").replace("\n", "\\n").replace("\r", "\\r").replace("\t", "\\t");
     }
 }

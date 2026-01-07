@@ -2,7 +2,6 @@ package com.java_web.dao;
 
 import java.sql.CallableStatement;
 import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
@@ -256,32 +255,21 @@ public class ApplicationDAO {
      */
     public List<ApplicationListDTO> getApplicationsByCandidate(Integer candidateId, String status, int pageNumber, int pageSize) throws SQLException {
         List<ApplicationListDTO> applications = new ArrayList<>();
-        String sql = "SELECT a.ApplicationId, a.JobId, j.Title AS JobTitle, a.CandidateId, c.FullName AS CandidateName, u.Email AS CandidateEmail, e.Name AS CompanyName, a.CoverLetter, a.Source, a.AppliedAt, a.Status, a.ResumeId, r.FileUrl, r.FileName "
-                + "FROM candidate.Applications a "
-                + "LEFT JOIN candidate.Candidates c ON a.CandidateId = c.CandidateId "
-                + "LEFT JOIN auth.Users u ON c.UserID = u.UserID "
-                + "LEFT JOIN employer.Jobs j ON a.JobId = j.JobId "
-                + "LEFT JOIN employer.Companies e ON j.CompanyID = e.CompanyID "
-                + "LEFT JOIN candidate.Resumes r ON a.ResumeId = r.ResumeId "
-                + "WHERE a.CandidateId = ? ";
+        String sql = "{call candidate.sp_GetApplicationsByCandidate(?, ?, ?, ?)}";
 
-        if (status != null && !status.trim().isEmpty()) {
-            sql += " AND a.Status = ? ";
-        }
+        try (Connection conn = DB.getConnection(); CallableStatement stmt = conn.prepareCall(sql)) {
+            stmt.setInt(1, candidateId);
 
-        sql += " ORDER BY a.AppliedAt DESC OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
-
-        try (Connection conn = DB.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
-            int idx = 1;
-            ps.setInt(idx++, candidateId);
             if (status != null && !status.trim().isEmpty()) {
-                ps.setString(idx++, status);
+                stmt.setString(2, status);
+            } else {
+                stmt.setNull(2, Types.NVARCHAR);
             }
-            int offset = (pageNumber - 1) * pageSize;
-            ps.setInt(idx++, offset);
-            ps.setInt(idx++, pageSize);
 
-            try (ResultSet rs = ps.executeQuery()) {
+            stmt.setInt(3, pageNumber);
+            stmt.setInt(4, pageSize);
+
+            try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
                     ApplicationListDTO app = new ApplicationListDTO();
                     app.setApplicationId(rs.getInt("ApplicationId"));
@@ -309,24 +297,22 @@ public class ApplicationDAO {
      * Get total application count for a candidate (for pagination)
      */
     public int getApplicationCountByCandidate(Integer candidateId, String status) throws SQLException {
-        String sql = "SELECT COUNT(*) AS cnt FROM candidate.Applications a WHERE a.CandidateId = ?";
-        if (status != null && !status.trim().isEmpty()) {
-            sql += " AND a.Status = ?";
-        }
+        String sql = "{call candidate.sp_GetApplicationCountByCandidate(?, ?, ?)}";
 
-        try (Connection conn = DB.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
-            int idx = 1;
-            ps.setInt(idx++, candidateId);
+        try (Connection conn = DB.getConnection(); CallableStatement stmt = conn.prepareCall(sql)) {
+            stmt.setInt(1, candidateId);
+
             if (status != null && !status.trim().isEmpty()) {
-                ps.setString(idx++, status);
+                stmt.setString(2, status);
+            } else {
+                stmt.setNull(2, Types.NVARCHAR);
             }
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    return rs.getInt("cnt");
-                }
-            }
+
+            stmt.registerOutParameter(3, Types.INTEGER);
+            stmt.execute();
+
+            return stmt.getInt(3);
         }
-        return 0;
     }
 
     /**
@@ -334,12 +320,16 @@ public class ApplicationDAO {
      * belongs to candidate.
      */
     public boolean withdrawApplication(Integer applicationId, Integer candidateId) throws SQLException {
-        String sql = "UPDATE candidate.Applications SET Status = 'Withdrawn' WHERE ApplicationId = ? AND CandidateId = ? AND Status IN ('Applied', 'Under Review')";
-        try (Connection conn = DB.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setInt(1, applicationId);
-            ps.setInt(2, candidateId);
-            int updated = ps.executeUpdate();
-            return updated > 0;
+        String sql = "{call candidate.sp_WithdrawApplication(?, ?, ?)}";
+
+        try (Connection conn = DB.getConnection(); CallableStatement stmt = conn.prepareCall(sql)) {
+            stmt.setInt(1, applicationId);
+            stmt.setInt(2, candidateId);
+            stmt.registerOutParameter(3, Types.BIT);
+
+            stmt.execute();
+
+            return stmt.getBoolean(3);
         }
     }
 
@@ -347,16 +337,71 @@ public class ApplicationDAO {
      * Check if a candidate has already applied for a job
      */
     public boolean hasApplied(Integer candidateId, Integer jobId) throws SQLException {
-        String sql = "SELECT COUNT(*) AS cnt FROM candidate.Applications WHERE CandidateId = ? AND JobId = ?";
-        try (Connection conn = DB.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setInt(1, candidateId);
-            ps.setInt(2, jobId);
-            try (ResultSet rs = ps.executeQuery()) {
+        String sql = "{call candidate.sp_HasApplied(?, ?, ?)}";
+
+        try (Connection conn = DB.getConnection(); CallableStatement stmt = conn.prepareCall(sql)) {
+            stmt.setInt(1, candidateId);
+            stmt.setInt(2, jobId);
+            stmt.registerOutParameter(3, Types.BIT);
+
+            stmt.execute();
+
+            return stmt.getBoolean(3);
+        }
+    }
+
+    /**
+     * Get application detail for a candidate (only returns if application
+     * belongs to candidate)
+     */
+    public ApplicationDetailDTO getApplicationDetailByCandidate(Integer applicationId, Integer candidateId) throws SQLException {
+        String sql = "{call candidate.sp_GetApplicationDetailByCandidate(?, ?)}";
+
+        try (Connection conn = DB.getConnection(); CallableStatement stmt = conn.prepareCall(sql)) {
+            stmt.setInt(1, applicationId);
+            stmt.setInt(2, candidateId);
+
+            try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
-                    return rs.getInt("cnt") > 0;
+                    ApplicationDetailDTO app = new ApplicationDetailDTO();
+                    app.setApplicationId(rs.getInt("ApplicationId"));
+                    app.setJobId(rs.getInt("JobId"));
+                    app.setJobTitle(rs.getString("JobTitle"));
+                    app.setCompanyName(rs.getString("CompanyName"));
+                    app.setAppliedAt(rs.getTimestamp("AppliedAt"));
+                    app.setStatus(rs.getString("Status"));
+                    app.setCoverLetter(rs.getString("CoverLetter"));
+                    app.setResumeFileName(rs.getString("ResumeFileName"));
+                    app.setResumeFileUrl(rs.getString("ResumeFileUrl"));
+                    // RecruiterNote - may not exist in all implementations
+                    try {
+                        app.setRecruiterNote(rs.getString("RecruiterNote"));
+                    } catch (SQLException e) {
+                        // Column might not exist, ignore
+                    }
+                    return app;
                 }
             }
         }
-        return false;
+        return null;
+    }
+
+    /**
+     * Update application cover letter (only if application belongs to candidate
+     * and status is 'Applied')
+     */
+    public boolean updateApplicationCoverLetter(Integer applicationId, Integer candidateId, String coverLetter) throws SQLException {
+        String sql = "{call candidate.sp_UpdateApplicationCoverLetter(?, ?, ?, ?)}";
+
+        try (Connection conn = DB.getConnection(); CallableStatement stmt = conn.prepareCall(sql)) {
+            stmt.setInt(1, applicationId);
+            stmt.setInt(2, candidateId);
+            stmt.setString(3, coverLetter);
+            stmt.registerOutParameter(4, Types.BIT);
+
+            stmt.execute();
+
+            return stmt.getBoolean(4);
+        }
     }
 }

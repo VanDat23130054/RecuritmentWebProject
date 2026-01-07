@@ -2,8 +2,6 @@ package com.java_web.controller;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 import javax.servlet.ServletException;
@@ -15,7 +13,7 @@ import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang3.StringUtils;
 
-import com.java_web.config.DB;
+import com.java_web.dao.ApplicationDAO;
 import com.java_web.dao.CandidateDAO;
 import com.java_web.dao.UserDAO;
 import com.java_web.model.auth.User;
@@ -26,6 +24,7 @@ public class CandidateApplicationEditServlet extends HttpServlet {
 
     private UserDAO userDAO = new UserDAO();
     private CandidateDAO candidateDAO = new CandidateDAO();
+    private ApplicationDAO applicationDAO = new ApplicationDAO();
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
@@ -77,19 +76,14 @@ public class CandidateApplicationEditServlet extends HttpServlet {
 
             int applicationId = Integer.parseInt(appIdStr);
 
-            // Direct JDBC update: only update if application belongs to candidate and status = 'Applied'
-            String sql = "UPDATE candidate.Applications SET CoverLetter = ? WHERE ApplicationId = ? AND CandidateId = ? AND Status = 'Applied'";
-            try (Connection conn = DB.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
-                ps.setString(1, newCover);
-                ps.setInt(2, applicationId);
-                ps.setInt(3, candidateId);
-                int updated = ps.executeUpdate();
-                if (updated > 0) {
-                    out.print("{\"success\": true, \"message\": \"Cover letter updated\"}");
-                } else {
-                    response.setStatus(HttpServletResponse.SC_CONFLICT);
-                    out.print("{\"success\": false, \"message\": \"Unable to update cover letter. It may have been viewed already or does not belong to you.\"}");
-                }
+            // Use ApplicationDAO to update cover letter via stored procedure
+            boolean updated = applicationDAO.updateApplicationCoverLetter(applicationId, candidateId, newCover);
+
+            if (updated) {
+                out.print("{\"success\": true, \"message\": \"Cover letter updated\"}");
+            } else {
+                response.setStatus(HttpServletResponse.SC_CONFLICT);
+                out.print("{\"success\": false, \"message\": \"Unable to update cover letter. It may have been viewed already or does not belong to you.\"}");
             }
 
         } catch (NumberFormatException e) {

@@ -29,4 +29,5 @@ public class ApplicationDetailDTO implements Serializable {
     private String companyName;
     private String resumeFileName;
     private String resumeFileUrl;
+    private String recruiterNote;
 }

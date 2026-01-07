@@ -2,10 +2,8 @@ package com.java_web.dao;
 
 import java.sql.CallableStatement;
 import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
@@ -56,29 +54,23 @@ public class ResumeDAO {
      * @return resumeId of the inserted record
      */
     public int saveResume(int candidateId, String driveFileId, String fileName, String fileUrl) throws SQLException {
-        String sql = "INSERT INTO candidate.Resumes (CandidateId, DriveFileId, FileName, FileUrl, IsPrimary, IsPublic, UploadedAt) "
-                + "VALUES (?, ?, ?, ?, 1, 1, GETDATE())";
+        String sql = "{call candidate.sp_SaveResume(?, ?, ?, ?, ?)}";
 
-        try (Connection conn = DB.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+        try (Connection conn = DB.getConnection(); CallableStatement stmt = conn.prepareCall(sql)) {
 
             stmt.setInt(1, candidateId);
             stmt.setString(2, driveFileId);
             stmt.setString(3, fileName);
             stmt.setString(4, fileUrl);
+            stmt.registerOutParameter(5, Types.INTEGER);
 
-            int affectedRows = stmt.executeUpdate();
+            stmt.execute();
 
-            if (affectedRows == 0) {
-                throw new SQLException("Creating resume failed, no rows affected.");
+            int resumeId = stmt.getInt(5);
+            if (resumeId == 0) {
+                throw new SQLException("Creating resume failed, no ID obtained.");
             }
-
-            try (ResultSet generatedKeys = stmt.getGeneratedKeys()) {
-                if (generatedKeys.next()) {
-                    return generatedKeys.getInt(1);
-                } else {
-                    throw new SQLException("Creating resume failed, no ID obtained.");
-                }
-            }
+            return resumeId;
         }
     }
 
@@ -89,10 +81,9 @@ public class ResumeDAO {
      * @return ResumeDTO containing resume details
      */
     public ResumeDTO getResume(int resumeId) throws SQLException {
-        String sql = "SELECT ResumeId, CandidateId, DriveFileId, FileName, FileUrl, ParsedJson, "
-                + "IsPrimary, IsPublic, UploadedAt FROM candidate.Resumes WHERE ResumeId = ?";
+        String sql = "{call candidate.sp_GetResumeById(?)}";
 
-        try (Connection conn = DB.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
+        try (Connection conn = DB.getConnection(); CallableStatement stmt = conn.prepareCall(sql)) {
 
             stmt.setInt(1, resumeId);
 
@@ -122,13 +113,11 @@ public class ResumeDAO {
      * @return List of ResumeDTO objects
      */
     public List<ResumeDTO> getResumesByCandidateId(int candidateId) throws SQLException {
-        String sql = "SELECT ResumeId, CandidateId, DriveFileId, FileName, FileUrl, ParsedJson, "
-                + "IsPrimary, IsPublic, UploadedAt FROM candidate.Resumes WHERE CandidateId = ? "
-                + "ORDER BY IsPrimary DESC, UploadedAt DESC";
+        String sql = "{call candidate.sp_GetResumesByCandidateId(?)}";
 
         List<ResumeDTO> resumes = new ArrayList<>();
 
-        try (Connection conn = DB.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
+        try (Connection conn = DB.getConnection(); CallableStatement stmt = conn.prepareCall(sql)) {
 
             stmt.setInt(1, candidateId);
 
@@ -163,15 +152,15 @@ public class ResumeDAO {
      * @param fileUrl Download URL from Google Drive
      */
     public void updateDriveFileId(int resumeId, String driveFileId, String fileUrl) throws SQLException {
-        String sql = "UPDATE candidate.Resumes SET DriveFileId = ?, FileUrl = ? WHERE ResumeId = ?";
+        String sql = "{call candidate.sp_UpdateResumeDriveFileId(?, ?, ?)}";
 
-        try (Connection conn = DB.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
+        try (Connection conn = DB.getConnection(); CallableStatement stmt = conn.prepareCall(sql)) {
 
-            stmt.setString(1, driveFileId);
-            stmt.setString(2, fileUrl);
-            stmt.setInt(3, resumeId);
+            stmt.setInt(1, resumeId);
+            stmt.setString(2, driveFileId);
+            stmt.setString(3, fileUrl);
 
-            stmt.executeUpdate();
+            stmt.execute();
         }
     }
 
@@ -181,12 +170,12 @@ public class ResumeDAO {
      * @param resumeId ID of the resume
      */
     public void deleteResume(int resumeId) throws SQLException {
-        String sql = "DELETE FROM candidate.Resumes WHERE ResumeId = ?";
+        String sql = "{call candidate.sp_DeleteResume(?)}";
 
-        try (Connection conn = DB.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
+        try (Connection conn = DB.getConnection(); CallableStatement stmt = conn.prepareCall(sql)) {
 
             stmt.setInt(1, resumeId);
-            stmt.executeUpdate();
+            stmt.execute();
         }
     }
 
@@ -196,12 +185,11 @@ public class ResumeDAO {
      * @return List of all resumes
      */
     public List<ResumeDTO> getAllResumes() throws SQLException {
-        String sql = "SELECT ResumeId, CandidateId, DriveFileId, FileName, FileUrl, ParsedJson, "
-                + "IsPrimary, IsPublic, UploadedAt FROM candidate.Resumes";
+        String sql = "{call candidate.sp_GetAllResumes()}";
 
         List<ResumeDTO> resumes = new ArrayList<>();
 
-        try (Connection conn = DB.getConnection(); Statement stmt = conn.createStatement(); ResultSet rs = stmt.executeQuery(sql)) {
+        try (Connection conn = DB.getConnection(); CallableStatement stmt = conn.prepareCall(sql); ResultSet rs = stmt.executeQuery()) {
 
             while (rs.next()) {
                 ResumeDTO resume = new ResumeDTO();
@@ -227,37 +215,14 @@ public class ResumeDAO {
      * @param candidateId ID of the candidate
      */
     public void setPrimaryResume(int resumeId, int candidateId) throws SQLException {
-        Connection conn = null;
-        try {
-            conn = DB.getConnection();
-            conn.setAutoCommit(false);
+        String sql = "{call candidate.sp_SetPrimaryResume(?, ?)}";
 
-            // First, set all resumes for this candidate as non-primary
-            String sql1 = "UPDATE candidate.Resumes SET IsPrimary = 0 WHERE CandidateId = ?";
-            try (PreparedStatement stmt1 = conn.prepareStatement(sql1)) {
-                stmt1.setInt(1, candidateId);
-                stmt1.executeUpdate();
-            }
+        try (Connection conn = DB.getConnection(); CallableStatement stmt = conn.prepareCall(sql)) {
 
-            // Then set the specified resume as primary
-            String sql2 = "UPDATE candidate.Resumes SET IsPrimary = 1 WHERE ResumeId = ? AND CandidateId = ?";
-            try (PreparedStatement stmt2 = conn.prepareStatement(sql2)) {
-                stmt2.setInt(1, resumeId);
-                stmt2.setInt(2, candidateId);
-                stmt2.executeUpdate();
-            }
+            stmt.setInt(1, resumeId);
+            stmt.setInt(2, candidateId);
 
-            conn.commit();
-        } catch (SQLException e) {
-            if (conn != null) {
-                conn.rollback();
-            }
-            throw e;
-        } finally {
-            if (conn != null) {
-                conn.setAutoCommit(true);
-                conn.close();
-            }
+            stmt.execute();
         }
     }
 
@@ -270,14 +235,17 @@ public class ResumeDAO {
      * @return true if update was successful
      */
     public boolean renameResume(int resumeId, String newFileName, int candidateId) throws SQLException {
-        String sql = "UPDATE candidate.Resumes SET FileName = ? WHERE ResumeId = ? AND CandidateId = ?";
+        String sql = "{call candidate.sp_RenameResume(?, ?, ?, ?)}";
 
-        try (Connection conn = DB.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setString(1, newFileName);
-            stmt.setInt(2, resumeId);
+        try (Connection conn = DB.getConnection(); CallableStatement stmt = conn.prepareCall(sql)) {
+            stmt.setInt(1, resumeId);
+            stmt.setString(2, newFileName);
             stmt.setInt(3, candidateId);
+            stmt.registerOutParameter(4, Types.BIT);
 
-            return stmt.executeUpdate() > 0;
+            stmt.execute();
+
+            return stmt.getBoolean(4);
         }
     }
 
@@ -289,13 +257,16 @@ public class ResumeDAO {
      * @return true if deletion was successful
      */
     public boolean deleteResumeSecure(int resumeId, int candidateId) throws SQLException {
-        String sql = "DELETE FROM candidate.Resumes WHERE ResumeId = ? AND CandidateId = ?";
+        String sql = "{call candidate.sp_DeleteResumeSecure(?, ?, ?)}";
 
-        try (Connection conn = DB.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
+        try (Connection conn = DB.getConnection(); CallableStatement stmt = conn.prepareCall(sql)) {
             stmt.setInt(1, resumeId);
             stmt.setInt(2, candidateId);
+            stmt.registerOutParameter(3, Types.BIT);
 
-            return stmt.executeUpdate() > 0;
+            stmt.execute();
+
+            return stmt.getBoolean(3);
         }
     }
 }
