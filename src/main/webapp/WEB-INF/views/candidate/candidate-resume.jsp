@@ -122,14 +122,29 @@
             function applyFilter() {
                 const q = search.value.trim().toLowerCase();
                 const items = list.querySelectorAll('li');
+                let visibleCount = 0;
+                
                 items.forEach(function(li) {
                     const filenameEl = li.querySelector('.resume-filename');
                     const text = filenameEl ? filenameEl.textContent.trim().toLowerCase() : '';
-                    li.style.display = text.indexOf(q) === -1 ? 'none' : '';
+                    const matches = q === '' || text.indexOf(q) !== -1;
+                    li.style.display = matches ? '' : 'none';
+                    if (matches) visibleCount++;
                 });
+                
+                // Show message if no matches
+                if (visibleCount === 0 && q !== '') {
+                    console.log('No resumes found matching: ' + q);
+                }
             }
 
             search.addEventListener('input', applyFilter);
+            search.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    applyFilter();
+                }
+            });
             if (btn) {
                 btn.addEventListener('click', function (e) {
                     e.preventDefault();

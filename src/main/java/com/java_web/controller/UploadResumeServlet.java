@@ -1,6 +1,8 @@
 package com.java_web.controller;
 
 import java.io.IOException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
 
 import javax.servlet.ServletException;
@@ -120,7 +122,9 @@ public class UploadResumeServlet extends HttpServlet {
 
         } catch (Exception e) {
             e.printStackTrace();
-            response.sendRedirect(request.getContextPath() + "/candidate/uploadResume?error=uploadFailed&message=" + e.getMessage());
+            String errorMessage = e.getMessage() != null ? e.getMessage() : "Unknown error";
+            String encodedMessage = URLEncoder.encode(errorMessage, StandardCharsets.UTF_8);
+            response.sendRedirect(request.getContextPath() + "/candidate/uploadResume?error=uploadFailed&message=" + encodedMessage);
         }
     }
 
