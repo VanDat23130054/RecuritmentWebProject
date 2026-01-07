@@ -1,14 +1,15 @@
 package com.java_web.model.employer;
 
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
 import java.io.Serializable;
 import java.time.LocalDateTime;
+
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor
 public class Job implements Serializable {
+
     private static final long serialVersionUID = 1L;
     private Integer jobId;
     private Integer companyId;
@@ -34,6 +35,13 @@ public class Job implements Serializable {
     private boolean isFeatured;
     private Integer viewsCount;
     private Integer applicationsCount;
+
+    // Transient fields for JSP binding (not persisted to DB)
+    private String cityName;
+    private String countryName;
+    private String companyName;
+    private String location;
+    private String salary;
 
     public Job(Integer jobId) {
         this.jobId = jobId;

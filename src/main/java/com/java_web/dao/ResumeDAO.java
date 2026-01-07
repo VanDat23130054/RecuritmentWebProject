@@ -260,4 +260,42 @@ public class ResumeDAO {
             }
         }
     }
+
+    /**
+     * Rename a resume file (update display name in database)
+     *
+     * @param resumeId ID of the resume
+     * @param newFileName New display name for the file
+     * @param candidateId Candidate ID for security verification
+     * @return true if update was successful
+     */
+    public boolean renameResume(int resumeId, String newFileName, int candidateId) throws SQLException {
+        String sql = "UPDATE candidate.Resumes SET FileName = ? WHERE ResumeId = ? AND CandidateId = ?";
+
+        try (Connection conn = DB.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, newFileName);
+            stmt.setInt(2, resumeId);
+            stmt.setInt(3, candidateId);
+
+            return stmt.executeUpdate() > 0;
+        }
+    }
+
+    /**
+     * Delete a resume by ID (with security check for candidate ownership)
+     *
+     * @param resumeId ID of the resume
+     * @param candidateId Candidate ID for security verification
+     * @return true if deletion was successful
+     */
+    public boolean deleteResumeSecure(int resumeId, int candidateId) throws SQLException {
+        String sql = "DELETE FROM candidate.Resumes WHERE ResumeId = ? AND CandidateId = ?";
+
+        try (Connection conn = DB.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, resumeId);
+            stmt.setInt(2, candidateId);
+
+            return stmt.executeUpdate() > 0;
+        }
+    }
 }

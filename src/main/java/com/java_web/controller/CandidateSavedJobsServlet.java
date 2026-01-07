@@ -20,14 +20,15 @@ import com.java_web.dao.SavedJobDAO;
 import com.java_web.dao.UserDAO;
 import com.java_web.model.auth.User;
 import com.java_web.model.candidate.SavedJob;
-import com.java_web.model.dto.JobSearchDTO;
 import com.java_web.model.dto.JobDetailDTO;
+import com.java_web.model.dto.JobSearchDTO;
 
 /**
  * Servlet to display a candidate's saved jobs on a separate page
  */
 @WebServlet("/candidate/saved-jobs")
 public class CandidateSavedJobsServlet extends HttpServlet {
+
     private static final long serialVersionUID = 1L;
 
     private SavedJobDAO savedJobDAO;
@@ -68,11 +69,18 @@ public class CandidateSavedJobsServlet extends HttpServlet {
             // Load saved jobs and convert to job DTOs
             List<SavedJob> rawSaved = savedJobDAO.getSavedJobsByUser(userId);
             List<JobSearchDTO> jobs = new ArrayList<>();
+
+            System.out.println("[DEBUG] CandidateSavedJobsServlet: userId=" + userId + ", rawSaved count=" + (rawSaved != null ? rawSaved.size() : 0));
+
             if (rawSaved != null && !rawSaved.isEmpty()) {
                 for (SavedJob sj : rawSaved) {
                     try {
+                        System.out.println("[DEBUG] Processing saved job: jobId=" + sj.getJobId());
                         JobDetailDTO detail = jobDAO.getJobDetail(sj.getJobId());
-                        if (detail == null) continue;
+                        if (detail == null) {
+                            System.out.println("[DEBUG] Job detail is null for jobId=" + sj.getJobId());
+                            continue;
+                        }
 
                         JobSearchDTO job = new JobSearchDTO();
                         job.setJobId(detail.getJobId());
@@ -91,18 +99,22 @@ public class CandidateSavedJobsServlet extends HttpServlet {
                         if (detail.getSkills() != null && !detail.getSkills().isEmpty()) {
                             List<Map<String, Object>> skillsList = objectMapper.readValue(
                                     detail.getSkills(), new TypeReference<List<Map<String, Object>>>() {
-                                    });
+                            });
                             job.setSkillsList(skillsList);
                         }
 
                         job.setIsSaved(Boolean.TRUE);
                         jobs.add(job);
+                        System.out.println("[DEBUG] Added job to list: " + job.getTitle());
                     } catch (Exception e) {
                         // log and continue
+                        System.err.println("[ERROR] Failed to load job details for jobId=" + sj.getJobId() + ": " + e.getMessage());
                         e.printStackTrace();
                     }
                 }
             }
+
+            System.out.println("[DEBUG] Final jobs list size: " + jobs.size());
 
             request.setAttribute("jobs", jobs);
             request.getRequestDispatcher("/WEB-INF/views/candidate/saved-jobs.jsp").forward(request, response);

@@ -48,6 +48,7 @@ public class AuthorizationFilter implements Filter {
         ROLE_ACCESS_MAP.put("/candidate/applications", Arrays.asList("Candidate"));
         ROLE_ACCESS_MAP.put("/candidate/saved-jobs", Arrays.asList("Candidate"));
         ROLE_ACCESS_MAP.put("/candidate/uploadResume", Arrays.asList("Candidate"));
+        ROLE_ACCESS_MAP.put("/candidate/resume", Arrays.asList("Candidate"));
     }
 
     @Override

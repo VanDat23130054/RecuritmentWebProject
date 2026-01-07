@@ -42,36 +42,55 @@
                     </div>
                 </div>
 
-                <c:if test="${not empty user}">
-                    <c:if test="${user.role == 'Candidate'}">
-
-                        <div class="mb-4">
+                <div class="mb-4">
                             <h4 class="mb-2">Your uploaded resumes</h4>
 
                             <c:if test="${not empty resumes}">
                                 <ul id="resumeList" class="list-group">
                                     <c:forEach var="r" items="${resumes}">
-                                        <li class="list-group-item d-flex justify-content-between align-items-center">
-                                            <div class="resume-meta">
-                                                <strong class="resume-filename"><c:out value="${r.fileName}"/></strong>
-                                                <div><small>Uploaded: <fmt:formatDate value="${r.uploadedAt}" pattern="yyyy-MM-dd HH:mm"/></small></div>
+                                        <li class="list-group-item d-flex justify-content-between align-items-center" data-resume-id="${r.resumeId}">
+                                            <div class="resume-meta d-flex align-items-center gap-2">
+                                                <c:if test="${r.isPrimary}">
+                                                    <span class="badge bg-success" title="Primary Resume"><i class="fas fa-star"></i></span>
+                                                </c:if>
+                                                <div>
+                                                    <strong class="resume-filename"><c:out value="${r.fileName}"/></strong>
+                                                    <div><small class="text-muted">Uploaded: <fmt:formatDate value="${r.uploadedAt}" pattern="yyyy-MM-dd HH:mm"/></small></div>
+                                                </div>
                                             </div>
-                                            <div>
+                                            <div class="d-flex gap-2 align-items-center">
                                                 <c:choose>
                                                     <c:when test="${not empty r.fileUrl}">
                                                         <c:choose>
                                                             <c:when test="${fn:startsWith(r.fileUrl, '/')}">
-                                                                <a class="btn btn-outline-primary btn-sm" href="${pageContext.request.contextPath}${r.fileUrl}" target="_blank">View / Download</a>
+                                                                <a class="btn btn-outline-primary btn-sm" href="${pageContext.request.contextPath}${r.fileUrl}" target="_blank" title="View/Download">
+                                                                    <i class="fas fa-download"></i>
+                                                                </a>
                                                             </c:when>
                                                             <c:otherwise>
-                                                                <a class="btn btn-outline-primary btn-sm" href="${r.fileUrl}" target="_blank">View / Download</a>
+                                                                <a class="btn btn-outline-primary btn-sm" href="${r.fileUrl}" target="_blank" title="View/Download">
+                                                                    <i class="fas fa-download"></i>
+                                                                </a>
                                                             </c:otherwise>
                                                         </c:choose>
                                                     </c:when>
                                                     <c:otherwise>
-                                                        <a class="btn btn-outline-primary btn-sm" href="${pageContext.request.contextPath}/employer/applications/resume?id=${r.resumeId}" target="_blank">View / Download</a>
+                                                        <a class="btn btn-outline-primary btn-sm" href="${pageContext.request.contextPath}/employer/applications/resume?id=${r.resumeId}" target="_blank" title="View/Download">
+                                                            <i class="fas fa-download"></i>
+                                                        </a>
                                                     </c:otherwise>
                                                 </c:choose>
+                                                <button class="btn btn-outline-secondary btn-sm rename-btn" data-resume-id="${r.resumeId}" data-filename="${r.fileName}" title="Rename">
+                                                    <i class="fas fa-pen"></i>
+                                                </button>
+                                                <c:if test="${!r.isPrimary}">
+                                                    <button class="btn btn-outline-success btn-sm primary-btn" data-resume-id="${r.resumeId}" title="Set as Primary">
+                                                        <i class="fas fa-star"></i>
+                                                    </button>
+                                                </c:if>
+                                                <button class="btn btn-outline-danger btn-sm delete-btn" data-resume-id="${r.resumeId}" data-filename="${r.fileName}" title="Delete">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
                                             </div>
                                         </li>
                                     </c:forEach>
@@ -85,19 +104,6 @@
                                 </div>
                             </c:if>
                         </div>
-
-                    </c:if>
-                    <c:if test="${user.role != 'Candidate'}">
-                        <div class="alert alert-warning">This page is for candidates only.</div>
-                    </c:if>
-                </c:if>
-
-                <c:if test="${empty user}">
-                    <div class="text-center my-5">
-                        <p class="lead">Please log in to manage your resume.</p>
-                        <a href="${pageContext.request.contextPath}/login" class="btn btn-primary">Login</a>
-                    </div>
-                </c:if>
 
             </div>
         </main>
@@ -130,6 +136,106 @@
                     applyFilter();
                 });
             }
+        })();
+
+        // Resume management functions
+        (function() {
+            const contextPath = '${pageContext.request.contextPath}';
+
+            // Rename handler
+            document.querySelectorAll('.rename-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const resumeId = this.dataset.resumeId;
+                    const currentName = this.dataset.filename;
+                    const newName = prompt('Enter new name for the resume:', currentName);
+                    
+                    if (newName && newName.trim() !== '' && newName !== currentName) {
+                        fetch(contextPath + '/api/resume/rename', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                            body: 'resumeId=' + resumeId + '&newName=' + encodeURIComponent(newName)
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                const li = document.querySelector('li[data-resume-id="' + resumeId + '"]');
+                                if (li) {
+                                    li.querySelector('.resume-filename').textContent = data.newName;
+                                    li.querySelector('.rename-btn').dataset.filename = data.newName;
+                                }
+                                alert('Resume renamed successfully!');
+                            } else {
+                                alert('Error: ' + data.message);
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            alert('An error occurred while renaming.');
+                        });
+                    }
+                });
+            });
+
+            // Delete handler
+            document.querySelectorAll('.delete-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const resumeId = this.dataset.resumeId;
+                    const filename = this.dataset.filename;
+                    
+                    if (confirm('Are you sure you want to delete "' + filename + '"? This action cannot be undone.')) {
+                        fetch(contextPath + '/api/resume/delete', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                            body: 'resumeId=' + resumeId
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                const li = document.querySelector('li[data-resume-id="' + resumeId + '"]');
+                                if (li) {
+                                    li.remove();
+                                }
+                                // Check if list is now empty
+                                const remaining = document.querySelectorAll('#resumeList li');
+                                if (remaining.length === 0) {
+                                    location.reload();
+                                }
+                            } else {
+                                alert('Error: ' + data.message);
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            alert('An error occurred while deleting.');
+                        });
+                    }
+                });
+            });
+
+            // Set Primary handler
+            document.querySelectorAll('.primary-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const resumeId = this.dataset.resumeId;
+                    
+                    fetch(contextPath + '/api/resume/primary', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                        body: 'resumeId=' + resumeId
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            location.reload(); // Reload to reflect changes
+                        } else {
+                            alert('Error: ' + data.message);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('An error occurred while setting primary.');
+                    });
+                });
+            });
         })();
     </script>
 </body>

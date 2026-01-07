@@ -1,15 +1,16 @@
 // package com.jobboard.model.candidate;
 package com.java_web.model.candidate;
 
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
 import java.io.Serializable;
 import java.time.LocalDateTime;
+
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor
 public class Candidate implements Serializable {
+
     private static final long serialVersionUID = 1L;
 
     private Integer candidateId;
@@ -25,7 +26,12 @@ public class Candidate implements Serializable {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
-    public Candidate(Integer candidateId) { this.candidateId = candidateId; }
+    // Transient fields for JSP binding (not persisted to DB)
+    private String cityName;
+    private String countryName;
 
+    public Candidate(Integer candidateId) {
+        this.candidateId = candidateId;
+    }
 
 }

@@ -2,7 +2,7 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -19,16 +19,31 @@
         <jsp:include page="_sidebar.jsp" />
 
         <main class="dashboard-main">
-            <div class="container my-5">
-                <h1>My Saved Jobs</h1>
+            <div class="dashboard-header">
+                <div class="header-content">
+                    <h1><i class="fas fa-bookmark me-2"></i>My Saved Jobs</h1>
+                    <p class="text-muted">Jobs you've saved for later review</p>
+                </div>
+            </div>
 
+            <div class="dashboard-card">
+                <div class="card-body">
                 <c:choose>
                     <c:when test="${not empty jobs}">
                         <div class="job-listings">
                             <c:forEach items="${jobs}" var="job">
                                 <div class="job-card mb-3">
                                     <div class="job-card-header">
-                                        <img src="${job.logoUrl}" alt="${job.companyName}" class="company-logo">
+                                        <c:choose>
+                                            <c:when test="${not empty job.logoUrl}">
+                                                <img src="${job.logoUrl}" alt="${job.companyName}" class="company-logo">
+                                            </c:when>
+                                            <c:otherwise>
+                                                <div class="company-logo bg-secondary d-flex align-items-center justify-content-center">
+                                                    <i class="fas fa-building text-white"></i>
+                                                </div>
+                                            </c:otherwise>
+                                        </c:choose>
                                         <div class="job-info">
                                             <h3 class="mb-1"><a href="${pageContext.request.contextPath}/job/${job.jobId}">${job.title}</a></h3>
                                             <p class="company-name mb-0"><i class="fas fa-building"></i> ${job.companyName}</p>
@@ -37,7 +52,9 @@
 
                                     <div class="job-card-body">
                                         <div class="job-meta">
-                                            <span class="job-location"><i class="fas fa-map-marker-alt"></i> ${job.cityName}</span>
+                                            <c:if test="${not empty job.cityName}">
+                                                <span class="job-location"><i class="fas fa-map-marker-alt"></i> ${job.cityName}</span>
+                                            </c:if>
                                             <c:if test="${not empty job.salaryMin && not empty job.salaryMax}">
                                                 <span class="job-salary"><i class="fas fa-dollar-sign"></i>
                                                     <fmt:formatNumber value="${job.salaryMin}" type="number"/> - 
@@ -61,17 +78,10 @@
                                     </div>
 
                                     <div class="job-card-footer">
-                                        <a href="${pageContext.request.contextPath}/job/${job.jobId}" class="btn btn-primary">View Details</a>
-                                        <c:if test="${empty sessionScope.user || sessionScope.user.role == 'Candidate'}">
-                                            <c:choose>
-                                                <c:when test="${job.isSaved}">
-                                                    <button class="btn btn-secondary save-job-btn saved" data-job-id="${job.jobId}"><i class="fas fa-bookmark"></i> Saved</button>
-                                                </c:when>
-                                                <c:otherwise>
-                                                    <button class="btn btn-secondary save-job-btn" data-job-id="${job.jobId}"><i class="far fa-bookmark"></i> Save</button>
-                                                </c:otherwise>
-                                            </c:choose>
-                                        </c:if>
+                                        <a href="${pageContext.request.contextPath}/job/${job.jobId}" class="btn btn-primary btn-sm">View Details</a>
+                                        <button class="btn btn-outline-danger btn-sm save-job-btn saved" data-job-id="${job.jobId}">
+                                            <i class="fas fa-bookmark"></i> Remove
+                                        </button>
                                     </div>
                                 </div>
                             </c:forEach>
@@ -83,41 +93,34 @@
                             document.querySelectorAll('.save-job-btn').forEach(btn => {
                                 btn.addEventListener('click', function() {
                                     const jobId = this.dataset.jobId;
-                                    const isSaved = this.classList.contains('saved');
-                                    const action = isSaved ? 'unsave' : 'save';
                                     const button = this;
 
+                                    // Since we're on saved jobs page, action is always unsave
                                     fetch('${pageContext.request.contextPath}/api/save-job', {
                                         method: 'POST',
                                         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                                        body: 'jobId=' + jobId + '&action=' + action
+                                        body: 'jobId=' + jobId + '&action=unsave'
                                     })
                                     .then(response => response.json())
                                     .then(data => {
                                         if (data.success) {
-                                            if (action === 'save') {
-                                                button.innerHTML = '<i class="fas fa-bookmark"></i> Saved';
-                                                button.classList.add('saved');
-                                                showSuccess('Job saved successfully!', 'Saved');
-                                            } else {
-                                                button.innerHTML = '<i class="far fa-bookmark"></i> Save';
-                                                button.classList.remove('saved');
-                                                showInfo('Job removed from saved list', 'Removed');
+                                            // Remove the job card from the page
+                                            const jobCard = button.closest('.job-card');
+                                            if (jobCard) {
+                                                jobCard.remove();
+                                            }
+                                            // Check if there are no more jobs
+                                            const remaining = document.querySelectorAll('.job-card');
+                                            if (remaining.length === 0) {
+                                                location.reload();
                                             }
                                         } else {
-                                            if (data.message && data.message.includes('login')) {
-                                                showWarning('Please login to save jobs', 'Login Required');
-                                                setTimeout(() => {
-                                                    window.location.href = '${pageContext.request.contextPath}/login?redirect=' + encodeURIComponent(window.location.pathname + window.location.search);
-                                                }, 1500);
-                                            } else {
-                                                showError(data.message || 'Failed to save job', 'Error');
-                                            }
+                                            alert('Error: ' + (data.message || 'Failed to remove job'));
                                         }
                                     })
                                     .catch(error => {
                                         console.error('Error:', error);
-                                        showError('An error occurred. Please try again.', 'Network Error');
+                                        alert('An error occurred. Please try again.');
                                     });
                                 });
                             });
@@ -125,12 +128,19 @@
 
                     </c:when>
                     <c:otherwise>
-                        <div class="text-center my-5">
-                            <p class="lead">You have no saved jobs.</p>
-                            <a href="${pageContext.request.contextPath}/jobs" class="btn btn-primary">Browse Jobs</a>
+                        <div class="text-center py-5">
+                            <div class="mb-4">
+                                <i class="fas fa-bookmark fa-4x text-muted"></i>
+                            </div>
+                            <h4>No saved jobs yet</h4>
+                            <p class="text-muted mb-4">Start browsing jobs and save the ones you're interested in!</p>
+                            <a href="${pageContext.request.contextPath}/jobs" class="btn btn-primary">
+                                <i class="fas fa-search me-2"></i>Browse Jobs
+                            </a>
                         </div>
                     </c:otherwise>
                 </c:choose>
+                </div>
             </div>
         </main>
     </div>
