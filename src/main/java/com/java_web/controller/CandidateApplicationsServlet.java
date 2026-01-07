@@ -73,7 +73,9 @@ public class CandidateApplicationsServlet extends HttpServlet {
                     page = 1; // fallback to page 1 on bad input
                 }
             }
-            if (page < 1) page = 1;
+            if (page < 1) {
+                page = 1;
+            }
             int pageSize = 20;
 
             // Ensure candidateId exists to avoid NPE when unboxing
@@ -88,7 +90,9 @@ public class CandidateApplicationsServlet extends HttpServlet {
 
             int total = applicationDAO.getApplicationCountByCandidate(candidate.getCandidateId(), status);
             int totalPages = (int) Math.ceil((double) total / pageSize);
-            if (totalPages < 1) totalPages = 1;
+            if (totalPages < 1) {
+                totalPages = 1;
+            }
 
             request.setAttribute("applications", applications);
             request.setAttribute("currentPage", page);
@@ -105,6 +109,9 @@ public class CandidateApplicationsServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+
+        System.out.println("[DEBUG] doPost called for /candidate/applications");
+
         // Handle withdraw action
         HttpSession session = request.getSession(false);
         if (session == null) {
@@ -118,14 +125,19 @@ public class CandidateApplicationsServlet extends HttpServlet {
             return;
         }
 
+        System.out.println("[DEBUG] UserId from session: " + userId);
+
         boolean isAjax = "XMLHttpRequest".equalsIgnoreCase(request.getHeader("X-Requested-With"))
                 || (request.getHeader("Accept") != null && request.getHeader("Accept").contains("application/json"));
 
         try {
             User user = userDAO.findById(userId);
+            System.out.println("[DEBUG] User found: " + (user != null ? user.getEmail() : "null"));
+
             if (user == null || !"Candidate".equals(user.getRole())) {
                 if (isAjax) {
                     response.setContentType("application/json");
+                    response.setCharacterEncoding("UTF-8");
                     response.setStatus(HttpServletResponse.SC_FORBIDDEN);
                     try (PrintWriter pw = response.getWriter()) {
                         pw.write("{\"success\":false,\"message\":\"Forbidden\"}");
@@ -138,9 +150,12 @@ public class CandidateApplicationsServlet extends HttpServlet {
             }
 
             Candidate candidate = candidateDAO.getCandidateByUserId(userId);
+            System.out.println("[DEBUG] Candidate found: " + (candidate != null ? "CandidateId=" + candidate.getCandidateId() : "null"));
+
             if (candidate == null) {
                 if (isAjax) {
                     response.setContentType("application/json");
+                    response.setCharacterEncoding("UTF-8");
                     response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                     try (PrintWriter pw = response.getWriter()) {
                         pw.write("{\"success\":false,\"message\":\"Candidate profile not found\"}");
@@ -153,14 +168,35 @@ public class CandidateApplicationsServlet extends HttpServlet {
             }
 
             String action = request.getParameter("action");
+            String appIdParam = request.getParameter("applicationId");
+
+            // Debug: print all parameters
+            System.out.println("[DEBUG] Action: " + action);
+            System.out.println("[DEBUG] ApplicationId param: " + appIdParam);
+            System.out.println("[DEBUG] Content-Type: " + request.getContentType());
+            java.util.Enumeration<String> paramNames = request.getParameterNames();
+            while (paramNames.hasMoreElements()) {
+                String paramName = paramNames.nextElement();
+                System.out.println("[DEBUG] Param: " + paramName + " = " + request.getParameter(paramName));
+            }
+
             if ("withdraw".equals(action)) {
                 String appIdStr = request.getParameter("applicationId");
                 if (appIdStr != null && !appIdStr.isEmpty()) {
                     try {
                         Integer appId = Integer.valueOf(appIdStr);
-                        boolean ok = applicationDAO.withdrawApplication(appId, candidate.getCandidateId());
+                        Integer candidateId = candidate.getCandidateId();
+
+                        // Debug logging
+                        System.out.println("[DEBUG] Withdraw - ApplicationId: " + appId + ", CandidateId: " + candidateId);
+
+                        boolean ok = applicationDAO.withdrawApplication(appId, candidateId);
+
+                        System.out.println("[DEBUG] Withdraw result: " + ok);
+
                         if (isAjax) {
                             response.setContentType("application/json");
+                            response.setCharacterEncoding("UTF-8");
                             try (PrintWriter pw = response.getWriter()) {
                                 if (ok) {
                                     // Properly construct JSON for success
@@ -168,7 +204,7 @@ public class CandidateApplicationsServlet extends HttpServlet {
                                     pw.write(json);
                                 } else {
                                     response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-                                    pw.write("{\"success\":false,\"message\":\"Unable to withdraw application. It may already be processed.\"}");
+                                    pw.write("{\"success\":false,\"message\":\"Unable to withdraw application (AppId: " + appId + ", CandidateId: " + candidateId + "). It may already be processed.\"}");
                                 }
                             }
                             return;
@@ -182,6 +218,7 @@ public class CandidateApplicationsServlet extends HttpServlet {
                     } catch (NumberFormatException nfe) {
                         if (isAjax) {
                             response.setContentType("application/json");
+                            response.setCharacterEncoding("UTF-8");
                             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                             try (PrintWriter pw = response.getWriter()) {
                                 pw.write("{\"success\":false,\"message\":\"Invalid application id.\"}");
@@ -192,6 +229,15 @@ public class CandidateApplicationsServlet extends HttpServlet {
                         }
                     }
                 }
+            } else if (isAjax) {
+                // Unknown action for AJAX request - return error
+                response.setContentType("application/json");
+                response.setCharacterEncoding("UTF-8");
+                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                try (PrintWriter pw = response.getWriter()) {
+                    pw.write("{\"success\":false,\"message\":\"Invalid action: " + (action != null ? action : "null") + "\"}");
+                }
+                return;
             }
 
             if (!isAjax) {
@@ -201,9 +247,12 @@ public class CandidateApplicationsServlet extends HttpServlet {
         } catch (SQLException e) {
             if (isAjax) {
                 response.setContentType("application/json");
+                response.setCharacterEncoding("UTF-8");
                 response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
                 try (PrintWriter pw = response.getWriter()) {
-                    String msg = e.getMessage() != null ? e.getMessage().replace("\"", "\\\"") : "Database error";
+                    String msg = e.getMessage() != null
+                            ? e.getMessage().replace("\\", "\\\\").replace("\"", "\\\"").replace("\n", " ").replace("\r", " ")
+                            : "Database error";
                     pw.write("{\"success\":false,\"message\":\"" + msg + "\"}");
                 }
                 return;

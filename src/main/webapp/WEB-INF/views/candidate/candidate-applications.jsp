@@ -280,14 +280,22 @@
                 if (!confirm('Are you sure you want to withdraw this application?')) return;
                 btn.disabled = true; btn.textContent = 'Withdrawing...';
 
-                var formData = new FormData(form);
-                fetch(form.action, {
+                // Use getAttribute to get the actual action URL, not the input named "action"
+                var actionUrl = form.getAttribute('action');
+                
+                // Send as URL-encoded instead of multipart/form-data
+                var params = new URLSearchParams();
+                params.append('action', 'withdraw');
+                params.append('applicationId', appId);
+                
+                fetch(actionUrl, {
                     method: 'POST',
                     headers: {
                         'X-Requested-With': 'XMLHttpRequest',
-                        'Accept': 'application/json'
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/x-www-form-urlencoded'
                     },
-                    body: formData,
+                    body: params.toString(),
                     credentials: 'same-origin'
                 })
                 .then(function(response) {
