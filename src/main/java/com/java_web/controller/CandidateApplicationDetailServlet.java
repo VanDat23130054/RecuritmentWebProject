@@ -81,6 +81,12 @@ public class CandidateApplicationDetailServlet extends HttpServlet {
                 return;
             }
 
+            // Debug logging
+            System.out.println("[DEBUG] App Details - ID: " + app.getApplicationId()
+                    + ", JobTitle: " + app.getJobTitle()
+                    + ", CompanyName: " + app.getCompanyName()
+                    + ", Status: " + app.getStatus());
+
             StringBuilder json = new StringBuilder();
             json.append("{\"success\": true, \"application\": {");
             json.append("\"applicationId\": ").append(app.getApplicationId()).append(',');
@@ -119,7 +125,9 @@ public class CandidateApplicationDetailServlet extends HttpServlet {
             }
             json.append("}}");
 
-            out.print(json.toString());
+            String jsonOutput = json.toString();
+            System.out.println("[DEBUG] JSON Output: " + jsonOutput);
+            out.print(jsonOutput);
         } catch (NumberFormatException e) {
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             out.print("{\"success\": false, \"message\": \"Invalid application ID\"}");

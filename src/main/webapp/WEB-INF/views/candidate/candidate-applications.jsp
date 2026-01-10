@@ -197,15 +197,24 @@
 <script>
     // View application details (candidate endpoint)
     function viewApplication(applicationId) {
+        console.log('viewApplication called:', applicationId);
+        
         const modal = new bootstrap.Modal(document.getElementById('applicationModal'));
         modal.show();
 
         const url = '${pageContext.request.contextPath}/candidate/application/detail?id=' + applicationId;
+        console.log('Fetching from:', url);
+        
         fetch(url)
-            .then(response => response.json())
+            .then(response => {
+                console.log('Response status:', response.status);
+                return response.json();
+            })
             .then(data => {
+                console.log('Response data:', data);
                 if (data.success) {
                     const app = data.application;
+                    console.log('Application data:', app);
 
                     // Format applied date nicely
                     let appliedDate = 'N/A';
@@ -218,38 +227,44 @@
                         }
                     }
 
-                    const coverHtml = app.coverLetter ? `<div class="border rounded p-3 bg-light">${app.coverLetter}</div>` : '<p class="text-muted">No cover letter provided.</p>';
-                    const resumeHtml = app.resumeFileUrl ? `<a href="${pageContext.request.contextPath}${app.resumeFileUrl}" target="_blank" class="btn btn-outline-primary btn-sm"><i class="fas fa-file-download me-1"></i>${app.resumeFileName || 'Download Resume'}</a>` : '<span class="text-muted">No resume uploaded</span>';
+                    const coverHtml = app.coverLetter
+                        ? `<div class="border rounded p-3 bg-light">${'$'}{app.coverLetter}</div>`
+                        : '<p class="text-muted">No cover letter provided.</p>';
+                    
+                    const resumeHtml = app.resumeFileUrl
+                        ? `<a href="${'$'}{app.resumeFileUrl}" target="_blank" class="btn btn-outline-primary btn-sm"><i class="fas fa-file-download me-1"></i>${'$'}{app.resumeFileName || 'Download Resume'}</a>`
+                        : '<span class="text-muted">No resume uploaded</span>';
 
                     document.getElementById('applicationDetails').innerHTML = `
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <h6 class="text-muted">Job Information</h6>
-                                <p class="mb-1"><strong>Position:</strong> ${app.jobTitle || 'N/A'}</p>
-                                <p class="mb-1"><strong>Company:</strong> ${app.companyName || 'N/A'}</p>
-                                <p class="mb-1"><strong>Applied:</strong> ${appliedDate}</p>
+                                <p class="mb-1"><strong>Position:</strong> ${'$'}{app.jobTitle || 'N/A'}</p>
+                                <p class="mb-1"><strong>Company:</strong> ${'$'}{app.companyName || 'N/A'}</p>
+                                <p class="mb-1"><strong>Applied:</strong> ${'$'}{appliedDate}</p>
                             </div>
                             <div class="col-12 mb-3">
                                 <h6 class="text-muted">Cover Letter</h6>
-                                ${coverHtml}
+                                ${'$'}{coverHtml}
                             </div>
                             <div class="col-12 mb-3">
                                 <h6 class="text-muted">Resume</h6>
-                                ${resumeHtml}
+                                ${'$'}{resumeHtml}
                             </div>
                             <div class="col-12">
                                 <h6 class="text-muted">Recruiter Note</h6>
-                                <div class="border rounded p-3 bg-light">${app.recruiterNote || '<em class="text-muted">No notes</em>'}</div>
+                                <div class="border rounded p-3 bg-light">${'$'}{app.recruiterNote || '<em class="text-muted">No notes</em>'}</div>
                             </div>
                         </div>
                     `;
                 } else {
-                    document.getElementById('applicationDetails').innerHTML = `<div class="alert alert-danger">${data.message}</div>`;
+                    console.error('Error from server:', data.message);
+                    document.getElementById('applicationDetails').innerHTML = `<div class="alert alert-danger">${'$'}{data.message}</div>`;
                 }
             })
             .catch(err => {
                 console.error('Detail fetch error', err);
-                document.getElementById('applicationDetails').innerHTML = `<div class="alert alert-danger">Failed to load application details.</div>`;
+                document.getElementById('applicationDetails').innerHTML = `<div class="alert alert-danger">Failed to load application details. Error: ${'$'}{err.message}</div>`;
             });
     }
 
