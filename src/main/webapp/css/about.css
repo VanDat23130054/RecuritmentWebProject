@@ -1,0 +1,231 @@
+/* About Page Styles */
+
+.about-hero {
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  color: white;
+  padding: 80px 0;
+  text-align: center;
+}
+
+.about-hero h1 {
+  font-size: 3rem;
+  font-weight: 700;
+  margin-bottom: 20px;
+}
+
+.about-hero p {
+  font-size: 1.25rem;
+  opacity: 0.9;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.about-section {
+  padding: 80px 0;
+}
+
+.about-section.bg-light {
+  background-color: #f9fafb;
+}
+
+.section-title {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 20px;
+  color: #1f2937;
+}
+
+.section-subtitle {
+  color: #4b5563;
+  font-size: 1.1rem;
+  margin-bottom: 40px;
+}
+
+.feature-card {
+  background: white;
+  border-radius: 12px;
+  padding: 30px;
+  text-align: center;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+  height: 100%;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.feature-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+}
+
+.feature-icon {
+  width: 70px;
+  height: 70px;
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 20px;
+  color: white;
+  font-size: 1.8rem;
+}
+
+.feature-card h4 {
+  font-weight: 600;
+  margin-bottom: 15px;
+  color: #1f2937;
+}
+
+.feature-card p {
+  color: #4b5563;
+  margin-bottom: 0;
+}
+
+.stats-section {
+  background: linear-gradient(135deg, #1f2937 0%, #374151 100%);
+  color: white;
+  padding: 60px 0;
+}
+
+.stat-item {
+  text-align: center;
+  padding: 20px;
+}
+
+.stat-number {
+  font-size: 3rem;
+  font-weight: 700;
+  color: #3b82f6;
+  display: block;
+}
+
+.stat-label {
+  font-size: 1.1rem;
+  color: white;
+  opacity: 0.9;
+}
+
+.team-card {
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+  transition: transform 0.3s ease;
+}
+
+.team-card:hover {
+  transform: translateY(-5px);
+}
+
+.team-avatar {
+  width: 120px;
+  height: 120px;
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 30px auto 20px;
+  color: white;
+  font-size: 3rem;
+  font-weight: 600;
+}
+
+.team-card .card-body {
+  text-align: center;
+  padding: 20px 30px 30px;
+}
+
+.team-card h5 {
+  font-weight: 600;
+  margin-bottom: 5px;
+}
+
+.team-card .role {
+  color: #3b82f6;
+  font-weight: 500;
+  margin-bottom: 15px;
+}
+
+.team-card p {
+  color: #4b5563;
+  font-size: 0.95rem;
+}
+
+.team-social a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #f3f4f6;
+  color: #4b5563;
+  margin: 0 5px;
+  transition: all 0.3s ease;
+}
+
+.team-social a:hover {
+  background: #3b82f6;
+  color: white;
+}
+
+.tech-stack {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 15px;
+  margin-top: 30px;
+}
+
+.tech-badge {
+  background: white;
+  border: 2px solid #e5e7eb;
+  border-radius: 50px;
+  padding: 10px 25px;
+  font-weight: 500;
+  color: #1f2937;
+  transition: all 0.3s ease;
+}
+
+.tech-badge:hover {
+  border-color: #3b82f6;
+  color: #3b82f6;
+}
+
+.tech-badge i {
+  margin-right: 8px;
+}
+
+.cta-section {
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  color: white;
+  padding: 80px 0;
+  text-align: center;
+}
+
+.cta-section h2 {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 20px;
+}
+
+.cta-section p {
+  font-size: 1.2rem;
+  opacity: 0.9;
+  margin-bottom: 30px;
+}
+
+.cta-section .btn {
+  padding: 15px 40px;
+  font-size: 1.1rem;
+  border-radius: 50px;
+}
+
+.cta-section .btn-light {
+  color: #3b82f6;
+  font-weight: 600;
+}
+
+.cta-section .btn-outline-light {
+  border-width: 2px;
+}

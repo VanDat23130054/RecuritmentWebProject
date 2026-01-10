@@ -4,6 +4,7 @@ import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -100,5 +101,61 @@ public class CommonDAO {
             }
         }
         return types;
+    }
+
+    /**
+     * Get total count of published jobs
+     */
+    public int getTotalJobCount() throws SQLException {
+        String sql = "{call common.sp_GetTotalJobCount(?)}";
+
+        try (Connection conn = DB.getConnection(); CallableStatement stmt = conn.prepareCall(sql)) {
+
+            stmt.registerOutParameter(1, Types.INTEGER);
+            stmt.execute();
+            return stmt.getInt(1);
+        }
+    }
+
+    /**
+     * Get total count of companies
+     */
+    public int getTotalCompanyCount() throws SQLException {
+        String sql = "{call common.sp_GetTotalCompanyCount(?)}";
+
+        try (Connection conn = DB.getConnection(); CallableStatement stmt = conn.prepareCall(sql)) {
+
+            stmt.registerOutParameter(1, Types.INTEGER);
+            stmt.execute();
+            return stmt.getInt(1);
+        }
+    }
+
+    /**
+     * Get total count of candidates
+     */
+    public int getTotalCandidateCount() throws SQLException {
+        String sql = "{call common.sp_GetTotalCandidateCount(?)}";
+
+        try (Connection conn = DB.getConnection(); CallableStatement stmt = conn.prepareCall(sql)) {
+
+            stmt.registerOutParameter(1, Types.INTEGER);
+            stmt.execute();
+            return stmt.getInt(1);
+        }
+    }
+
+    /**
+     * Get total count of applications
+     */
+    public int getTotalApplicationCount() throws SQLException {
+        String sql = "{call common.sp_GetTotalApplicationCount(?)}";
+
+        try (Connection conn = DB.getConnection(); CallableStatement stmt = conn.prepareCall(sql)) {
+
+            stmt.registerOutParameter(1, Types.INTEGER);
+            stmt.execute();
+            return stmt.getInt(1);
+        }
     }
 }

@@ -22,7 +22,7 @@
             <div class="sidebar-header">
                 <h3><i class="fas fa-building"></i> Employer Portal</h3>
             </div>
-            
+              
             <nav class="sidebar-nav">
                 <a href="${pageContext.request.contextPath}/employer/dashboard" class="nav-item">
                     <i class="fas fa-chart-line"></i> Dashboard
