@@ -71,7 +71,7 @@ public class HomeServlet extends HttpServlet {
             Integer cityId = (StringUtils.isNotBlank(cityIdStr))
                     ? Integer.valueOf(cityIdStr) : null;
 
-            List<JobSearchDTO> jobs = jobDAO.searchJobs(keyword, cityId, null, 1, 20);
+            List<JobSearchDTO> jobs = jobDAO.searchJobs(keyword, cityId, null, 1, 50);
 
             // Parse skills JSON for each job
             for (JobSearchDTO job : jobs) {
