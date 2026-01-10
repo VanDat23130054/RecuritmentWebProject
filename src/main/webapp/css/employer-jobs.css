@@ -337,20 +337,49 @@
   margin-bottom: 1.5rem;
 }
 
-/* Responsive */
-@media (max-width: 768px) {
+/* Responsive - Tablet (1024px and below) */
+@media (max-width: 1024px) {
+  .jobs-container {
+    padding: 1.5rem;
+  }
+
   .jobs-header {
     flex-direction: column;
     align-items: flex-start;
-    gap: 1rem;
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .jobs-header h1 {
+    font-size: 1.75rem;
+  }
+
+  .header-actions {
+    flex-wrap: wrap;
+  }
+
+  .filter-tabs {
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .filter-tab {
+    padding: 0.75rem 1rem;
+    font-size: 0.85rem;
   }
 
   .search-section {
     flex-direction: column;
+    gap: 0.75rem;
   }
 
   .search-box {
     min-width: 100%;
+  }
+
+  .search-btn {
+    width: 100%;
   }
 
   .jobs-table {
@@ -363,7 +392,357 @@
   }
 
   .stats-cell {
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+
+  .stat-item {
+    font-size: 0.8rem;
+  }
+
+  .action-buttons {
+    gap: 0.25rem;
+  }
+
+  .btn-icon {
+    width: 28px;
+    height: 28px;
+    font-size: 0.75rem;
+  }
+
+  .featured-badge {
+    margin-left: 0.25rem;
+  }
+}
+
+/* Responsive - Mobile (767px and below) */
+@media (max-width: 767px) {
+  .jobs-container {
+    padding: 1rem;
+  }
+
+  .jobs-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.75rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .jobs-header h1 {
+    font-size: 1.5rem;
+  }
+
+  .header-actions {
+    width: 100%;
+  }
+
+  .header-actions a,
+  .header-actions button {
+    flex: 1;
+    font-size: 0.85rem;
+    padding: 0.75rem;
+  }
+
+  .filter-tabs {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    margin-bottom: 1.25rem;
+    gap: 0.5rem;
+  }
+
+  .filter-tab {
+    padding: 0.75rem 1rem;
+    font-size: 0.8rem;
+    white-space: nowrap;
+  }
+
+  .filter-tab .count {
+    font-size: 0.75rem;
+    padding: 0.15rem 0.5rem;
+  }
+
+  .search-section {
     flex-direction: column;
     gap: 0.5rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .search-box {
+    min-width: 100%;
+  }
+
+  .search-box input {
+    font-size: 16px; /* Prevents mobile zoom */
+    padding: 0.75rem 1rem 0.75rem 2.5rem;
+  }
+
+  .search-btn {
+    width: 100%;
+    font-size: 0.9rem;
+    padding: 0.75rem 1rem;
+  }
+
+  /* Mobile Table Layout */
+  .jobs-table-container {
+    border-radius: 0;
+  }
+
+  .jobs-table {
+    display: block;
+  }
+
+  .jobs-table thead {
+    display: none;
+  }
+
+  .jobs-table tbody,
+  .jobs-table tr,
+  .jobs-table td {
+    display: block;
+    width: 100%;
+  }
+
+  .jobs-table tbody tr {
+    margin-bottom: 1rem;
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    overflow: hidden;
+  }
+
+  .jobs-table tbody tr:hover {
+    background: white;
+  }
+
+  .jobs-table td {
+    text-align: right;
+    padding: 0.5rem 1rem;
+    position: relative;
+    padding-left: 50%;
+    border: none;
+    border-bottom: 1px solid #f3f4f6;
+  }
+
+  .jobs-table td:before {
+    content: attr(data-label);
+    position: absolute;
+    left: 0;
+    width: 50%;
+    padding: 0.5rem 1rem;
+    font-weight: 600;
+    color: #6b7280;
+    font-size: 0.8rem;
+    text-align: left;
+    text-transform: uppercase;
+  }
+
+  .jobs-table td:last-child {
+    border-bottom: none;
+  }
+
+  .job-title-cell {
+    padding: 1rem !important;
+    padding-left: 1rem !important;
+    text-align: left !important;
+  }
+
+  .job-title-cell:before {
+    display: none;
+  }
+
+  .job-title-cell strong {
+    display: block;
+    margin-bottom: 0.5rem;
+  }
+
+  .job-title-cell .job-meta {
+    flex-direction: column;
+    gap: 0.25rem;
+    font-size: 0.8rem;
+  }
+
+  .status-badge {
+    padding: 0.3rem 0.6rem;
+    font-size: 0.75rem;
+  }
+
+  .stats-cell {
+    flex-direction: column;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem !important;
+    text-align: left !important;
+  }
+
+  .stats-cell:before {
+    display: none;
+  }
+
+  .stat-item {
+    font-size: 0.8rem;
+  }
+
+  .action-buttons {
+    padding: 0.5rem 1rem !important;
+    gap: 0.5rem;
+    text-align: left !important;
+  }
+
+  .action-buttons:before {
+    display: none;
+  }
+
+  .btn-icon {
+    width: 32px;
+    height: 32px;
+    font-size: 0.9rem;
+  }
+
+  .pagination {
+    gap: 0.25rem;
+    padding: 1.5rem 0;
+  }
+
+  .pagination a,
+  .pagination span {
+    min-width: 32px;
+    height: 32px;
+    padding: 0 0.5rem;
+    font-size: 0.85rem;
+  }
+
+  .empty-state {
+    padding: 2rem 1rem;
+  }
+
+  .empty-state i {
+    font-size: 3rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .empty-state h3 {
+    font-size: 1.25rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .empty-state p {
+    font-size: 0.9rem;
+  }
+}
+
+/* Responsive - Small Phones (479px and below) */
+@media (max-width: 479px) {
+  .jobs-container {
+    padding: 0.75rem;
+  }
+
+  .jobs-header {
+    margin-bottom: 1rem;
+  }
+
+  .jobs-header h1 {
+    font-size: 1.25rem;
+  }
+
+  .header-actions {
+    width: 100%;
+    gap: 0.5rem;
+  }
+
+  .header-actions a,
+  .header-actions button {
+    font-size: 0.75rem;
+    padding: 0.5rem;
+  }
+
+  .filter-tabs {
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+  }
+
+  .filter-tab {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.75rem;
+  }
+
+  .filter-tab .count {
+    font-size: 0.65rem;
+    padding: 0.1rem 0.4rem;
+  }
+
+  .search-section {
+    margin-bottom: 1rem;
+    gap: 0.25rem;
+  }
+
+  .search-box input {
+    font-size: 16px;
+    padding: 0.65rem 0.75rem 0.65rem 2.25rem;
+  }
+
+  .search-box i {
+    left: 0.75rem;
+  }
+
+  .search-btn {
+    font-size: 0.85rem;
+    padding: 0.65rem;
+  }
+
+  .jobs-table td {
+    padding: 0.35rem 0.75rem;
+    font-size: 0.8rem;
+  }
+
+  .job-title-cell strong {
+    font-size: 0.9rem;
+  }
+
+  .job-title-cell .job-meta {
+    font-size: 0.75rem;
+  }
+
+  .status-badge {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.7rem;
+  }
+
+  .stat-item {
+    font-size: 0.75rem;
+  }
+
+  .btn-icon {
+    width: 28px;
+    height: 28px;
+    font-size: 0.75rem;
+  }
+
+  .pagination a,
+  .pagination span {
+    min-width: 28px;
+    height: 28px;
+    padding: 0 0.4rem;
+    font-size: 0.75rem;
+  }
+
+  .featured-badge {
+    font-size: 0.65rem;
+    margin-left: 0.15rem;
+  }
+
+  .empty-state {
+    padding: 1.5rem 0.75rem;
+  }
+
+  .empty-state i {
+    font-size: 2.5rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .empty-state h3 {
+    font-size: 1.1rem;
+  }
+
+  .empty-state p {
+    font-size: 0.85rem;
   }
 }

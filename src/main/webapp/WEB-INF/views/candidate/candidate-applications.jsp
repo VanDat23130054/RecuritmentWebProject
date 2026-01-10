@@ -19,6 +19,10 @@
 
 <!-- New dashboard layout: sidebar + main -->
 <div class="dashboard-container">
+    <!-- Sidebar Toggle Button (Mobile/Tablet) -->
+    <button class="sidebar-toggle" aria-label="Toggle Sidebar">
+        <i class="fas fa-bars"></i>
+    </button>
     <jsp:include page="_sidebar.jsp" />
 
     <!-- Main Content -->
@@ -441,5 +445,6 @@
         margin-left: 5px;
     }
 </style>
+<script src="${pageContext.request.contextPath}/js/main.js"></script>
 </body>
 </html>

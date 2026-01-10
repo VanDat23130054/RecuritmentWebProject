@@ -468,35 +468,508 @@
   font-size: 1rem;
 }
 
-/* Responsive */
-@media (max-width: 768px) {
+/* Responsive - Tablet (1024px and below) */
+@media (max-width: 1024px) {
+  .chat-container {
+    padding: 2rem 1rem;
+  }
+
+  .chat-header {
+    margin-bottom: 1.5rem;
+  }
+
+  .chat-header h1 {
+    font-size: 1.75rem;
+  }
+
+  .conversation-item {
+    padding: 1rem 1rem;
+  }
+
+  .conversation-avatar {
+    width: 50px;
+    height: 50px;
+    flex-shrink: 0;
+  }
+
+  .conversation-info {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .conversation-name {
+    font-size: 0.95rem;
+  }
+
+  .conversation-preview {
+    font-size: 0.85rem;
+  }
+
+  .conversation-meta {
+    gap: 0.5rem;
+  }
+
+  .conversation-time {
+    font-size: 0.8rem;
+  }
+
+  .conversation-new-badge {
+    width: 10px;
+    height: 10px;
+  }
+
+  .new-conversation-btn {
+    font-size: 0.9rem;
+    padding: 0.75rem 1.25rem;
+  }
+
   .chat-window {
-    height: calc(100vh - 200px);
     border-radius: 0;
-    margin: 0 -12px;
+  }
+
+  .chat-window-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+    padding: 1rem;
+  }
+
+  .chat-job-context {
+    width: 100%;
   }
 
   .message {
     max-width: 85%;
   }
 
-  .chat-window-header {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 12px;
+  .message-bubble {
+    padding: 0.75rem 1rem;
+    font-size: 0.9rem;
   }
 
-  .chat-job-context {
-    align-self: flex-start;
+  .message-time {
+    font-size: 0.75rem;
+    margin-top: 0.25rem;
+  }
+
+  .message-input-area {
+    padding: 1rem;
+    gap: 0.5rem;
+  }
+
+  .message-input {
+    font-size: 16px;
+    padding: 0.75rem 1rem;
+  }
+
+  .send-btn {
+    width: 36px;
+    height: 36px;
+  }
+
+  .send-btn i {
+    font-size: 0.9rem;
+  }
+}
+
+/* Responsive - Mobile (767px and below) */
+@media (max-width: 767px) {
+  .chat-container {
+    padding: 1rem 0;
+    min-height: calc(100vh - 150px);
+  }
+
+  .chat-header {
+    margin-bottom: 1rem;
+    padding: 0 1rem;
+  }
+
+  .chat-header h1 {
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .chat-header p {
+    font-size: 0.9rem;
+  }
+
+  .chat-header .new-conversation-btn {
+    font-size: 0.85rem;
+    padding: 0.65rem 1rem;
+  }
+
+  .empty-state {
+    margin: 1rem;
+    padding: 3rem 1.5rem;
+    border-radius: 12px;
+  }
+
+  .empty-icon {
+    width: 80px;
+    height: 80px;
+    margin: 0 auto 1.5rem;
+  }
+
+  .empty-icon i {
+    font-size: 35px;
+  }
+
+  .empty-state h3 {
+    font-size: 1.25rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .empty-state p {
+    font-size: 0.9rem;
+  }
+
+  .conversations-list {
+    border-radius: 0;
+    box-shadow: none;
+    border-top: 1px solid #e2e8f0;
+    border-bottom: 1px solid #e2e8f0;
   }
 
   .conversation-item {
-    padding: 16px;
+    padding: 1rem;
+    gap: 0.75rem;
+  }
+
+  .conversation-item:active {
+    background-color: #f1f5f9;
   }
 
   .conversation-avatar {
-    width: 48px;
-    height: 48px;
+    width: 44px;
+    height: 44px;
+    flex-shrink: 0;
+  }
+
+  .conversation-info {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .conversation-name {
+    font-size: 0.95rem;
+    font-weight: 500;
+  }
+
+  .conversation-preview {
+    font-size: 0.8rem;
+    color: #94a3b8;
+  }
+
+  .conversation-meta {
+    gap: 0.5rem;
+    align-items: center;
+  }
+
+  .conversation-time {
+    font-size: 0.75rem;
+    white-space: nowrap;
+  }
+
+  .conversation-new-badge {
+    width: 10px;
+    height: 10px;
+    flex-shrink: 0;
+  }
+
+  /* Chat Window Mobile */
+  .chat-window {
+    height: calc(100vh - 180px);
+    border-radius: 0;
+    margin: 0;
+    border: none;
+  }
+
+  .chat-window-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.5rem;
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid #e2e8f0;
+  }
+
+  .chat-window-header-top {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .back-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    background: none;
+    border: none;
+    color: #3b82f6;
+    cursor: pointer;
+    font-size: 1.25rem;
+  }
+
+  .chat-recipient-info {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .chat-recipient-avatar {
+    width: 36px;
+    height: 36px;
+  }
+
+  .chat-recipient-name {
+    font-size: 0.95rem;
+    font-weight: 600;
+  }
+
+  .chat-recipient-status {
+    font-size: 0.75rem;
+  }
+
+  .chat-job-context {
+    width: 100%;
+    padding: 0.5rem;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    background: #f8fafc;
+  }
+
+  .messages-container {
+    padding: 1rem;
+    gap: 0.75rem;
+  }
+
+  .message-group {
+    gap: 0.25rem;
+  }
+
+  .message {
+    max-width: 90%;
+  }
+
+  .message.sent {
+    align-self: flex-end;
+  }
+
+  .message.received {
+    align-self: flex-start;
+  }
+
+  .message-bubble {
+    padding: 0.65rem 0.85rem;
+    font-size: 0.9rem;
+    border-radius: 12px;
+    word-break: break-word;
+    min-width: 0;
+  }
+
+  .message.sent .message-bubble {
+    background: #3b82f6;
+    color: white;
+  }
+
+  .message.received .message-bubble {
+    background: #e2e8f0;
+    color: #1e293b;
+  }
+
+  .message-time {
+    font-size: 0.7rem;
+    margin-top: 0.25rem;
+    display: none;
+  }
+
+  .message-input-area {
+    padding: 1rem;
+    gap: 0.5rem;
+    background: white;
+    border-top: 1px solid #e2e8f0;
+    margin-top: auto;
+  }
+
+  .message-input {
+    font-size: 16px; /* Prevents mobile zoom */
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+    flex: 1;
+    min-width: 0;
+  }
+
+  .send-btn {
+    width: 36px;
+    height: 36px;
+    background: #3b82f6;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 1rem;
+    flex-shrink: 0;
+  }
+
+  .send-btn:active {
+    background: #2563eb;
+  }
+
+  .send-btn i {
+    font-size: 0.9rem;
+  }
+}
+
+/* Responsive - Small Phones (479px and below) */
+@media (max-width: 479px) {
+  .chat-container {
+    padding: 0.75rem 0;
+  }
+
+  .chat-header {
+    padding: 0 0.75rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .chat-header h1 {
+    font-size: 1.25rem;
+    margin-bottom: 0.25rem;
+  }
+
+  .chat-header p {
+    font-size: 0.85rem;
+  }
+
+  .chat-header .new-conversation-btn {
+    font-size: 0.8rem;
+    padding: 0.5rem 0.75rem;
+  }
+
+  .empty-state {
+    margin: 0.75rem;
+    padding: 2.5rem 1rem;
+  }
+
+  .empty-icon {
+    width: 70px;
+    height: 70px;
+    margin: 0 auto 1rem;
+  }
+
+  .empty-icon i {
+    font-size: 30px;
+  }
+
+  .empty-state h3 {
+    font-size: 1.1rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .empty-state p {
+    font-size: 0.85rem;
+  }
+
+  .conversations-list {
+    margin-top: 0;
+  }
+
+  .conversation-item {
+    padding: 0.75rem;
+    gap: 0.5rem;
+  }
+
+  .conversation-avatar {
+    width: 40px;
+    height: 40px;
+  }
+
+  .conversation-name {
+    font-size: 0.9rem;
+  }
+
+  .conversation-preview {
+    font-size: 0.75rem;
+  }
+
+  .conversation-time {
+    font-size: 0.7rem;
+  }
+
+  /* Chat Window Small Phone */
+  .chat-window {
+    height: calc(100vh - 160px);
+    border-radius: 0;
+  }
+
+  .chat-window-header {
+    padding: 0.5rem 0.75rem;
+    gap: 0.25rem;
+  }
+
+  .back-btn {
+    width: 28px;
+    height: 28px;
+    font-size: 1.1rem;
+  }
+
+  .chat-recipient-avatar {
+    width: 32px;
+    height: 32px;
+  }
+
+  .chat-recipient-name {
+    font-size: 0.9rem;
+  }
+
+  .chat-recipient-status {
+    font-size: 0.7rem;
+  }
+
+  .chat-job-context {
+    padding: 0.35rem 0.5rem;
+    font-size: 0.8rem;
+  }
+
+  .messages-container {
+    padding: 0.75rem;
+    gap: 0.5rem;
+  }
+
+  .message {
+    max-width: 92%;
+  }
+
+  .message-bubble {
+    padding: 0.5rem 0.7rem;
+    font-size: 0.85rem;
+    border-radius: 10px;
+  }
+
+  .message-time {
+    font-size: 0.65rem;
+  }
+
+  .message-input-area {
+    padding: 0.75rem;
+    gap: 0.35rem;
+  }
+
+  .message-input {
+    font-size: 16px;
+    padding: 0.6rem 0.85rem;
+    border-radius: 6px;
+  }
+
+  .send-btn {
+    width: 32px;
+    height: 32px;
+    font-size: 0.9rem;
+  }
+
+  .send-btn i {
+    font-size: 0.8rem;
   }
 }
 

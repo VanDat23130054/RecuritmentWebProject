@@ -229,3 +229,419 @@
 .cta-section .btn-outline-light {
   border-width: 2px;
 }
+/* Responsive - Tablet (1024px and below) */
+@media (max-width: 1024px) {
+  .about-hero {
+    padding: 3rem 1.5rem;
+  }
+
+  .about-hero h1 {
+    font-size: 1.75rem;
+  }
+
+  .about-hero p {
+    font-size: 1rem;
+  }
+
+  .about-section {
+    padding: 3rem 1.5rem;
+  }
+
+  .section-title {
+    font-size: 1.75rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .section-subtitle {
+    font-size: 1rem;
+    margin-bottom: 2rem;
+  }
+
+  .feature-card {
+    padding: 1.5rem;
+  }
+
+  .feature-icon {
+    width: 60px;
+    height: 60px;
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+  }
+
+  .feature-card h4 {
+    font-weight: 600;
+    margin-bottom: 0.75rem;
+  }
+
+  .feature-card p {
+    color: #4b5563;
+    margin-bottom: 0;
+    font-size: 0.95rem;
+  }
+
+  .stats-section {
+    padding: 2.5rem 1rem;
+  }
+
+  .stat-item {
+    padding: 1rem;
+  }
+
+  .stat-number {
+    font-size: 2.5rem;
+  }
+
+  .stat-label {
+    font-size: 1rem;
+  }
+
+  .team-card {
+    border-radius: 12px;
+  }
+
+  .team-avatar {
+    width: 100px;
+    height: 100px;
+    margin: 1.5rem auto 1rem;
+    font-size: 2.5rem;
+  }
+
+  .team-card .card-body {
+    padding: 1rem 1.5rem 1.5rem;
+  }
+
+  .team-card h5 {
+    margin-bottom: 0.35rem;
+    font-size: 1.05rem;
+  }
+
+  .team-card .role {
+    margin-bottom: 0.75rem;
+    font-size: 0.9rem;
+  }
+
+  .team-card p {
+    font-size: 0.9rem;
+  }
+
+  .tech-stack {
+    gap: 1rem;
+    margin-top: 1.5rem;
+  }
+
+  .tech-badge {
+    padding: 0.65rem 1.25rem;
+    font-size: 0.9rem;
+  }
+
+  .cta-section {
+    padding: 3rem 1rem;
+  }
+
+  .cta-section h2 {
+    font-size: 1.75rem;
+    margin-bottom: 1rem;
+  }
+
+  .cta-section p {
+    font-size: 1rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .cta-section .btn {
+    padding: 0.85rem 2rem;
+    font-size: 1rem;
+  }
+}
+
+/* Responsive - Mobile (767px and below) */
+@media (max-width: 767px) {
+  .about-hero {
+    padding: 2rem 1rem;
+    text-align: center;
+  }
+
+  .about-hero h1 {
+    font-size: 1.5rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .about-hero p {
+    font-size: 0.95rem;
+    line-height: 1.5;
+  }
+
+  .about-section {
+    padding: 1.5rem 1rem;
+  }
+
+  .section-title {
+    font-size: 1.35rem;
+    margin-bottom: 1.25rem;
+    text-align: center;
+  }
+
+  .section-subtitle {
+    font-size: 0.95rem;
+    margin-bottom: 1.25rem;
+    text-align: center;
+  }
+
+  .feature-card {
+    padding: 1.25rem 1rem;
+    border-radius: 12px;
+    margin-bottom: 1rem;
+  }
+
+  .feature-icon {
+    width: 55px;
+    height: 55px;
+    font-size: 1.4rem;
+    margin: 0 auto 1rem;
+  }
+
+  .feature-card h4 {
+    font-size: 1.05rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .feature-card p {
+    font-size: 0.9rem;
+  }
+
+  .stats-section {
+    padding: 2rem 1rem;
+  }
+
+  .stat-item {
+    padding: 1rem 0.5rem;
+  }
+
+  .stat-number {
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .stat-label {
+    font-size: 0.95rem;
+  }
+
+  .team-card {
+    margin-bottom: 1rem;
+  }
+
+  .team-avatar {
+    width: 90px;
+    height: 90px;
+    margin: 1.25rem auto 1rem;
+    font-size: 2.2rem;
+  }
+
+  .team-card .card-body {
+    padding: 1rem;
+    text-align: center;
+  }
+
+  .team-card h5 {
+    font-size: 1rem;
+    margin-bottom: 0.25rem;
+  }
+
+  .team-card .role {
+    font-size: 0.85rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .team-card p {
+    font-size: 0.85rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .team-social a {
+    width: 32px;
+    height: 32px;
+    margin: 0 0.35rem;
+  }
+
+  .tech-stack {
+    gap: 0.75rem;
+    justify-content: center;
+    margin-top: 1.25rem;
+  }
+
+  .tech-badge {
+    padding: 0.6rem 1.1rem;
+    font-size: 0.85rem;
+  }
+
+  .tech-badge i {
+    margin-right: 0.5rem;
+  }
+
+  .cta-section {
+    padding: 2.5rem 1rem;
+    text-align: center;
+  }
+
+  .cta-section h2 {
+    font-size: 1.5rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .cta-section p {
+    font-size: 0.95rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .cta-section .btn {
+    padding: 0.75rem 1.75rem;
+    font-size: 0.95rem;
+    width: 100%;
+    max-width: 100%;
+  }
+}
+
+/* Responsive - Small Phones (479px and below) */
+@media (max-width: 479px) {
+  .about-hero {
+    padding: 1.5rem 0.75rem;
+  }
+
+  .about-hero h1 {
+    font-size: 1.25rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .about-hero p {
+    font-size: 0.9rem;
+    line-height: 1.4;
+  }
+
+  .about-section {
+    padding: 1.25rem 0.75rem;
+  }
+
+  .section-title {
+    font-size: 1.2rem;
+    margin-bottom: 1rem;
+  }
+
+  .section-subtitle {
+    font-size: 0.9rem;
+    margin-bottom: 1rem;
+  }
+
+  .feature-card {
+    padding: 1rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .feature-icon {
+    width: 50px;
+    height: 50px;
+    font-size: 1.2rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .feature-card h4 {
+    font-size: 1rem;
+    margin-bottom: 0.35rem;
+  }
+
+  .feature-card p {
+    font-size: 0.85rem;
+  }
+
+  .stats-section {
+    padding: 1.5rem 0.75rem;
+  }
+
+  .stat-item {
+    padding: 0.75rem 0.5rem;
+  }
+
+  .stat-number {
+    font-size: 1.75rem;
+    margin-bottom: 0.35rem;
+  }
+
+  .stat-label {
+    font-size: 0.9rem;
+  }
+
+  .team-card {
+    margin-bottom: 0.75rem;
+  }
+
+  .team-avatar {
+    width: 80px;
+    height: 80px;
+    margin: 1rem auto 0.75rem;
+    font-size: 2rem;
+  }
+
+  .team-card .card-body {
+    padding: 0.85rem;
+  }
+
+  .team-card h5 {
+    font-size: 0.95rem;
+    margin-bottom: 0.2rem;
+  }
+
+  .team-card .role {
+    font-size: 0.8rem;
+    margin-bottom: 0.35rem;
+  }
+
+  .team-card p {
+    font-size: 0.8rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .team-social {
+    display: flex;
+    justify-content: center;
+    gap: 0.35rem;
+  }
+
+  .team-social a {
+    width: 28px;
+    height: 28px;
+    font-size: 0.75rem;
+  }
+
+  .tech-stack {
+    gap: 0.5rem;
+    margin-top: 1rem;
+  }
+
+  .tech-badge {
+    padding: 0.5rem 0.9rem;
+    font-size: 0.8rem;
+  }
+
+  .tech-badge i {
+    margin-right: 0.35rem;
+  }
+
+  .cta-section {
+    padding: 2rem 0.75rem;
+  }
+
+  .cta-section h2 {
+    font-size: 1.25rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .cta-section p {
+    font-size: 0.9rem;
+    margin-bottom: 1rem;
+  }
+
+  .cta-section .btn {
+    padding: 0.65rem 1.5rem;
+    font-size: 0.9rem;
+    width: 100%;
+  }
+}

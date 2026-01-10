@@ -23,6 +23,10 @@
     <body>
     <jsp:include page="../common/header.jsp" />
     <div class="dashboard-container">
+        <!-- Sidebar Toggle Button (Mobile/Tablet) -->
+        <button class="sidebar-toggle" aria-label="Toggle Sidebar">
+            <i class="fas fa-bars"></i>
+        </button>
         <jsp:include page="_sidebar.jsp" />
         <main class="dashboard-main">
             <div class="dashboard-header">
@@ -118,6 +122,7 @@
     <jsp:include page="../common/footer.jsp" />
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="${pageContext.request.contextPath}/js/alert.js"></script>
+    <script src="${pageContext.request.contextPath}/js/main.js"></script>
     </body>
     </html>
   </c:when>

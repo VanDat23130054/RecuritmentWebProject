@@ -17,6 +17,11 @@
     <jsp:include page="../common/header.jsp" />
 
     <div class="dashboard-container">
+        <!-- Sidebar Toggle Button (Mobile/Tablet) -->
+        <button class="sidebar-toggle" aria-label="Toggle Sidebar">
+            <i class="fas fa-bars"></i>
+        </button>
+
         <!-- Sidebar Navigation -->
         <aside class="dashboard-sidebar">
             <div class="sidebar-header">
@@ -578,5 +583,6 @@
             margin-left: 5px;
         }
     </style>
+    <script src="${pageContext.request.contextPath}/js/main.js"></script>
 </body>
 </html>

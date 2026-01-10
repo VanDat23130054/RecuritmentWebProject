@@ -1671,14 +1671,107 @@ footer {
 @media (max-width: 768px) {
   .header-content {
     flex-wrap: wrap;
+    position: relative;
   }
 
   .main-nav {
     display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: white;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    z-index: 1000;
+    border-radius: 0 0 8px 8px;
+  }
+
+  .main-nav.mobile-open {
+    display: block;
+  }
+
+  .main-nav ul {
+    flex-direction: column;
+    padding: 1rem 0;
+  }
+
+  .main-nav ul li {
+    width: 100%;
+  }
+
+  .main-nav ul li a {
+    display: block;
+    padding: 0.875rem 1.5rem;
+    border-bottom: 1px solid #f3f4f6;
+  }
+
+  .main-nav ul li:last-child a {
+    border-bottom: none;
+  }
+
+  .main-nav ul li a:hover {
+    background: #f9fafb;
+  }
+
+  .header-actions {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: white;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    z-index: 999;
+    padding: 1rem;
+    flex-direction: column;
+    gap: 0.75rem;
+    border-radius: 0 0 8px 8px;
+    margin-top: -1px;
+  }
+
+  .header-actions.mobile-open {
+    display: flex;
+  }
+
+  .header-actions .btn-login,
+  .header-actions .btn-register {
+    width: 100%;
+    text-align: center;
+    justify-content: center;
+  }
+
+  .header-actions .user-menu {
+    width: 100%;
+  }
+
+  .header-actions .user-profile-btn {
+    width: 100%;
+    justify-content: center;
   }
 
   .mobile-menu-toggle {
-    display: block;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    color: var(--gray-700);
+    cursor: pointer;
+    border-radius: 8px;
+    transition: background 0.2s, color 0.2s;
+  }
+
+  .mobile-menu-toggle:hover {
+    background: #f3f4f6;
+    color: var(--primary-blue);
+  }
+
+  .mobile-menu-toggle.active {
+    background: var(--primary-blue);
+    color: white;
   }
 
   .hero h1 {
