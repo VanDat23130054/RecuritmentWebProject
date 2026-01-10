@@ -18,6 +18,8 @@ public class RecentApplicationDTO implements Serializable {
     private Integer candidateId;
     private String candidateName;
     private String candidateEmail;
+    private Integer recruiterId;
+    private String companyName;
     private Timestamp appliedAt;
     private String status;
     private String fileUrl;

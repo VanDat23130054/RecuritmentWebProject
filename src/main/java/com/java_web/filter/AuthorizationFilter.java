@@ -49,6 +49,9 @@ public class AuthorizationFilter implements Filter {
         ROLE_ACCESS_MAP.put("/candidate/saved-jobs", Arrays.asList("Candidate"));
         ROLE_ACCESS_MAP.put("/candidate/uploadResume", Arrays.asList("Candidate"));
         ROLE_ACCESS_MAP.put("/candidate/resume", Arrays.asList("Candidate"));
+
+        // Chat routes - accessible to candidates and recruiters
+        ROLE_ACCESS_MAP.put("/chat", Arrays.asList("Candidate", "Recruiter", "EmployerAdmin"));
     }
 
     @Override
@@ -132,7 +135,8 @@ public class AuthorizationFilter implements Filter {
         return path.startsWith("/employer/")
                 || path.startsWith("/candidate/")
                 || path.startsWith("/admin/")
-                || path.startsWith("/profile/");
+                || path.startsWith("/profile/")
+                || path.startsWith("/chat");
     }
 
     /**

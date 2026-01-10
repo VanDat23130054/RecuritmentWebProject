@@ -11,9 +11,11 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import com.java_web.dao.CandidateDAO;
 import com.java_web.dao.RecruiterDAO;
 import com.java_web.dao.UserDAO;
 import com.java_web.model.auth.User;
+import com.java_web.model.candidate.Candidate;
 import com.java_web.model.employer.Recruiter;
 import com.java_web.utils.PasswordUtil;
 
@@ -22,11 +24,13 @@ public class LoginServlet extends HttpServlet {
 
     private UserDAO userDAO;
     private RecruiterDAO recruiterDAO;
+    private CandidateDAO candidateDAO;
 
     @Override
     public void init() throws ServletException {
         userDAO = new UserDAO();
         recruiterDAO = new RecruiterDAO();
+        candidateDAO = new CandidateDAO();
     }
 
     @Override
@@ -88,6 +92,11 @@ public class LoginServlet extends HttpServlet {
                     session.setAttribute("recruiterId", recruiter.getRecruiterId());
                     session.setAttribute("companyId", recruiter.getCompanyId());
                     session.setAttribute("recruiterTitle", recruiter.getTitle());
+                }
+            } else if ("Candidate".equals(user.getRole())) {
+                Candidate candidate = candidateDAO.getCandidateByUserId(user.getUserId());
+                if (candidate != null) {
+                    session.setAttribute("candidateId", candidate.getCandidateId());
                 }
             }
 

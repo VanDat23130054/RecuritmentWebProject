@@ -117,6 +117,18 @@
                                                         <button type="button" class="btn btn-outline-primary" onclick="viewApplication(${app.applicationId})" title="View Details">
                                                             <i class="fas fa-eye"></i>
                                                         </button>
+                                                        <c:if test="${not empty app.recruiterId}">
+                                                            <button type="button" class="btn btn-outline-info" 
+                                                                    onclick="startConversationAsCandidate(${app.candidateId}, ${app.recruiterId}, ${app.jobId})"
+                                                                    title="Message Recruiter">
+                                                                <i class="fas fa-comments"></i>
+                                                            </button>
+                                                        </c:if>
+                                                        <c:if test="${empty app.recruiterId}">
+                                                            <button type="button" class="btn btn-outline-secondary" disabled title="Recruiter not available">
+                                                                <i class="fas fa-comments"></i>
+                                                            </button>
+                                                        </c:if>
                                                         <c:if test="${not empty app.resumeId}">
                                                             <button type="button" class="btn btn-outline-success" onclick="downloadResume(${app.resumeId})" title="Download Resume">
                                                                 <i class="fas fa-download"></i>
@@ -342,6 +354,65 @@
             });
         });
     });
+
+    // Start conversation as candidate
+    function startConversationAsCandidate(candidateId, recruiterId, jobId) {
+        console.log('[DEBUG] startConversationAsCandidate called with:', {
+            candidateId: candidateId,
+            recruiterId: recruiterId,
+            jobId: jobId,
+            candidateIdType: typeof candidateId,
+            recruiterIdType: typeof recruiterId
+        });
+        
+        if (!candidateId || !recruiterId) {
+            console.error('[DEBUG] Missing required params - candidateId:', candidateId, 'recruiterId:', recruiterId);
+            alert('Missing candidate or recruiter information. candidateId=' + candidateId + ', recruiterId=' + recruiterId);
+            return;
+        }
+
+        // Use URLSearchParams instead of FormData for proper servlet parameter parsing
+        const params = new URLSearchParams();
+        params.append('candidateId', candidateId);
+        params.append('recruiterId', recruiterId);
+        if (jobId) {
+            params.append('jobId', jobId);
+        }
+        
+        console.log('[DEBUG] Sending to /chat/start with params:', params.toString());
+
+        fetch('${pageContext.request.contextPath}/chat/start', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            body: params
+        })
+        .then(response => {
+            console.log('[DEBUG] Response status:', response.status);
+            return response.json();
+        })
+        .then(data => {
+            console.log('[DEBUG] Response data:', data);
+            if (data.success) {
+                window.location.href = data.redirectUrl;
+            } else {
+                if (typeof showError === 'function') {
+                    showError(data.error || 'Failed to start conversation', 'Error');
+                } else {
+                    alert(data.error || 'Failed to start conversation');
+                }
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            if (typeof showError === 'function') {
+                showError('Failed to start conversation: ' + error.message, 'Error');
+            } else {
+                alert('Failed to start conversation: ' + error.message);
+            }
+        });
+    }
 </script>
 
 <style>

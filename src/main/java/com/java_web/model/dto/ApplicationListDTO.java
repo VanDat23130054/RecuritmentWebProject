@@ -18,6 +18,7 @@ public class ApplicationListDTO implements Serializable {
     private Integer candidateId;
     private String candidateName;
     private String candidateEmail;
+    private Integer recruiterId;
     private String companyName;
     private String coverLetter;
     private String source;

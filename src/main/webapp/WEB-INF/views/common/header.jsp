@@ -27,6 +27,12 @@
                 <c:choose>
                     <c:when test="${not empty sessionScope.user}">
                         <!-- Logged In User -->
+                        <div class="header-icons">
+                            <a href="${pageContext.request.contextPath}/chat" class="header-icon-btn" title="Messages">
+                                <i class="fa-solid fa-comments"></i>
+                                <span class="icon-label">Messages</span>
+                            </a>
+                        </div>
                         <div class="user-menu">
                             <button class="user-profile-btn">
                                 <i class="fa-solid fa-user-circle"></i>

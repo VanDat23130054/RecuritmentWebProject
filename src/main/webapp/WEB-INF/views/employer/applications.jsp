@@ -202,6 +202,11 @@
                                                                     title="View Details">
                                                                 <i class="fas fa-eye"></i>
                                                             </button>
+                                                            <button type="button" class="btn btn-outline-info" 
+                                                                    onclick="startConversation(${app.candidateId}, ${sessionScope.recruiterId}, ${app.jobId})"
+                                                                    title="Message Candidate">
+                                                                <i class="fas fa-comments"></i>
+                                                            </button>
                                                             <c:if test="${not empty app.resumeId}">
                                                                 <button type="button" class="btn btn-outline-success" 
                                                                         onclick="downloadResume(${app.resumeId})"
@@ -494,6 +499,47 @@
             });
             
             return false;
+        }
+
+        // Start conversation with candidate
+        function startConversation(candidateId, recruiterId, jobId) {
+            if (!candidateId || !recruiterId) {
+                alert('Missing candidate or recruiter information');
+                return;
+            }
+
+            const params = new URLSearchParams();
+            params.append('candidateId', candidateId);
+            params.append('recruiterId', recruiterId);
+            if (jobId) {
+                params.append('jobId', jobId);
+            }
+
+            fetch('${pageContext.request.contextPath}/chat/start', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: params
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    window.location.href = data.redirectUrl;
+                } else {
+                    if (typeof showError === 'function') {
+                        showError(data.error || 'Failed to start conversation', 'Error');
+                    } else {
+                        alert(data.error || 'Failed to start conversation');
+                    }
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                if (typeof showError === 'function') {
+                    showError('Failed to start conversation: ' + error.message, 'Error');
+                } else {
+                    alert('Failed to start conversation: ' + error.message);
+                }
+            });
         }
 
         // Check for success message in URL

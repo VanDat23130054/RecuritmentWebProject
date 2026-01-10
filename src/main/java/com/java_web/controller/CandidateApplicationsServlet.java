@@ -85,10 +85,23 @@ public class CandidateApplicationsServlet extends HttpServlet {
                 return;
             }
 
+            System.out.println("[DEBUG] Getting applications for candidateId: " + candidate.getCandidateId() + ", status: " + status + ", page: " + page + ", pageSize: " + pageSize);
+
             List<ApplicationListDTO> applications = applicationDAO.getApplicationsByCandidate(
                     candidate.getCandidateId(), status, page, pageSize);
 
+            System.out.println("[DEBUG] Found " + applications.size() + " applications");
+            for (ApplicationListDTO app : applications) {
+                System.out.println("[DEBUG] App: " + app.getApplicationId()
+                        + " - " + app.getJobTitle()
+                        + " - " + app.getStatus()
+                        + " - CandidateId: " + app.getCandidateId()
+                        + " - RecruiterId: " + app.getRecruiterId()
+                        + " - JobId: " + app.getJobId());
+            }
+
             int total = applicationDAO.getApplicationCountByCandidate(candidate.getCandidateId(), status);
+            System.out.println("[DEBUG] Total count from DB: " + total);
             int totalPages = (int) Math.ceil((double) total / pageSize);
             if (totalPages < 1) {
                 totalPages = 1;

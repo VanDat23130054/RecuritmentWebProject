@@ -6,7 +6,7 @@
   --primary-blue: #3b82f6;
   --primary-blue-dark: #2563eb;
   --primary-blue-light: #60a5fa;
-  
+
   --primary-red: #ef4444;
   --primary-green: #10b981;
   --primary-yellow: #f59e0b;
@@ -25,7 +25,7 @@
   --gray-200: #e5e7eb;
   --gray-100: #f3f4f6;
   --gray-50: #f9fafb;
-  
+
   --white: #ffffff;
   --black: #000000;
 
@@ -42,9 +42,12 @@
   /* Shadows */
   --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
   --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
-  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1),
+    0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1),
+    0 10px 10px -5px rgba(0, 0, 0, 0.04);
 
   /* Border Radius */
   --radius-sm: 0.25rem;
@@ -69,7 +72,8 @@ html {
 }
 
 body {
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    sans-serif;
   color: var(--gray-900);
   line-height: 1.6;
   background-color: var(--gray-50);
@@ -82,7 +86,9 @@ a {
   transition: var(--transition-fast);
 }
 
-a:hover:not(.btn):not(.btn-login):not(.btn-register):not(.btn-view):not(.btn-primary):not(.btn-secondary):not(.btn-outline-primary) {
+a:hover:not(.btn):not(.btn-login):not(.btn-register):not(.btn-view):not(
+    .btn-primary
+  ):not(.btn-secondary):not(.btn-outline-primary) {
   color: var(--primary-blue-dark);
 }
 
@@ -161,7 +167,7 @@ img {
 }
 
 .main-nav a::after {
-  content: '';
+  content: "";
   position: absolute;
   bottom: 0;
   left: 0;
@@ -183,6 +189,60 @@ img {
   display: flex;
   align-items: center;
   gap: 1rem;
+}
+
+/* Header Icons (Messages, Notifications) */
+.header-icons {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.header-icon-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  color: var(--gray-600);
+  text-decoration: none;
+  border-radius: var(--radius);
+  transition: all 0.2s;
+  position: relative;
+}
+
+.header-icon-btn:hover {
+  background: var(--gray-100);
+  color: var(--primary);
+}
+
+.header-icon-btn i {
+  font-size: 1.1rem;
+}
+
+.header-icon-btn .icon-label {
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.header-icon-btn .unread-dot {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  width: 8px;
+  height: 8px;
+  background: #ef4444;
+  border-radius: 50%;
+  border: 2px solid white;
+}
+
+@media (max-width: 768px) {
+  .header-icon-btn .icon-label {
+    display: none;
+  }
+
+  .header-icon-btn {
+    padding: 0.5rem;
+  }
 }
 
 .user-menu {
@@ -370,7 +430,11 @@ img {
    HERO SECTION
    ================================ */
 .hero {
-  background: linear-gradient(135deg, var(--primary-blue) 0%, var(--primary-blue-dark) 100%);
+  background: linear-gradient(
+    135deg,
+    var(--primary-blue) 0%,
+    var(--primary-blue-dark) 100%
+  );
   padding: 4rem 0;
   color: var(--white);
   text-align: center;
@@ -649,7 +713,7 @@ img {
 
 .auth-divider::before,
 .auth-divider::after {
-  content: '';
+  content: "";
   flex: 1;
   border-bottom: 1px solid var(--gray-300);
 }
@@ -1594,11 +1658,11 @@ footer {
   .job-listings-container {
     grid-template-columns: 1fr;
   }
-  
+
   .job-filters-sidebar {
     position: static;
   }
-  
+
   .job-detail-container {
     grid-template-columns: 1fr;
   }
@@ -1608,39 +1672,39 @@ footer {
   .header-content {
     flex-wrap: wrap;
   }
-  
+
   .main-nav {
     display: none;
   }
-  
+
   .mobile-menu-toggle {
     display: block;
   }
-  
+
   .hero h1 {
     font-size: 1.75rem;
   }
-  
+
   .search-form {
     flex-direction: column;
   }
-  
+
   .auth-box {
     padding: 1.5rem;
   }
-  
+
   .form-row {
     grid-template-columns: 1fr;
   }
-  
+
   .job-header-content {
     flex-direction: column;
   }
-  
+
   .job-actions {
     flex-direction: column;
   }
-  
+
   .jobs-grid,
   .employers-grid {
     grid-template-columns: 1fr;
@@ -1651,15 +1715,15 @@ footer {
   .container {
     padding: 0 1rem;
   }
-  
+
   .job-card {
     padding: 1rem;
   }
-  
+
   .job-detail-main {
     padding: 1.5rem;
   }
-  
+
   .auth-container {
     max-width: 100%;
   }
@@ -1680,17 +1744,41 @@ footer {
   text-align: center;
 }
 
-.mt-1 { margin-top: 0.5rem; }
-.mt-2 { margin-top: 1rem; }
-.mt-3 { margin-top: 1.5rem; }
-.mt-4 { margin-top: 2rem; }
+.mt-1 {
+  margin-top: 0.5rem;
+}
+.mt-2 {
+  margin-top: 1rem;
+}
+.mt-3 {
+  margin-top: 1.5rem;
+}
+.mt-4 {
+  margin-top: 2rem;
+}
 
-.mb-1 { margin-bottom: 0.5rem; }
-.mb-2 { margin-bottom: 1rem; }
-.mb-3 { margin-bottom: 1.5rem; }
-.mb-4 { margin-bottom: 2rem; }
+.mb-1 {
+  margin-bottom: 0.5rem;
+}
+.mb-2 {
+  margin-bottom: 1rem;
+}
+.mb-3 {
+  margin-bottom: 1.5rem;
+}
+.mb-4 {
+  margin-bottom: 2rem;
+}
 
-.p-1 { padding: 0.5rem; }
-.p-2 { padding: 1rem; }
-.p-3 { padding: 1.5rem; }
-.p-4 { padding: 2rem; }
+.p-1 {
+  padding: 0.5rem;
+}
+.p-2 {
+  padding: 1rem;
+}
+.p-3 {
+  padding: 1.5rem;
+}
+.p-4 {
+  padding: 2rem;
+}

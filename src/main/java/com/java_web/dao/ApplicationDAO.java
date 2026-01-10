@@ -257,6 +257,8 @@ public class ApplicationDAO {
         List<ApplicationListDTO> applications = new ArrayList<>();
         String sql = "{call candidate.sp_GetApplicationsByCandidate(?, ?, ?, ?)}";
 
+        System.out.println("[DAO DEBUG] getApplicationsByCandidate - candidateId: " + candidateId + ", status: " + status + ", page: " + pageNumber + ", pageSize: " + pageSize);
+
         try (Connection conn = DB.getConnection(); CallableStatement stmt = conn.prepareCall(sql)) {
             stmt.setInt(1, candidateId);
 
@@ -269,8 +271,12 @@ public class ApplicationDAO {
             stmt.setInt(3, pageNumber);
             stmt.setInt(4, pageSize);
 
+            System.out.println("[DAO DEBUG] Executing stored procedure...");
+
             try (ResultSet rs = stmt.executeQuery()) {
+                int rowCount = 0;
                 while (rs.next()) {
+                    rowCount++;
                     ApplicationListDTO app = new ApplicationListDTO();
                     app.setApplicationId(rs.getInt("ApplicationId"));
                     app.setJobId(rs.getInt("JobId"));
@@ -278,6 +284,12 @@ public class ApplicationDAO {
                     app.setCandidateId(rs.getInt("CandidateId"));
                     app.setCandidateName(rs.getString("CandidateName"));
                     app.setCandidateEmail(rs.getString("CandidateEmail"));
+
+                    // Debug: Check what RecruiterId the stored procedure returns
+                    Object recruiterIdObj = rs.getObject("RecruiterId");
+                    System.out.println("[DAO DEBUG] Row " + rowCount + " - RecruiterId raw value: " + recruiterIdObj + " (type: " + (recruiterIdObj != null ? recruiterIdObj.getClass().getName() : "null") + ")");
+                    app.setRecruiterId(recruiterIdObj != null ? ((Number) recruiterIdObj).intValue() : null);
+
                     app.setCompanyName(rs.getString("CompanyName"));
                     app.setCoverLetter(rs.getString("CoverLetter"));
                     app.setSource(rs.getString("Source"));
@@ -287,7 +299,9 @@ public class ApplicationDAO {
                     app.setFileUrl(rs.getString("FileUrl"));
                     app.setFileName(rs.getString("FileName"));
                     applications.add(app);
+                    System.out.println("[DAO DEBUG] Row " + rowCount + ": AppId=" + app.getApplicationId() + ", Job=" + app.getJobTitle() + ", RecruiterId=" + app.getRecruiterId());
                 }
+                System.out.println("[DAO DEBUG] Total rows fetched: " + rowCount);
             }
         }
         return applications;
