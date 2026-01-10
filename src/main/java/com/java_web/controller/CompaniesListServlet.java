@@ -3,6 +3,7 @@ package com.java_web.controller;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -10,6 +11,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.java_web.dao.CompanyDAO;
 import com.java_web.model.dto.CompanyListDTO;
 
@@ -40,6 +43,24 @@ public class CompaniesListServlet extends HttpServlet {
 
             // Get top employers (for now get a large number to show all)
             List<CompanyListDTO> companies = companyDAO.getTopEmployers(500);
+
+            // Parse JSON skills for each company
+            ObjectMapper mapper = new ObjectMapper();
+            for (CompanyListDTO company : companies) {
+                if (company.getTopSkills() != null && !company.getTopSkills().isEmpty()) {
+                    try {
+                        List<Map<String, Object>> skillsList = mapper.readValue(
+                                company.getTopSkills(),
+                                new TypeReference<List<Map<String, Object>>>() {
+                        }
+                        );
+                        company.setTopSkillsList(skillsList);
+                    } catch (Exception e) {
+                        // If JSON parsing fails, leave topSkillsList as null
+                        System.err.println("Error parsing skills JSON for company " + company.getCompanyId() + ": " + e.getMessage());
+                    }
+                }
+            }
 
             // Simple pagination in memory
             int totalCompanies = companies.size();

@@ -72,11 +72,11 @@
                                         </c:if>
                                     </div>
 
-                                    <c:if test="${not empty company.topSkills}">
+                                    <c:if test="${not empty company.topSkillsList}">
                                         <div class="skills-preview">
-                                            <c:forEach items="${company.topSkills.split(',')}" var="skill" varStatus="status">
+                                            <c:forEach items="${company.topSkillsList}" var="skill" varStatus="status">
                                                 <c:if test="${status.index < 3}">
-                                                    <span class="skill-tag">${fn:trim(skill)}</span>
+                                                    <span class="skill-tag">${skill.Name}</span>
                                                 </c:if>
                                             </c:forEach>
                                         </div>
