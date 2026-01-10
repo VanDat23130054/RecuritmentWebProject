@@ -116,8 +116,10 @@ public class AuthorizationFilter implements Filter {
                 || path.equals("/logout")
                 || path.equals("/jobs")
                 || path.equals("/job-detail")
+                || path.startsWith("/job/")
                 || path.equals("/companies")
                 || path.equals("/company-detail")
+                || path.startsWith("/company/")
                 || path.equals("/about")
                 || path.equals("/contact")
                 || path.startsWith("/api/public/");

@@ -101,4 +101,21 @@ public class SavedJobDAO {
         }
         return savedJobs;
     }
+
+    /**
+     * Get list of saved job IDs for a user
+     */
+    public List<Integer> getSavedJobIds(Integer userId) throws SQLException {
+        List<Integer> jobIds = new ArrayList<>();
+
+        if (userId == null) {
+            return jobIds;
+        }
+
+        List<SavedJob> savedJobs = getSavedJobsByUser(userId);
+        for (SavedJob savedJob : savedJobs) {
+            jobIds.add(savedJob.getJobId());
+        }
+        return jobIds;
+    }
 }

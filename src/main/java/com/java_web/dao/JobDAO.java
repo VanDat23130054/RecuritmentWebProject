@@ -230,7 +230,6 @@ public class JobDAO {
         return jobs;
     }
 
-
     /**
      * Get total job count for a recruiter with optional filters
      */
@@ -555,5 +554,38 @@ public class JobDAO {
             }
         }
         return metrics;
+    }
+
+    public List<JobSearchDTO> searchJobsByCompany(Integer companyId, int pageNumber, int pageSize)
+            throws SQLException {
+        List<JobSearchDTO> jobs = new ArrayList<>();
+        String sql = "{call employer.sp_GetCompanyJobs(?, ?, ?)}";
+
+        try (Connection conn = DB.getConnection(); CallableStatement stmt = conn.prepareCall(sql)) {
+
+            stmt.setInt(1, companyId);
+            stmt.setInt(2, pageNumber);
+            stmt.setInt(3, pageSize);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    JobSearchDTO job = new JobSearchDTO();
+                    job.setJobId(rs.getInt("JobID"));
+                    job.setTitle(rs.getString("Title"));
+                    job.setSlug(rs.getString("Slug"));
+                    job.setCompanyId(rs.getInt("CompanyID"));
+                    job.setCompanyName(rs.getString("CompanyName"));
+                    job.setLogoUrl(rs.getString("LogoUrl"));
+                    job.setCityName(rs.getString("CityName"));
+                    job.setSalaryMin(rs.getBigDecimal("SalaryMin"));
+                    job.setSalaryMax(rs.getBigDecimal("SalaryMax"));
+                    job.setCurrency(rs.getString("Currency"));
+                    job.setIsFeatured(rs.getBoolean("IsFeatured"));
+                    job.setSkills(rs.getString("Skills"));
+                    jobs.add(job);
+                }
+            }
+        }
+        return jobs;
     }
 }
