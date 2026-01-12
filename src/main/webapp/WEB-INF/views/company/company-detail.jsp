@@ -211,8 +211,8 @@
             formData.append('jobId', jobId);
             
             const url = isSaved ? 
-                contextPath + '/api/save-job?action=remove' :
-                contextPath + '/api/save-job?action=add';
+                contextPath + '/api/save-job?action=unsave' :
+                contextPath + '/api/save-job?action=save';
             
             fetch(url, {
                 method: 'POST',
