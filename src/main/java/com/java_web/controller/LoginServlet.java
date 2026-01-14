@@ -57,12 +57,14 @@ public class LoginServlet extends HttpServlet {
             User user = userDAO.findByEmail(email);
 
             if (user == null) {
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                 request.setAttribute("error", "Invalid email or password");
                 request.getRequestDispatcher("/WEB-INF/views/auth/login.jsp").forward(request, response);
                 return;
             }
 
             if (!user.isActive()) {
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                 request.setAttribute("error", "Your account has been deactivated");
                 request.getRequestDispatcher("/WEB-INF/views/auth/login.jsp").forward(request, response);
                 return;
@@ -70,6 +72,7 @@ public class LoginServlet extends HttpServlet {
 
             // Verify password
             if (!PasswordUtil.verifyPassword(password, user.getPasswordHash(), user.getSalt())) {
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                 request.setAttribute("error", "Invalid email or password");
                 request.getRequestDispatcher("/WEB-INF/views/auth/login.jsp").forward(request, response);
                 return;
