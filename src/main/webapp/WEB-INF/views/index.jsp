@@ -82,7 +82,7 @@
                             <img src="${job.logoUrl != null ? job.logoUrl : pageContext.request.contextPath.concat('/images/default-company.png')}" 
                                  alt="${job.companyName}" 
                                  class="company-logo">
-                            <a href="${pageContext.request.contextPath}/companies/${job.companyId}">
+                            <a href="${pageContext.request.contextPath}/company/${job.companyId}">
                                 ${job.companyName}
                             </a>
                         </div>
@@ -144,7 +144,7 @@
             <div class="employer-grid">
                 <c:forEach items="${topEmployers}" var="company">
                     <div class="employer-card">
-                        <a href="${pageContext.request.contextPath}/companies/${company.companyId}">
+                        <a href="${pageContext.request.contextPath}/company/${company.companyId}">
                             <img src="${company.logoUrl != null ? company.logoUrl : pageContext.request.contextPath.concat('/images/default-company.png')}" 
                                  alt="${company.name}">
                         </a>
@@ -161,13 +161,13 @@
                         
                         <div class="employer-meta">
                             <span class="location"><i class="fa-solid fa-building"></i> ${company.cityName}</span>
-                            <a href="${pageContext.request.contextPath}/companies/${company.companyId}" 
+                            <a href="${pageContext.request.contextPath}/company/${company.companyId}" 
                                class="job-count">
                                 <i class="fa-solid fa-briefcase"></i> ${company.activeJobCount} Jobs
                             </a>
                         </div>
                         
-                        <a href="${pageContext.request.contextPath}/companies/${company.companyId}" 
+                        <a href="${pageContext.request.contextPath}/company/${company.companyId}" 
                            class="btn-view">
                             View company <i class="fa-solid fa-arrow-right"></i>
                         </a>

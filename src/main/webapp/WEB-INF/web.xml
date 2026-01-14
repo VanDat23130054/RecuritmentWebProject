@@ -67,7 +67,7 @@
     </filter>
     
     <!-- Apply authentication filter to protected paths -->
-    <filter-mapping>
+    <!-- <filter-mapping>
         <filter-name>AuthenticationFilter</filter-name>
         <url-pattern>/candidate/profile/*</url-pattern>
     </filter-mapping>
@@ -89,7 +89,7 @@
         <filter-mapping>
         <filter-name>AuthenticationFilter</filter-name>
         <url-pattern>/jobs/*</url-pattern>
-    </filter-mapping>
+    </filter-mapping> -->
 
     <!-- ============================================ -->
     <!-- STATIC RESOURCES                             -->
