@@ -285,10 +285,9 @@ public class ApplicationDAO {
                     app.setCandidateName(rs.getString("CandidateName"));
                     app.setCandidateEmail(rs.getString("CandidateEmail"));
 
-                    // Debug: Check what RecruiterId the stored procedure returns
-//                    Object recruiterIdObj = rs.getObject("RecruiterId");
-//                    System.out.println("[DAO DEBUG] Row " + rowCount + " - RecruiterId raw value: " + recruiterIdObj + " (type: " + (recruiterIdObj != null ? recruiterIdObj.getClass().getName() : "null") + ")");
-//                    app.setRecruiterId(recruiterIdObj != null ? ((Number) recruiterIdObj).intValue() : null);
+                    // Set RecruiterId from the stored procedure result
+                    Object recruiterIdObj = rs.getObject("RecruiterId");
+                    app.setRecruiterId(recruiterIdObj != null ? ((Number) recruiterIdObj).intValue() : null);
 
                     app.setCompanyName(rs.getString("CompanyName"));
                     app.setCoverLetter(rs.getString("CoverLetter"));
@@ -299,9 +298,9 @@ public class ApplicationDAO {
                     app.setFileUrl(rs.getString("FileUrl"));
                     app.setFileName(rs.getString("FileName"));
                     applications.add(app);
-//                    System.out.println("[DAO DEBUG] Row " + rowCount + ": AppId=" + app.getApplicationId() + ", Job=" + app.getJobTitle() + ", RecruiterId=" + app.getRecruiterId());
+                    System.out.println("[DAO DEBUG] Row " + rowCount + ": AppId=" + app.getApplicationId() + ", Job=" + app.getJobTitle() + ", RecruiterId=" + app.getRecruiterId());
                 }
-//                System.out.println("[DAO DEBUG] Total rows fetched: " + rowCount);
+                System.out.println("[DAO DEBUG] Total rows fetched: " + rowCount);
             }
         }
         return applications;
